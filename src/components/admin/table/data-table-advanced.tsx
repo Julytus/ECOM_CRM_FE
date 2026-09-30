@@ -166,9 +166,10 @@ export function DataTableAdvanced<TData extends { id: number }>({
                 .getAllColumns()
                 .filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide())
                 .map((column) => {
-                  const header = typeof column.columnDef.header === "string"
-                    ? column.columnDef.header
-                    : column.id
+                  const header =
+                    typeof column.columnDef.header === "string"
+                      ? column.columnDef.header
+                      : column.id;
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
