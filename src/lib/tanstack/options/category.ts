@@ -64,8 +64,8 @@ export const upsertCategoryMutationOptions = (): UseMutationOptions<
   mutationFn: upsertCategory,
   meta: {
     invalidatesQuery: [["categories"]],
-    successMessage: "Lưu category thành công",
-    errorMessage: "Không thể lưu category"
+    successMessage: "Lưu Danh mục thành công",
+    errorMessage: "Không thể lưu Danh mục"
   }
 });
 
@@ -73,7 +73,7 @@ export const deleteCategoryMutationOptions = (): UseMutationOptions<string, Erro
   mutationFn: deleteCategory,
   meta: {
     invalidatesQuery: [["categories"]],
-    successMessage: "Xóa category thành công",
-    errorMessage: "Không thể xóa category"
+    successMessage: "Xóa Danh mục thành công",
+    errorMessage: "Không thể xóa Danh mục"
   }
 });

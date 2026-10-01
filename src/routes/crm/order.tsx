@@ -31,10 +31,10 @@ import {
 import { OrderDetailSheet } from "@/components/admin/order/order-sheet";
 
 export const Route = createFileRoute("/crm/order")({
-  component: AdminOrders
+  component: CrmOrders
 });
 
-function AdminOrders() {
+function CrmOrders() {
   const queryClient = useQueryClient();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -62,16 +62,7 @@ function AdminOrders() {
   const orders = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
   const total = useMemo(() => data?.pages[0]?.total ?? 0, [data]);
 
-  const updateOrderMutation = useMutation({
-    ...updateOrderMutationOptions(),
-    onSuccess: () => {
-      toast.success("Cập nhật trạng thái thành công");
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-    },
-    onError: () => {
-      toast.error("Không thể cập nhật đơn hàng");
-    }
-  });
+  const updateOrderMutation = useMutation(updateOrderMutationOptions());
 
   const columns = useMemo(
     () =>

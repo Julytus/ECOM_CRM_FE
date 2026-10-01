@@ -91,11 +91,10 @@ function AdminCategories() {
   const columns = React.useMemo(
     () =>
       createCategoryColumns({
-        onUpdate: handleUpdate,
         onDelete: handleDelete,
         onEdit: handleEdit
       }),
-    [handleUpdate, handleDelete]
+    [handleEdit, handleDelete]
   );
 
   return (

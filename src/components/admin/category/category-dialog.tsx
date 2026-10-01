@@ -37,9 +37,7 @@ export function CategoryFormDialog({
       onOpenChange={onOpenChange}
       title={category ? "Chỉnh sửa danh mục" : "Tạo mới danh mục"}
       description={
-        category
-          ? "Cập nhật thông tin danh mục sản phẩm"
-          : "Tạo danh mục mới để phân loại sản phẩm"
+        category ? "Cập nhật thông tin danh mục sản phẩm" : "Tạo danh mục mới để phân loại sản phẩm"
       }
       onSubmit={handleSubmit}
       submitLabel={category ? "Cập nhật" : "Tạo mới"}
@@ -66,7 +64,7 @@ export function CategoryFormDialog({
           onChange={(e) => setDescription(e.target.value)}
           className="min-h-[100px]"
         />
-        <p className="text-pretty text-muted-foreground text-xs">
+        <p className="text-muted-foreground text-xs text-pretty">
           Mô tả chi tiết giúp khách hàng hiểu rõ hơn về danh mục sản phẩm.
         </p>
       </div>

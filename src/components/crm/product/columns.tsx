@@ -49,7 +49,7 @@ export const createProductColumns = ({
   },
   {
     accessorKey: "image",
-    header: "Ảnh",
+    header: "",
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         {row.original.thumbnail || row.original.image ? (
