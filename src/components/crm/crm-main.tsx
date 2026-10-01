@@ -51,7 +51,7 @@ export function CrmMain({
                 <SidebarMenuButton isActive={isParentActive} asChild tooltip={item.title}>
                   <Link to={item.url}>
                     <item.icon />
-                    <span>{item.title}</span>
+                    <span className="font-bold"> {item.title}</span>
                   </Link>
                 </SidebarMenuButton>
 

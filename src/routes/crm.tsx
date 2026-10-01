@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AdminLoading } from "@/components/admin/admin-loading";
+import { ThemeToggle } from "@/components/layout/theme/theme-toggle";
 
 export const Route = createFileRoute("/crm")({
   component: CrmLayout
@@ -49,6 +50,7 @@ function CrmLayout() {
             </Breadcrumb>
           </div>
           <div className="ml-auto flex items-center gap-2 px-4">
+            <ThemeToggle />
             <CrmUser
               user={{
                 name: me?.name ?? "Unknown",
