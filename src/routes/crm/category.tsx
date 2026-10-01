@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { createCategoryColumns } from "@/components/crm/category/columns";
-import { CategoryFormSheet } from "@/components/admin/category/category-sheet";
+import { CategoryFormDialog } from "@/components/admin/category/category-dialog";
 
 import {
   createInfiniteCategoriesQueryOptions,
@@ -59,6 +59,11 @@ function AdminCategories() {
     upsertMutation.mutate(values as any);
   };
 
+  const handleEdit = (category: CategoryDTO) => {
+    setSelectedCategory(category);
+    setOpenForm(true);
+  };
+
   const handleDelete = (id: number) => {
     if (confirm("Bạn có chắc muốn xóa danh mục này?")) {
       deleteMutation.mutate(id);
@@ -87,7 +92,8 @@ function AdminCategories() {
     () =>
       createCategoryColumns({
         onUpdate: handleUpdate,
-        onDelete: handleDelete
+        onDelete: handleDelete,
+        onEdit: handleEdit
       }),
     [handleUpdate, handleDelete]
   );
@@ -113,7 +119,7 @@ function AdminCategories() {
         title="Quản lý danh mục"
         description="Tạo, chỉnh sửa và sắp xếp các danh mục sản phẩm"
       />
-      <CategoryFormSheet
+      <CategoryFormDialog
         open={openForm}
         category={selectedCategory}
         onOpenChange={setOpenForm}

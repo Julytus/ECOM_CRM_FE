@@ -1,10 +1,10 @@
-import * as React from "react"
-import { type ColumnDef } from "@tanstack/react-table"
-import { MoreVertical } from "lucide-react"
+import * as React from "react";
+import { type ColumnDef } from "@tanstack/react-table";
+import { MoreVertical } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
   DrawerClose,
@@ -13,42 +13,42 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
+  DrawerTrigger
+} from "@/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useIsMobile } from "@/hooks/use-mobile"
-import type { CategoryDTO } from "@/lib/types/category"
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
+import type { CategoryDTO } from "@/lib/types/category";
 
 // Category detail drawer
 function CategoryDetailDrawer({
   item,
-  onUpdate,
+  onUpdate
 }: {
-  item: CategoryDTO
-  onUpdate: (values: Partial<CategoryDTO>) => void
+  item: CategoryDTO;
+  onUpdate: (values: Partial<CategoryDTO>) => void;
 }) {
-  const isMobile = useIsMobile()
-  const [name, setName] = React.useState(item.name)
-  const [description, setDescription] = React.useState(item.description || "")
+  const isMobile = useIsMobile();
+  const [name, setName] = React.useState(item.name);
+  const [description, setDescription] = React.useState(item.description || "");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onUpdate({ id: item.id, name, description })
-  }
+    e.preventDefault();
+    onUpdate({ id: item.id, name, description });
+  };
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
-        <Button variant="link" className="w-fit px-0 text-left text-foreground">
+        <Button variant="link" className="text-foreground w-fit px-0 text-left">
           {item.name}
         </Button>
       </DrawerTrigger>
@@ -88,15 +88,17 @@ function CategoryDetailDrawer({
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }
 
 export const createCategoryColumns = ({
   onUpdate,
   onDelete,
+  onEdit
 }: {
-  onUpdate: (values: Partial<CategoryDTO>) => void
-  onDelete: (id: number) => void
+  onUpdate: (values: Partial<CategoryDTO>) => void;
+  onDelete: (id: number) => void;
+  onEdit: (category: CategoryDTO) => void;
 }): ColumnDef<CategoryDTO>[] => [
   {
     id: "select",
@@ -122,24 +124,7 @@ export const createCategoryColumns = ({
       </div>
     ),
     enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: "Tên danh mục",
-    cell: ({ row }) => {
-      return <CategoryDetailDrawer item={row.original} onUpdate={onUpdate} />
-    },
-    enableHiding: false,
-  },
-  {
-    accessorKey: "description",
-    header: "Mô tả",
-    cell: ({ row }) => (
-      <div className="max-w-md truncate text-muted-foreground">
-        {row.original.description || "—"}
-      </div>
-    ),
+    enableHiding: false
   },
   {
     accessorKey: "id",
@@ -148,7 +133,24 @@ export const createCategoryColumns = ({
       <Badge variant="outline" className="font-mono">
         {row.original.id}
       </Badge>
-    ),
+    )
+  },
+  {
+    accessorKey: "name",
+    header: "Tên danh mục",
+    cell: ({ row }) => {
+      return <CategoryDetailDrawer item={row.original} onUpdate={onUpdate} />;
+    },
+    enableHiding: false
+  },
+  {
+    accessorKey: "description",
+    header: "Mô tả",
+    cell: ({ row }) => (
+      <div className="text-muted-foreground max-w-md truncate">
+        {row.original.description || "—"}
+      </div>
+    )
   },
   {
     id: "actions",
@@ -157,7 +159,7 @@ export const createCategoryColumns = ({
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
+            className="text-muted-foreground data-[state=open]:bg-muted flex size-8"
             size="icon"
           >
             <MoreVertical className="size-4" />
@@ -165,17 +167,14 @@ export const createCategoryColumns = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onEdit(row.original)}>Chỉnh sửa</DropdownMenuItem>
           <DropdownMenuItem>Sao chép</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="text-destructive"
-            onClick={() => onDelete(row.original.id)}
-          >
+          <DropdownMenuItem className="text-destructive" onClick={() => onDelete(row.original.id)}>
             Xóa
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    ),
-  },
-]
+    )
+  }
+];
