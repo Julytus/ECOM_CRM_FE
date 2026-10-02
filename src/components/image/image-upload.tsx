@@ -1,7 +1,19 @@
 import { useState, useRef } from "react";
 import { Upload, X, Loader2, Image as ImageIcon, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentGroup,
+  AttachmentMedia,
+  AttachmentTitle
+} from "@/components/ui/attachment";
+import { Spinner } from "@/components/ui/spinner";
 import axiosInstance from "@/lib/axios/instance";
+import { cn } from "@/lib/utils";
 
 interface ImageUploaderProps {
   value: string;
@@ -30,13 +42,11 @@ export function ImageUploader({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       alert("Vui lòng chọn file ảnh");
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert("Kích thước file không được vượt quá 5MB");
       return;
@@ -82,7 +92,6 @@ export function ImageUploader({
     onChange("");
   };
 
-  // Compact version for variant images
   if (compact) {
     return (
       <div className={className}>
@@ -93,55 +102,40 @@ export function ImageUploader({
           onChange={handleFileSelect}
           className="hidden"
         />
-        <div className="group relative h-32 w-32 flex-shrink-0 overflow-hidden rounded-2xl border border-stone-100 bg-stone-50">
-          {value ? (
-            <>
-              <img src={value} className="h-full w-full object-cover" alt="Preview" />
-              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                <button
-                  type="button"
+        <div className="relative h-32 w-32 flex-shrink-0">
+          {value && !uploading ? (
+            <Attachment orientation="vertical" className="h-full w-full p-0">
+              <AttachmentMedia variant="image" className="h-full w-full rounded-lg">
+                <img src={value} className="h-full w-full object-cover" alt="Preview" />
+              </AttachmentMedia>
+              <AttachmentActions className="bg-background/80 absolute top-2 right-2 rounded-md p-1 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+                <AttachmentAction
+                  aria-label="Change image"
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-full bg-white p-1.5 text-stone-900 hover:bg-stone-100"
-                  disabled={uploading}
                 >
-                  {uploading ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <ImagePlus className="h-3.5 w-3.5" />
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRemove}
-                  className="rounded-full bg-white p-1.5 text-red-500 hover:bg-red-50"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-              {uploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                  <div className="text-center">
-                    <Loader2 className="mx-auto h-6 w-6 animate-spin text-white" />
-                    <p className="mt-1 text-xs text-white">{uploadProgress}%</p>
-                  </div>
+                  <ImagePlus className="h-4 w-4" />
+                </AttachmentAction>
+                <AttachmentAction aria-label="Remove image" onClick={handleRemove}>
+                  <X className="h-4 w-4" />
+                </AttachmentAction>
+              </AttachmentActions>
+            </Attachment>
+          ) : uploading ? (
+            <Attachment orientation="vertical" state="uploading" className="h-full w-full">
+              <AttachmentMedia className="h-full w-full">
+                <div className="flex flex-col items-center gap-2">
+                  <Spinner />
+                  <span className="text-muted-foreground text-xs">{uploadProgress}%</span>
                 </div>
-              )}
-            </>
+              </AttachmentMedia>
+            </Attachment>
           ) : (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex h-full w-full items-center justify-center text-stone-300 hover:text-amber-500"
+              className="border-input bg-background hover:border-primary hover:bg-accent flex h-full w-full items-center justify-center rounded-lg border-2 border-dashed transition-colors"
             >
-              {uploading ? (
-                <div className="text-center">
-                  <Loader2 className="mx-auto h-8 w-8 animate-spin" />
-                  <p className="mt-1 text-xs">{uploadProgress}%</p>
-                </div>
-              ) : (
-                <ImageIcon className="h-8 w-8" />
-              )}
+              <ImageIcon className="text-muted-foreground h-8 w-8" />
             </button>
           )}
         </div>
@@ -149,18 +143,16 @@ export function ImageUploader({
     );
   }
 
-  // Full version with URL input
   return (
     <div className={className}>
       {label && (
         <label className="mb-2 block text-sm font-medium">
           {label}
-          {required && <span className="ml-1 text-red-500">*</span>}
+          {required && <span className="text-destructive ml-1">*</span>}
         </label>
       )}
 
       <div className="space-y-3">
-        {/* Image Preview Area */}
         <input
           ref={fileInputRef}
           type="file"
@@ -169,79 +161,69 @@ export function ImageUploader({
           className="hidden"
         />
 
-        <div className="group relative aspect-square w-full max-w-xs overflow-hidden rounded-2xl border-2 border-dashed border-stone-200 bg-stone-50 transition-all hover:border-amber-300">
-          {value ? (
-            <>
+        {value && !uploading ? (
+          <Attachment orientation="vertical" className="max-w-xs">
+            <AttachmentMedia variant="image" className="aspect-square">
               <img src={value} className="h-full w-full object-cover" alt="Preview" />
-              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="rounded-full bg-white p-2 text-stone-900 hover:bg-stone-100"
-                >
-                  {uploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <ImagePlus className="h-4 w-4" />
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleRemove}
-                  className="rounded-full bg-white p-2 text-red-500 hover:bg-red-50"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              {uploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                  <div className="text-center">
-                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-white" />
-                    <p className="mt-2 text-sm font-medium text-white">{uploadProgress}%</p>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex h-full w-full flex-col items-center justify-center text-stone-300 hover:text-amber-500"
-            >
-              {uploading ? (
-                <div className="text-center">
-                  <Loader2 className="mx-auto h-12 w-12 animate-spin" />
-                  <p className="mt-2 text-sm font-medium">{uploadProgress}%</p>
-                </div>
-              ) : (
-                <>
-                  <ImagePlus className="h-12 w-12" />
-                  <p className="mt-2 text-sm font-medium">Click để upload</p>
-                </>
-              )}
-            </button>
-          )}
-        </div>
+            </AttachmentMedia>
+            <AttachmentContent>
+              <AttachmentTitle>Hình ảnh & Truyền thống</AttachmentTitle>
+              <AttachmentDescription>Thumbnail và gallery</AttachmentDescription>
+            </AttachmentContent>
+            <AttachmentActions>
+              <AttachmentAction
+                aria-label="Change image"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImagePlus className="h-4 w-4" />
+              </AttachmentAction>
+              <AttachmentAction aria-label="Remove image" onClick={handleRemove}>
+                <X className="h-4 w-4" />
+              </AttachmentAction>
+            </AttachmentActions>
+          </Attachment>
+        ) : uploading ? (
+          <Attachment state="uploading" className="max-w-xs">
+            <AttachmentMedia>
+              <Spinner />
+            </AttachmentMedia>
+            <AttachmentContent>
+              <AttachmentTitle>Đang upload...</AttachmentTitle>
+              <AttachmentDescription>Uploading · {uploadProgress}%</AttachmentDescription>
+            </AttachmentContent>
+            <AttachmentActions>
+              <AttachmentAction aria-label="Cancel upload" onClick={handleRemove}>
+                <X className="h-4 w-4" />
+              </AttachmentAction>
+            </AttachmentActions>
+          </Attachment>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="border-input bg-background hover:border-primary hover:bg-accent flex aspect-square w-full max-w-xs flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors"
+          >
+            <ImagePlus className="text-muted-foreground h-12 w-12" />
+            <p className="text-muted-foreground mt-2 text-sm font-medium">Click để upload</p>
+          </button>
+        )}
 
-        {/* URL Input */}
         <div className="flex gap-2">
           <input
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder="Hoặc nhập URL trực tiếp"
-            className={`flex-1 rounded-xl border-2 bg-white px-4 py-2 transition-colors focus:outline-none ${
-              error ? "border-red-500" : "border-stone-200 focus:border-amber-400"
-            }`}
+            className={cn(
+              "bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex-1 rounded-md border px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              error ? "border-destructive" : "border-input"
+            )}
           />
           <Button
             type="button"
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="h-10"
           >
             {uploading ? (
               <>
@@ -257,7 +239,7 @@ export function ImageUploader({
           </Button>
         </div>
 
-        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {error && <p className="text-destructive text-sm">{error}</p>}
       </div>
     </div>
   );
@@ -333,6 +315,19 @@ export function MultiImageUploader({
     onChange(values.filter((_, i) => i !== index));
   };
 
+  const getFileName = (url: string) => {
+    try {
+      const fileName = url.split("/").pop() || "image";
+      return fileName.length > 20 ? fileName.substring(0, 20) + "..." : fileName;
+    } catch {
+      return "image";
+    }
+  };
+
+  const getFileSize = (index: number) => {
+    return `${index + 1}/${values.length}`;
+  };
+
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
@@ -352,7 +347,6 @@ export function MultiImageUploader({
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading || values.length >= maxImages}
-            className="rounded-xl"
           >
             {uploading ? (
               <>
@@ -369,55 +363,78 @@ export function MultiImageUploader({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 md:grid-cols-4">
-        {values.map((img, idx) => (
-          <div
-            key={idx}
-            className="group relative aspect-video overflow-hidden rounded-2xl border border-stone-100 bg-stone-50 shadow-sm"
-          >
-            <img src={img} alt={`Gallery ${idx + 1}`} className="h-full w-full object-cover" />
-            <button
-              type="button"
-              onClick={() => handleRemove(idx)}
-              className="absolute top-2 right-2 rounded-full bg-white/90 p-1.5 text-red-500 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 hover:bg-white"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-            <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/50 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
-              <p className="text-xs text-white">Ảnh {idx + 1}</p>
+      {values.length > 0 ? (
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+            {values.map((img, idx) => (
+              <Attachment key={idx} orientation="vertical" className="w-full">
+                <AttachmentMedia variant="image" className="aspect-video w-full">
+                  <img
+                    src={img}
+                    alt={`Gallery ${idx + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                </AttachmentMedia>
+                <AttachmentContent>
+                  <AttachmentTitle>{getFileName(img)}</AttachmentTitle>
+                  <AttachmentDescription>{getFileSize(idx)}</AttachmentDescription>
+                </AttachmentContent>
+                <AttachmentActions>
+                  <AttachmentAction
+                    aria-label={`Remove ${getFileName(img)}`}
+                    onClick={() => handleRemove(idx)}
+                  >
+                    <X className="h-4 w-4" />
+                  </AttachmentAction>
+                </AttachmentActions>
+              </Attachment>
+            ))}
+          </div>
+
+          {uploading && (
+            <Attachment state="uploading" className="w-full">
+              <AttachmentMedia>
+                <Spinner />
+              </AttachmentMedia>
+              <AttachmentContent>
+                <AttachmentTitle>Đang upload...</AttachmentTitle>
+                <AttachmentDescription>
+                  Uploading · {uploadProgress.current}/{uploadProgress.total}
+                </AttachmentDescription>
+              </AttachmentContent>
+              <AttachmentActions>
+                <AttachmentAction aria-label="Cancel upload">
+                  <X className="h-4 w-4" />
+                </AttachmentAction>
+              </AttachmentActions>
+            </Attachment>
+          )}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="border-input bg-background hover:border-primary hover:bg-accent flex w-full flex-col items-center justify-center rounded-lg border-2 border-dashed py-12 transition-colors"
+        >
+          {uploading ? (
+            <div className="text-center">
+              <Spinner className="mx-auto" />
+              <p className="text-muted-foreground mt-2 text-sm">
+                {uploadProgress.current}/{uploadProgress.total}
+              </p>
             </div>
-          </div>
-        ))}
-
-        {/* Add button */}
-        {values.length < maxImages && (
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="flex aspect-video items-center justify-center rounded-2xl border-2 border-dashed border-stone-200 bg-stone-50/50 text-stone-300 transition-all hover:border-amber-300 hover:bg-stone-50 hover:text-amber-500"
-          >
-            {uploading ? (
-              <div className="text-center">
-                <Loader2 className="mx-auto h-5 w-5 animate-spin" />
-                <p className="mt-1 text-xs">
-                  {uploadProgress.current}/{uploadProgress.total}
-                </p>
-              </div>
-            ) : (
-              <ImagePlus className="h-8 w-8" />
-            )}
-          </button>
-        )}
-
-        {values.length === 0 && (
-          <div className="col-span-3 rounded-2xl border-2 border-dashed border-stone-200 bg-stone-50/50 py-12 text-center text-stone-400 md:col-span-4">
-            <ImageIcon className="mx-auto mb-3 h-12 w-12 opacity-50" />
-            <p className="text-sm font-medium">Chưa có hình ảnh</p>
-            <p className="mt-1 text-xs">Click nút Upload để thêm ảnh</p>
-          </div>
-        )}
-      </div>
+          ) : (
+            <>
+              <ImageIcon className="text-muted-foreground h-12 w-12 opacity-50" />
+              <p className="text-foreground mt-3 text-sm font-medium">Chưa có hình ảnh</p>
+              <p className="text-muted-foreground mt-1 text-xs">
+                Click để upload hoặc kéo thả ảnh vào đây
+              </p>
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 }

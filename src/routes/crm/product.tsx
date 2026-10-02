@@ -15,7 +15,7 @@ import {
   deleteProductsMutationOptions
 } from "@/lib/tanstack/options/product";
 import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/admin/product/atoms";
-import { ProductSheet } from "@/components/admin/product/product-sheet";
+import { ProductDialog } from "@/components/admin/product/product-dialog";
 
 export const Route = createFileRoute("/crm/product")({
   component: AdminProducts
@@ -100,7 +100,7 @@ function AdminProducts() {
         title="Quản lý sản phẩm"
         description="Quản lý, tạo mới, chỉnh sửa sản phẩm"
       />
-      <ProductSheet />
+      <ProductDialog />
     </>
   );
 }
