@@ -33,7 +33,7 @@ export function ProductDialog() {
           <div className="flex items-center gap-2">
             {id ? <span className="text-[10px] font-medium text-stone-400">ID: #{id}</span> : null}
           </div>
-          <DialogTitle className="font-serif text-2xl font-normal tracking-tight">
+          <DialogTitle className="font-serif text-2xl font-bold tracking-tight">
             {id ? "Chỉnh sửa sản phẩm" : "Tạo sản phẩm mới"}
           </DialogTitle>
           <DialogDescription className="text-xs sm:text-sm">

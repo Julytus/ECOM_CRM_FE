@@ -332,7 +332,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
           <Package className="text-primary h-5 w-5" />
         </div>
         <div>
-          <h3 className="font-semibold">Thông tin cơ bản</h3>
+          <h3 className="font-bold">Thông tin cơ bản</h3>
           <p className="text-muted-foreground text-xs">Tên, danh mục và trạng thái</p>
         </div>
       </div>
@@ -368,7 +368,6 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
               <field.Textarea
                 label="Mô tả chi tiết"
                 placeholder="Mô tả tính năng, chất liệu nghệ thuật..."
-                className="min-h-[100px]"
               />
             )}
           </form.AppField>
@@ -395,7 +394,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
           <ImageIcon className="text-primary h-5 w-5" />
         </div>
         <div>
-          <h3 className="font-semibold">Hình ảnh & Truyền thông</h3>
+          <h3 className="font-bold">Hình ảnh & Truyền thông</h3>
           <p className="text-muted-foreground text-xs">Thumbnail và gallery</p>
         </div>
       </div>
@@ -442,7 +441,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
           <Layers className="text-primary h-5 w-5" />
         </div>
         <div>
-          <h3 className="font-semibold">Thuộc tính sản phẩm</h3>
+          <h3 className="font-bold">Thuộc tính sản phẩm</h3>
           <p className="text-muted-foreground text-xs">Định nghĩa màu sắc, kích thước, chất liệu</p>
         </div>
       </div>
@@ -560,8 +559,12 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
   /* Render Step 4: Variants Table */
   const renderVariants = () => {
     const attributes = form.getFieldValue("attributes") || [];
-    const variants = form.getFieldValue("variants") || [];
-
+    const variants: ProductVariant[] = (form.getFieldValue("variants") || []).map((variant) => ({
+      ...variant,
+      price: Number(variant.price),
+      originalPrice: Number(variant.originalPrice),
+      stock: Number(variant.stock)
+    }));
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3 border-b pb-4">
@@ -569,7 +572,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
             <Settings2 className="text-primary h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-semibold">Quản lý Biến thể ({variants.length})</h3>
+            <h3 className="font-bold">Quản lý Biến thể ({variants.length})</h3>
             <p className="text-muted-foreground text-xs">
               Chỉnh sửa giá, kho, SKU cho từng biến thể
             </p>
