@@ -223,7 +223,7 @@ function PriceInput({
   onChange: (val: number) => void;
 }) {
   return (
-    <div className="flex-1 space-y-2">
+    <div className="w-full max-w-[120px] space-y-2">
       <Label className="text-muted-foreground ml-1 text-[10px] font-medium tracking-widest uppercase">
         {label}
       </Label>

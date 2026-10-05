@@ -94,7 +94,7 @@ export function ImageUploader({
 
   if (compact) {
     return (
-      <div className={className}>
+      <div className={cn("h-full w-full", className)}>
         <input
           ref={fileInputRef}
           type="file"
@@ -102,47 +102,59 @@ export function ImageUploader({
           onChange={handleFileSelect}
           className="hidden"
         />
-        <div className="relative h-32 w-32 flex-shrink-0">
+
+        <div className="group relative h-full w-full">
           {value && !uploading ? (
-            <Attachment orientation="vertical" className="h-full w-full p-0">
-              <AttachmentMedia variant="image" className="h-full w-full rounded-lg">
-                <img src={value} className="h-full w-full object-cover" alt="Preview" />
-              </AttachmentMedia>
-              <AttachmentActions className="bg-background/80 absolute top-2 right-2 rounded-md p-1 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-                <AttachmentAction
+            <div className="relative h-full w-full overflow-hidden rounded-md border">
+              <img src={value} alt="Preview" className="block h-full w-full object-cover" />
+
+              {/* Overlay actions */}
+              <div className="absolute inset-0 flex items-start justify-end gap-1 bg-black/10 p-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <button
+                  type="button"
                   aria-label="Change image"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  className="bg-background/90 hover:bg-background flex h-6 w-6 items-center justify-center rounded shadow-sm"
                 >
-                  <ImagePlus className="h-4 w-4" />
-                </AttachmentAction>
-                <AttachmentAction aria-label="Remove image" onClick={handleRemove}>
-                  <X className="h-4 w-4" />
-                </AttachmentAction>
-              </AttachmentActions>
-            </Attachment>
+                  <ImagePlus className="h-3 w-3" />
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Remove image"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemove();
+                  }}
+                  className="bg-background/90 hover:bg-background flex h-6 w-6 items-center justify-center rounded shadow-sm"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
           ) : uploading ? (
-            <Attachment orientation="vertical" state="uploading" className="h-full w-full">
-              <AttachmentMedia className="h-full w-full">
-                <div className="flex flex-col items-center gap-2">
-                  <Spinner />
-                  <span className="text-muted-foreground text-xs">{uploadProgress}%</span>
-                </div>
-              </AttachmentMedia>
-            </Attachment>
+            <div className="flex h-full w-full items-center justify-center rounded-md border">
+              <div className="flex flex-col items-center gap-1">
+                <Spinner />
+                <span className="text-muted-foreground text-[10px]">{uploadProgress}%</span>
+              </div>
+            </div>
           ) : (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="border-input bg-background hover:border-primary hover:bg-accent flex h-full w-full items-center justify-center rounded-lg border-2 border-dashed transition-colors"
+              className="border-input bg-background hover:border-primary hover:bg-accent flex h-full w-full items-center justify-center rounded-md border-2 border-dashed transition-colors"
             >
-              <ImageIcon className="text-muted-foreground h-8 w-8" />
+              <ImageIcon className="text-muted-foreground h-6 w-6" />
             </button>
           )}
         </div>
       </div>
     );
   }
-
   return (
     <div className={className}>
       {label && (

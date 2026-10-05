@@ -605,9 +605,9 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
   };
 
   return (
-    <div className="flex gap-6">
+    <div className="flex min-w-0 flex-col gap-6 lg:flex-row">
       {/* Left: Stepper */}
-      <div className="w-52 flex-shrink-0">
+      <div className="w-full shrink-0 lg:w-52">
         <VerticalStepper
           steps={steps}
           currentStep={currentStep}
@@ -629,12 +629,12 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
           {currentStep === 3 && renderAttributes()}
           {currentStep === 4 && renderVariants()}
 
-          {/* Submit Buttons */}
-          <div className="mt-6 flex items-center justify-end gap-3 border-t pt-6">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="mt-6 flex flex-col-reverse items-stretch gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-end">
+            <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto">
               Hủy bỏ
             </Button>
-            <Button type="submit" disabled={form.state.isSubmitting}>
+
+            <Button type="submit" disabled={form.state.isSubmitting} className="w-full sm:w-auto">
               {form.state.isSubmitting ? "Đang xử lý..." : "Lưu sản phẩm"}
             </Button>
           </div>

@@ -90,7 +90,14 @@ export function DataTable<TData>({
                     className="border-muted/20 hover:bg-muted/10 data-[state=selected]:bg-primary/5 border-b transition-colors last:border-none"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-4">
+                      <TableCell
+                        key={cell.id}
+                        className="whitespace-nowrap"
+                        style={{
+                          width: cell.column.getSize(),
+                          minWidth: cell.column.getSize()
+                        }}
+                      >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}

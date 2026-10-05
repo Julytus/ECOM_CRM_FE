@@ -28,22 +28,22 @@ export function ProductDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="flex max-h-[95vh] w-[90vw] max-w-[1600px] flex-col gap-0 overflow-hidden p-0 sm:max-w-[1600px]">
-        <DialogHeader className="flex-shrink-0 space-y-2 px-6 pt-6 pb-4">
+      <DialogContent className="flex h-[100dvh] max-h-[100dvh] w-full max-w-none flex-col gap-0 overflow-hidden rounded-none p-0 sm:h-auto sm:max-h-[95vh] sm:w-[95vw] sm:max-w-[1400px] sm:rounded-lg">
+        <DialogHeader className="flex-shrink-0 space-y-1 px-4 pt-5 pb-4 sm:px-6 sm:pt-6">
           <div className="flex items-center gap-2">
             {id ? <span className="text-[10px] font-medium text-stone-400">ID: #{id}</span> : null}
           </div>
           <DialogTitle className="font-serif text-2xl font-normal tracking-tight">
             {id ? "Chỉnh sửa sản phẩm" : "Tạo sản phẩm mới"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs sm:text-sm">
             {id
               ? "Cập nhật thông tin cho sản phẩm đang chọn."
               : "Nhập thông tin để tạo sản phẩm mới."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-6 pb-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 sm:px-6">
           {isLoading ? (
             <div className="flex h-[400px] w-full flex-col items-center justify-center gap-4 text-stone-400">
               <div className="relative">
