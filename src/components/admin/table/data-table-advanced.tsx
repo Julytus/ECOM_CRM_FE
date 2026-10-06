@@ -224,14 +224,7 @@ export function DataTableAdvanced<TData extends { id: number }>({
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="whitespace-nowrap"
-                      style={{
-                        width: cell.column.getSize(),
-                        minWidth: cell.column.getSize()
-                      }}
-                    >
+                    <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

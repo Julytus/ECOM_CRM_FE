@@ -559,12 +559,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
   /* Render Step 4: Variants Table */
   const renderVariants = () => {
     const attributes = form.getFieldValue("attributes") || [];
-    const variants: ProductVariant[] = (form.getFieldValue("variants") || []).map((variant) => ({
-      ...variant,
-      price: Number(variant.price),
-      originalPrice: Number(variant.originalPrice),
-      stock: Number(variant.stock)
-    }));
+
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3 border-b pb-4">
@@ -572,31 +567,46 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
             <Settings2 className="text-primary h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-bold">Quản lý Biến thể ({variants.length})</h3>
+            <h3 className="font-bold">Quản lý Biến thể</h3>
             <p className="text-muted-foreground text-xs">
               Chỉnh sửa giá, kho, SKU cho từng biến thể
             </p>
           </div>
         </div>
 
-        {variants.length === 0 ? (
-          <div className="bg-muted/20 rounded-lg border-2 border-dashed p-12 text-center">
-            <Settings2 className="text-muted-foreground/50 mx-auto mb-4 h-12 w-12" />
-            <p className="mb-2 font-medium">Chưa có biến thể nào</p>
-            <p className="text-muted-foreground mb-4 text-sm">
-              Quay lại bước 3 để định nghĩa thuộc tính và tạo biến thể
-            </p>
-            <Button type="button" variant="outline" onClick={() => setCurrentStep(3)}>
-              ← Quay lại bước 3
-            </Button>
-          </div>
-        ) : (
-          <ProductVariantTable
-            variants={variants}
-            attributes={attributes.map((a) => ({ name: a.name, fieldName: a.fieldName }))}
-            onVariantsChange={(newVariants) => form.setFieldValue("variants", newVariants)}
-          />
-        )}
+        {/* Subscribe trực tiếp vào field variants để table re-render ngay sau khi edit. */}
+        <form.AppField name="variants">
+          {(field) => {
+            const variants: ProductVariant[] = (field.state.value || []).map((variant) => ({
+              ...variant,
+              price: Number(variant.price),
+              originalPrice: Number(variant.originalPrice),
+              stock: Number(variant.stock)
+            }));
+
+            return variants.length === 0 ? (
+              <div className="bg-muted/20 rounded-lg border-2 border-dashed p-12 text-center">
+                <Settings2 className="text-muted-foreground/50 mx-auto mb-4 h-12 w-12" />
+                <p className="mb-2 font-medium">Chưa có biến thể nào</p>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Quay lại bước 3 để định nghĩa thuộc tính và tạo biến thể
+                </p>
+                <Button type="button" variant="outline" onClick={() => setCurrentStep(3)}>
+                  ← Quay lại bước 3
+                </Button>
+              </div>
+            ) : (
+              <ProductVariantTable
+                variants={variants}
+                attributes={attributes.map((a) => ({
+                  name: a.name,
+                  fieldName: a.fieldName
+                }))}
+                onVariantsChange={(newVariants) => field.handleChange(newVariants)}
+              />
+            );
+          }}
+        </form.AppField>
 
         <div className="flex justify-between pt-4">
           <Button type="button" variant="outline" onClick={() => setCurrentStep(3)}>
