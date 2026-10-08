@@ -10,17 +10,17 @@ import axios from "axios";
 import { useAuthStore } from "@/lib/stores/auth";
 
 export const login = async (data: LoginApiRequest) => {
-  const response = await axiosInstance.post<LoginApiResponse>("/authenticate/login", data);
+  const response = await axiosInstance.post<LoginApiResponse>("/user/authenticate", data);
   return response.data.result;
 };
 
 export const signup = async (data: SignupApiRequest) => {
-  const response = await axiosInstance.post<SignupApiResponse>("/authenticate/register", data);
+  const response = await axiosInstance.post<SignupApiResponse>("/user/create", data);
   return response.data.result;
 };
 
 export const getMe = async () => {
-  const response = await axiosInstance.get<MeApiResponse>("/authenticate/me");
+  const response = await axiosInstance.get<MeApiResponse>("/user/info");
   return response.data.result;
 };
 

@@ -37,15 +37,55 @@ export type SignupApiResponse = Prettify<ApiResponse<MessageResponse>>;
 
 export interface MeDTO {
   id: number;
+
+  isOperator: number | null;
+
+  branchId: number | null;
+  branchName: string | null;
+
+  roleId: number | null;
+  roleName: string | null;
+
   name: string;
-  phone: string;
+  alias: string | null;
+
+  avatar: string | null;
+
+  phone: string | null;
+  phoneVerified: number | null;
+
+  email: string | null;
+
+  facebookId: string | null;
+  gplusId: string | null;
+
   password: string | null;
   plainPassword: string | null;
-  avatar: string | null;
-  email: string;
-  role: "user" | "admin";
-  active: boolean;
-  username: string;
+  hasPassword: number | null;
+
+  regisDate: string | null;
+
+  newPassword: string | null;
+  retypeNewPassword: string | null;
+
+  active: number | null;
+
+  firstTime: number | null;
+  time: number | null;
+
+  token: string | null;
+
+  cityName: string | null;
+  subdistrictName: string | null;
+  gender: number | null;
+
+  otp: string | null;
+  idToken: string | null;
+
+  deviceId: string | null;
+  actionType: string | null;
+
+  type: "login" | "register" | string | null;
 }
 
 export type MeApiResponse = Prettify<ApiResponse<MeDTO>>;

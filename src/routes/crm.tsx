@@ -57,7 +57,7 @@ function CrmLayout() {
                 email: me?.email ?? "unknown@example.com",
                 avatar:
                   me?.avatar ?? `https://ui-avatars.com/api/?name=${me?.name}&background=random`,
-                role: me?.role ?? "Unknown"
+                roleName: me?.roleName ?? "Unknown"
               }}
             />
           </div>

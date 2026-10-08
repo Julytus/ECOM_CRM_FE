@@ -20,7 +20,7 @@ function AdminLayout() {
     return <AdminLoading />;
   }
 
-  if (!me || me.role !== "admin") {
+  if (!me || me.isOperator !== 1) {
     return <AdminAccessDenied />;
   }
 

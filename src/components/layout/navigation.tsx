@@ -61,8 +61,10 @@ export function Navigation() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative" size="icon">
                   <Avatar className="h-5 w-5">
-                    <AvatarImage src={me.avatar || ""} alt={me.username} />
-                    <AvatarFallback>{me.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    <AvatarImage src={me.avatar || ""} alt={me.name} />
+                    <AvatarFallback>
+                      {me?.name?.slice(0, 2).toUpperCase() ?? "U"}
+                    </AvatarFallback>{" "}
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -74,7 +76,7 @@ export function Navigation() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {me.role === "admin" && (
+                {me.isOperator === 1 && (
                   <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Bảng điều khiển</span>
