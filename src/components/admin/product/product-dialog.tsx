@@ -17,7 +17,7 @@ import { productSheetOpenAtom, selectedProductIdAtom } from "./atoms";
 import { createProductDetailsQueryOptions } from "@/lib/tanstack/options/product";
 import { ProductForm } from "@/components/admin/product/product-form";
 
-export function ProductDialog() {
+export function ProductDialog({ onSaved }: { onSaved?: () => void }) {
   const [open, setOpen] = useAtom(productSheetOpenAtom);
   const [id] = useAtom(selectedProductIdAtom);
 
@@ -53,7 +53,12 @@ export function ProductDialog() {
               <p className="font-serif text-sm italic">Đang tải dữ liệu sản phẩm...</p>
             </div>
           ) : (
-            <ProductForm product={data} onClose={() => setOpen(false)} />
+            <ProductForm
+              key={id ?? "new-product"}
+              product={data}
+              onClose={() => setOpen(false)}
+              onSaved={onSaved}
+            />
           )}
         </div>
       </DialogContent>

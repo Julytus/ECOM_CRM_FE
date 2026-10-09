@@ -142,7 +142,7 @@ export function DataTableAdvanced<TData extends { id: number }>({
     <div className="container mx-auto flex flex-col gap-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
           <p className="text-muted-foreground text-sm">{description}</p>
         </div>
         <div className="flex items-center gap-2">

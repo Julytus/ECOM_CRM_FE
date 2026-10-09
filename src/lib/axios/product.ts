@@ -54,7 +54,7 @@ export const updateProduct = async (payload: UpdateProductDTO) => {
 };
 
 export const deleteProduct = async (id: number) => {
-  const res = await axiosInstance.delete<DeleteResponse>(`/product/${id}`);
+  const res = await axiosInstance.delete<DeleteResponse>(`/product/delete/${id}`);
   return res.data.result;
 };
 
@@ -75,7 +75,7 @@ export const getCategories = async () => {
     code: number;
     message: string;
     result: { items: CategoryDTO[] };
-  }>("/category/list", { params: { limit: 100 } });
+  }>("/categoryItem/list", { params: { limit: 100 } });
   return res.data.result.items;
 };
 

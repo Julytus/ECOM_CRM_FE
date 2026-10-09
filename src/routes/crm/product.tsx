@@ -100,7 +100,7 @@ function AdminProducts() {
         title="Quản lý sản phẩm"
         description="Quản lý, tạo mới, chỉnh sửa sản phẩm"
       />
-      <ProductDialog />
+      <ProductDialog onSaved={() => { void refetch(); }} />
     </>
   );
 }

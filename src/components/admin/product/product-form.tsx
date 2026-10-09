@@ -4,9 +4,8 @@ import * as React from "react";
 import { z } from "zod";
 import { Plus, Trash2, Package, Layers, Settings2, Wand2, ImageIcon, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { cn } from "@/lib/utils";
 import { useAppForm } from "@/components/form/hooks";
 import { FieldGroup } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
@@ -15,17 +14,10 @@ import { VerticalStepper } from "./vertical-stepper";
 import { ProductVariantTable } from "./product-variant-table";
 import type { ProductVariant } from "./product-variant-table";
 
-import {
-  createCategoriesQueryOptions,
-  createProductMutationOptions,
-  updateProductMutationOptions,
-  createProductAttributeMutationOptions,
-  createProductAttributeOptionMutationOptions,
-  createProductVariantMutationOptions,
-  updateProductVariantMutationOptions
-} from "@/lib/tanstack/options/product";
-
-import type { CreateProductDTO, ProductDetailsDTO, ProductStatus } from "@/lib/types/product";
+import { createCategoriesQueryOptions } from "@/lib/tanstack/options/product";
+import { saveProductAggregate } from "@/lib/api/product";
+import type { ProductAggregatePayload } from "@/lib/api/product";
+import type { ProductDetailsDTO } from "@/lib/types/product";
 import { normalizeImages } from "@/lib/format";
 import { SelectItem } from "@/components/ui/select";
 
@@ -50,7 +42,7 @@ const productFormSchema = z.object({
   name: z.string().min(1, "Tên sản phẩm bắt buộc"),
   description: z.string(),
   categoryId: z.string().nullable(),
-  active: z.boolean(),
+  status: z.boolean(),
   thumbnail: z.string().optional(),
   image: z.array(z.string()).optional(),
   attributes: z.array(
@@ -79,25 +71,7 @@ type ProductFormData = z.input<typeof productFormSchema>;
 interface ProductFormProps {
   product?: ProductDetailsDTO;
   onClose: () => void;
-}
-
-/* =======================
-   Helper resolve options
-======================= */
-
-function resolveVariantOptions(
-  variantOptions: Record<string, string>,
-  attributes: ProductFormData["attributes"]
-): number[] {
-  return Object.entries(variantOptions).map(([fieldName, value]) => {
-    const attr = attributes.find((a) => a.fieldName === fieldName);
-    if (!attr || !attr.id) throw new Error(`Attribute not found: ${fieldName}`);
-
-    const opt = attr.options.find((o) => o.value === value && o.id);
-    if (!opt || !opt.id) throw new Error(`Option not found: ${fieldName}=${value}`);
-
-    return opt.id;
-  });
+  onSaved?: () => void;
 }
 
 /* =======================
@@ -139,23 +113,65 @@ function generateVariants(attributes: ProductFormData["attributes"]): ProductVar
   });
 }
 
+/**
+ * Resolve each variant's option selection against the current attribute values.
+ * If an option was renamed, use its persisted option ID to find the new value.
+ */
+function resolveVariantOptionsForSubmit(
+  variantOptions: Record<string, string>,
+  attributes: ProductFormData["attributes"],
+  originalAttributes: NonNullable<ProductDetailsDTO["attributes"]>,
+  sku: string
+): Record<string, string> {
+  const resolved: Record<string, string> = {};
+
+  for (const attribute of attributes) {
+    const originalAttribute = originalAttributes.find(
+      (item) =>
+        (attribute.id != null && item.id === attribute.id) || item.fieldName === attribute.fieldName
+    );
+    const selectedFieldName = Object.prototype.hasOwnProperty.call(
+      variantOptions,
+      attribute.fieldName
+    )
+      ? attribute.fieldName
+      : originalAttribute?.fieldName;
+    const selectedValue = selectedFieldName ? variantOptions[selectedFieldName] : undefined;
+
+    if (selectedValue == null) {
+      throw new Error(`Biến thể ${sku} chưa chọn giá trị cho thuộc tính ${attribute.name}.`);
+    }
+
+    let currentOption = attribute.options.find((option) => option.value === selectedValue);
+    if (!currentOption && originalAttribute) {
+      const originalOption = originalAttribute.options.find(
+        (option) => option.value === selectedValue
+      );
+      if (originalOption?.id != null) {
+        currentOption = attribute.options.find((option) => option.id === originalOption.id);
+      }
+    }
+
+    if (!currentOption) {
+      throw new Error(
+        `Biến thể ${sku} đang tham chiếu giá trị "${selectedValue}" đã bị xóa khỏi thuộc tính ${attribute.name}. Hãy cập nhật hoặc tạo lại biến thể.`
+      );
+    }
+
+    resolved[attribute.fieldName] = currentOption.value;
+  }
+
+  return resolved;
+}
+
 /* =======================
    Main Component
 ======================= */
 
-export function ProductForm({ product, onClose }: ProductFormProps) {
+export function ProductForm({ product, onClose, onSaved }: ProductFormProps) {
   const isEdit = !!product?.id;
   const [currentStep, setCurrentStep] = React.useState(1);
-  const [generatedVariants, setGeneratedVariants] = React.useState<ProductVariant[]>([]);
-
   const { data: categories = [] } = useQuery(createCategoriesQueryOptions());
-
-  const createProduct = useMutation(createProductMutationOptions());
-  const updateProduct = useMutation(updateProductMutationOptions());
-  const createAttr = useMutation(createProductAttributeMutationOptions());
-  const createOpt = useMutation(createProductAttributeOptionMutationOptions());
-  const createVar = useMutation(createProductVariantMutationOptions());
-  const updateVar = useMutation(updateProductVariantMutationOptions());
 
   const form = useAppForm({
     defaultValues: {
@@ -163,7 +179,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
       name: product?.name ?? "",
       description: product?.description ?? "",
       categoryId: product?.categoryId ? String(product.categoryId) : null,
-      active: product?.active === 1,
+      status: product?.status === 1,
       thumbnail: product?.thumbnail ?? "",
       image: (() => {
         if (!product?.image) return [];
@@ -198,73 +214,51 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
     } as ProductFormData,
     validators: { onSubmit: productFormSchema },
     onSubmit: async ({ value }) => {
-      console.log("onSubmit triggered with value:", value);
       const loading = toast.loading("Đang lưu...");
       try {
-        let productId = product?.id;
-        const status: ProductStatus = value.active ? 1 : 0;
-
-        const productPayload = {
-          id: productId,
-          name: value.name,
+        const productId = product?.id;
+        const payload: ProductAggregatePayload = {
+          name: value.name.trim(),
           description: value.description,
           categoryId: value.categoryId ? Number(value.categoryId) : null,
-          active: status,
-          thumbnail: value.thumbnail,
-          image: normalizeImages(value.image).toString()
+          status: value.status ? 1 : 0,
+          thumbnail: value.thumbnail ?? "",
+          image: normalizeImages(value.image).toString(),
+          attributes: value.attributes.map((attribute) => ({
+            ...(attribute.id != null ? { id: attribute.id } : {}),
+            name: attribute.name.trim(),
+            fieldName: attribute.fieldName.trim(),
+            options: attribute.options.map((option) => ({
+              ...(option.id != null ? { id: option.id } : {}),
+              value: option.value.trim()
+            }))
+          })),
+          variants: value.variants.map((variant) => ({
+            ...(variant.id != null ? { id: variant.id } : {}),
+            sku: variant.sku.trim(),
+            price: Number(variant.price),
+            originalPrice: Number(variant.originalPrice),
+            stock: Number(variant.stock),
+            image: variant.image ?? null,
+            options: resolveVariantOptionsForSubmit(
+              variant.options,
+              value.attributes,
+              product?.attributes ?? [],
+              variant.sku
+            )
+          }))
         };
 
-        if (isEdit && productId) {
-          await updateProduct.mutateAsync(productPayload);
-        } else {
-          const res = await createProduct.mutateAsync(productPayload);
-          productId = res.id;
-        }
-
-        if (!productId) throw new Error("Missing productId");
-
-        for (const attr of value.attributes) {
-          const attrRes = await createAttr.mutateAsync({
-            id: attr.id,
-            productId,
-            name: attr.name,
-            fieldName: attr.fieldName
-          });
-
-          const attrId = attrRes.id;
-
-          for (const opt of attr.options) {
-            await createOpt.mutateAsync({
-              id: opt.id,
-              attributeId: attrId as number,
-              value: opt.value
-            });
-          }
-        }
-
-        for (const variant of value.variants) {
-          const resolvedOptions = resolveVariantOptions(variant.options, value.attributes);
-
-          const varPayload = {
-            productId,
-            sku: variant.sku,
-            price: Number(variant.price),
-            stock: Number(variant.stock),
-            image: variant.image,
-            attributeValueIds: resolvedOptions
-          };
-
-          if (variant.id) {
-            await updateVar.mutateAsync({ id: variant.id, ...varPayload });
-          } else {
-            await createVar.mutateAsync(varPayload);
-          }
-        }
-
-        toast.success("Đã lưu", { id: loading });
+        await saveProductAggregate(productId, payload);
+        toast.success(productId ? "Đã cập nhật sản phẩm" : "Đã tạo sản phẩm", { id: loading });
+        onSaved?.();
         onClose();
-      } catch (e: any) {
-        toast.error(e.message || "Không thể lưu dữ liệu", { id: loading });
+      } catch (error: unknown) {
+        const responseMessage = (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message;
+        const message =
+          responseMessage || (error instanceof Error ? error.message : "Không thể lưu sản phẩm");
+        toast.error(message, { id: loading });
       }
     }
   });
@@ -296,8 +290,16 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
       return;
     }
 
+    const variantCount = attributes.reduce(
+      (count, attribute) => count * attribute.options.length,
+      1
+    );
+    if (variantCount > 5000) {
+      toast.error("Tối đa 5.000 biến thể mỗi sản phẩm. Hãy giảm số tổ hợp thuộc tính.");
+      return;
+    }
+
     const variants = generateVariants(attributes);
-    setGeneratedVariants(variants);
     form.setFieldValue("variants", variants);
     toast.success(`Đã tạo ${variants.length} biến thể`);
     setCurrentStep(4);
@@ -373,7 +375,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
           </form.AppField>
         </div>
 
-        <form.AppField name="active">
+        <form.AppField name="status">
           {(field) => <field.Checkbox label="Kích hoạt kinh doanh (Hiển thị ngay)" />}
         </form.AppField>
       </FieldGroup>

@@ -24,7 +24,7 @@ export interface ProductDTO {
   image: string | null;
   thumbnail: string | null;
   avgRating: number | null;
-  active: ProductStatus;
+  status: ProductStatus;
   minPrice: number;
   maxPrice: number;
   originalMinPrice: number;
@@ -131,7 +131,7 @@ export interface ProductListApiResponse {
 export interface ProductListDetailsApiRequest {
   keyword?: string;
   categoryId?: number;
-  active?: ProductStatus;
+  status?: ProductStatus;
   priceFrom?: number;
   priceTo?: number;
 
@@ -201,7 +201,7 @@ export interface CreateProductDTO {
   name: string;
   description?: string | null;
   categoryId?: number | null;
-  active?: ProductStatus;
+  status?: ProductStatus;
   image?: string | null;
   thumbnail?: string | null;
 }

@@ -147,20 +147,20 @@ export const createProductColumns = ({
   },
 
   {
-    accessorKey: "active",
+    accessorKey: "status",
     header: "Trạng thái",
     cell: ({ row }) => {
-      const active = row.original.active;
+      const status = row.original.status;
       return (
         <Badge
           className={cn(
             "rounded-full border-none px-3 py-0.5 text-[11px] font-semibold tracking-wide uppercase",
-            active
+            status
               ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100"
               : "bg-orange-100 text-orange-700 hover:bg-orange-100"
           )}
         >
-          {active ? "Đang bán" : "Tạm ngưng"}
+          {status ? "Đang bán" : "Tạm ngưng"}
         </Badge>
       );
     }
