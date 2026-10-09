@@ -223,7 +223,7 @@ export function ProductForm({ product, onClose, onSaved }: ProductFormProps) {
           categoryId: value.categoryId ? Number(value.categoryId) : null,
           status: value.status ? 1 : 0,
           thumbnail: value.thumbnail ?? "",
-          image: normalizeImages(value.image).toString(),
+          image: normalizeImages(value.image),
           attributes: value.attributes.map((attribute) => ({
             ...(attribute.id != null ? { id: attribute.id } : {}),
             name: attribute.name.trim(),

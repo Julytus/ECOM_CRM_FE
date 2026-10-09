@@ -6,10 +6,16 @@ import { Box, Heart, Loader2, RefreshCcw, ShoppingCart, Truck, Zap } from "lucid
 import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
 
+import { QueryBoundary } from "@/components/boundary";
 import { ImageGallery } from "@/components/image/image-gallery";
+import { ProductImageGalleryScroll } from "@/components/shop/product/product-image-gallery-scroll";
 import { PageWrapper } from "@/components/layout/page-warper";
 import { MotionButton } from "@/components/motion-ui";
+import { ActionGroup } from "@/components/shop/action-group";
 import { ProductPriceDisplay } from "@/components/shop/product/product-price-display";
+import { InfoFeature } from "@/components/shop/product/info-feature";
+import { ProductHeader } from "@/components/shop/product/product-header";
+import { ProductReviews } from "@/components/shop/product/product-review";
 import { SizeGuide } from "@/components/shop/product/size-guide";
 import { VariantPicker } from "@/components/shop/product/variant-picker";
 import { QuantityInput } from "@/components/shop/quantity-input";
@@ -17,11 +23,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMediaQuery } from "@/hooks/use-media-query";
-
-import { QueryBoundary } from "@/components/boundary";
-import { ActionGroup } from "@/components/shop/action-group";
-import { InfoFeature } from "@/components/shop/product/info-feature";
-import { ProductHeader } from "@/components/shop/product/product-header";
 import { normalizeImages } from "@/lib/format";
 import { useCartStore } from "@/lib/stores/cart";
 import { createProductDetailsQueryOptions } from "@/lib/tanstack/options/product";
@@ -33,7 +34,6 @@ import {
 import type { ProductDetailsDTO } from "@/lib/types/product";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { ProductReviews } from "@/components/shop/product/product-review";
 
 export const Route = createFileRoute("/_shop/product/$id")({
   component: ProductDetailsPage
@@ -41,7 +41,11 @@ export const Route = createFileRoute("/_shop/product/$id")({
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+  }
 } as const;
 
 function ProductDetailsPage() {
@@ -51,20 +55,18 @@ function ProductDetailsPage() {
 
   const [selectedOptions, setSelectedOptions] = React.useState<Record<string, string>>({});
   const [quantity, setQuantity] = React.useState(1);
-  const addToCart = useCartStore((s) => s.addToCart);
+  const addToCart = useCartStore((state) => state.addToCart);
+  const navigate = useNavigate();
 
   const { data: wishlist } = useQuery(createWishlistQueryOptions());
-
   const isFavorited = wishlist?.some((item) => item.productId === product?.id) ?? false;
 
   const addToWishList = useMutation({
     ...createAddToWishlistMutationOptions()
   });
-
   const removeFromWishList = useMutation({
     ...createRemoveFromWishlistMutationOptions()
   });
-
   const isWishlistPending = addToWishList.isPending || removeFromWishList.isPending;
 
   const handleToggleWishlist = () => {
@@ -78,40 +80,75 @@ function ProductDetailsPage() {
   };
 
   React.useEffect(() => {
-    if (product) {
-      const initial: Record<string, string> = {};
-      product.attributes.forEach((attr) => {
-        initial[attr.fieldName] = attr.options[0]?.value || "";
-      });
-      setSelectedOptions(initial);
-    }
+    if (!product) return;
+
+    const initial: Record<string, string> = {};
+    product.attributes.forEach((attribute) => {
+      initial[attribute.fieldName] = attribute.options[0]?.value ?? "";
+    });
+    setSelectedOptions(initial);
   }, [product]);
 
-  const images = [product?.thumbnail, ...normalizeImages(product?.image)].filter(
-    Boolean
-  ) as string[];
-  const activeVariant = product?.variants.find((v) =>
-    Object.entries(selectedOptions).every(([key, value]) => v.options[key] === value)
-  );
+  // Chỉ chọn variant khi tất cả thuộc tính đã có giá trị và khớp hoàn toàn.
+  const activeVariant = React.useMemo(() => {
+    if (!product) return undefined;
+
+    const hasAllOptions = product.attributes.every((attribute) =>
+      Boolean(selectedOptions[attribute.fieldName])
+    );
+    if (!hasAllOptions) return undefined;
+
+    return product.variants.find((variant) =>
+      product.attributes.every(
+        (attribute) => variant.options[attribute.fieldName] === selectedOptions[attribute.fieldName]
+      )
+    );
+  }, [product, selectedOptions]);
+
+  // Đưa ảnh của variant đang chọn lên đầu để ImageGallery hiển thị làm ảnh chính.
+  const images = React.useMemo(() => {
+    if (!product) return [];
+
+    const candidates = [
+      activeVariant?.image,
+      product.thumbnail,
+      ...normalizeImages(product.image),
+      ...product.variants.map((variant) => variant.image)
+    ];
+
+    return Array.from(
+      new Set(
+        candidates.filter((url): url is string => typeof url === "string" && url.trim().length > 0)
+      )
+    );
+  }, [product, activeVariant]);
 
   const isOutOfStock =
-    !product?.variants ||
-    product.variants.length === 0 ||
-    product.variants.every((v) => v.stock <= 0);
-  const canBuy = activeVariant && (activeVariant?.stock ?? 0) > 0;
+    !product?.variants?.length || product.variants.every((variant) => variant.stock <= 0);
+  const canBuy = Boolean(activeVariant && activeVariant.stock > 0);
 
-  const navigate = useNavigate();
+  // Khi đổi variant, không giữ quantity lớn hơn tồn kho của variant mới.
+  React.useEffect(() => {
+    const stock = activeVariant?.stock ?? 0;
+    setQuantity((current) => {
+      if (stock <= 0) return 1;
+      return Math.min(Math.max(current, 1), stock);
+    });
+  }, [activeVariant?.id, activeVariant?.stock]);
 
-  const handleBuyNow = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!canBuy) return;
+  const handleBuyNow = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (!activeVariant || activeVariant.stock <= 0) return;
+
     addToCart(activeVariant.productId, activeVariant.id, 1, activeVariant.stock);
     navigate({ to: "/checkout" });
   };
 
   const handleAddToCart = () => {
-    if (!canBuy) return;
+    if (!activeVariant || activeVariant.stock <= 0) return;
+
     addToCart(activeVariant.productId, activeVariant.id, quantity, activeVariant.stock);
+    toast.success("Đã thêm sản phẩm vào giỏ hàng");
   };
 
   const handleShare = async () => {
@@ -125,7 +162,7 @@ function ProductDetailsPage() {
           url
         });
       } catch {
-        //
+        // Người dùng có thể đóng hộp thoại chia sẻ.
       }
     } else {
       await navigator.clipboard.writeText(url);
@@ -146,11 +183,11 @@ function ProductDetailsPage() {
       ]}
     >
       <QueryBoundary data={product} status={status} loadingFallback={<ProductDetailsSkeleton />}>
-        {(product) => (
+        {(loadedProduct) => (
           <>
             <div className="container mx-auto px-4">
               <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
-                {/* LEFT: MINIMALIST GALLERY */}
+                {/* Gallery */}
                 <div className="lg:col-span-7">
                   <motion.div
                     initial={{ opacity: 0, scale: 0.98 }}
@@ -158,19 +195,19 @@ function ProductDetailsPage() {
                     transition={{ duration: 1 }}
                     className="overflow-hidden"
                   >
-                    <ImageGallery
+                    <ProductImageGalleryScroll
+                      // Remount khi đổi variant để tự chọn ảnh variant ở đầu danh sách.
+                      key={activeVariant?.id ?? "no-active-variant"}
                       images={images}
-                      layout={isMobile ? "carousel" : "featured"}
                       aspectRatio={4 / 5}
                       className="bg-neutral-50"
                     />
                   </motion.div>
                 </div>
 
-                {/* RIGHT: ELEGANT PRODUCT INFO */}
+                {/* Product info */}
                 <div className="lg:col-span-5">
                   <div className="sticky top-32 flex flex-col space-y-8">
-                    {/* Header Group */}
                     <motion.div
                       variants={fadeInUp}
                       initial="hidden"
@@ -179,24 +216,41 @@ function ProductDetailsPage() {
                     >
                       <ProductHeader
                         brand="OAKLYN"
-                        name={product.name}
-                        rating={product.avgRating ?? 0}
+                        name={loadedProduct.name}
+                        rating={loadedProduct.avgRating ?? 0}
                         reviewCount={124}
                         status={isOutOfStock ? "outOfStock" : "inStock"}
                       />
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-2">
                         <ProductPriceDisplay
                           currentPrice={activeVariant?.price ?? 0}
                           originalPrice={activeVariant?.originalPrice ?? 0}
                           className="text-2xl font-light tracking-tight text-neutral-900"
                         />
+
+                        {activeVariant ? (
+                          <p
+                            className={cn(
+                              "text-sm font-medium",
+                              activeVariant.stock > 0 ? "text-emerald-700" : "text-red-600"
+                            )}
+                          >
+                            {activeVariant.stock > 0
+                              ? `Còn ${activeVariant.stock} sản phẩm`
+                              : "Sản phẩm này đã hết hàng"}
+                          </p>
+                        ) : (
+                          <p className="text-sm text-neutral-500">
+                            Vui lòng chọn đầy đủ thuộc tính sản phẩm
+                          </p>
+                        )}
                       </div>
                     </motion.div>
 
                     <Separator className="bg-neutral-100" />
 
-                    {/* Selection Group */}
+                    {/* Variant selection */}
                     <motion.div
                       variants={fadeInUp}
                       initial="hidden"
@@ -204,19 +258,24 @@ function ProductDetailsPage() {
                       transition={{ delay: 0.1 }}
                       className="space-y-8"
                     >
-                      {product.attributes.map((attr) => (
+                      {loadedProduct.attributes.map((attribute) => (
                         <VariantPicker
-                          key={attr.id}
-                          label={attr.name}
-                          variant={attr.fieldName.toLowerCase() === "color" ? "swatch" : "button"}
-                          value={selectedOptions[attr.fieldName]}
-                          options={attr.options}
-                          onChange={(val) =>
-                            setSelectedOptions((prev) => ({ ...prev, [attr.fieldName]: val }))
+                          key={attribute.id}
+                          label={attribute.name}
+                          variant={
+                            attribute.fieldName.toLowerCase() === "color" ? "swatch" : "button"
                           }
+                          value={selectedOptions[attribute.fieldName]}
+                          options={attribute.options}
+                          onChange={(value) => {
+                            setSelectedOptions((previous) => ({
+                              ...previous,
+                              [attribute.fieldName]: value
+                            }));
+                          }}
                           className="luxury-picker"
                           renderHeaderRight={
-                            attr.fieldName.toLowerCase() === "size" && <SizeGuide />
+                            attribute.fieldName.toLowerCase() === "size" && <SizeGuide />
                           }
                         />
                       ))}
@@ -224,7 +283,14 @@ function ProductDetailsPage() {
                       <div className="space-y-3">
                         <QuantityInput
                           value={quantity}
-                          onQuantityChange={setQuantity}
+                          onQuantityChange={(nextQuantity) => {
+                            const maxStock = activeVariant?.stock ?? 0;
+                            if (maxStock <= 0) {
+                              setQuantity(1);
+                              return;
+                            }
+                            setQuantity(Math.min(Math.max(1, nextQuantity), maxStock));
+                          }}
                           maxStock={activeVariant?.stock ?? 0}
                           roundness="lg"
                           className="rounded-md border-neutral-200"
@@ -233,7 +299,7 @@ function ProductDetailsPage() {
                       </div>
                     </motion.div>
 
-                    {/* Action Group Block */}
+                    {/* Actions */}
                     <ActionGroup layout="stack" gap="luxury" className="pt-6" staggerDelay={0.12}>
                       <ActionGroup layout="split" gap="compact" animate={false}>
                         <MotionButton
@@ -262,6 +328,7 @@ function ProductDetailsPage() {
                         <Button
                           onClick={handleToggleWishlist}
                           variant="ghost"
+                          disabled={isWishlistPending}
                           className={cn(
                             "group h-10 w-full text-[9px] font-bold tracking-[0.25em] uppercase transition-all",
                             isFavorited
@@ -282,7 +349,6 @@ function ProductDetailsPage() {
                             : "Thêm vào danh sách yêu thích"}
                         </Button>
 
-                        {/* Đường kẻ mảnh trang trí phong cách Editorial */}
                         <div className="h-px w-12 bg-neutral-200" />
 
                         <button
@@ -294,7 +360,7 @@ function ProductDetailsPage() {
                       </div>
                     </ActionGroup>
 
-                    {/* Luxury Trust Icons */}
+                    {/* Trust features */}
                     <div className="grid grid-cols-1 gap-8 border-t border-neutral-100 pt-10">
                       <InfoFeature
                         icon={Truck}
@@ -320,8 +386,8 @@ function ProductDetailsPage() {
               </div>
             </div>
 
-            <ProductDetailsSection product={product} images={images} />
-            <ProductReviews productId={product.id} avgRating={product.avgRating ?? 0} />
+            <ProductDetailsSection product={loadedProduct} images={images} />
+            <ProductReviews productId={loadedProduct.id} avgRating={loadedProduct.avgRating ?? 0} />
           </>
         )}
       </QueryBoundary>
@@ -356,7 +422,6 @@ export function ProductDetailsSection({
     <section className="bg-background border-t border-neutral-100 py-32">
       <div className="container mx-auto px-4">
         <Tabs defaultValue="description" className="mx-auto max-w-5xl" onValueChange={setActiveTab}>
-          {/* Tabs Navigation */}
           <TabsList className="relative mb-20 flex h-auto w-full justify-center gap-12 border-b border-neutral-100 bg-transparent p-0">
             {TABS.map((tab) => (
               <TabsTrigger
@@ -390,10 +455,10 @@ export function ProductDetailsSection({
                     Câu chuyện sản phẩm
                   </span>
                   <p className="font-serif text-xl leading-relaxed text-neutral-800 italic md:text-2xl">
-                    "{product.description}"
+                    {product.description || "Chưa có mô tả cho sản phẩm này."}
                   </p>
                 </div>
-                {images && (
+                {images && images.length > 0 && (
                   <>
                     <Separator />
                     <ImageGallery
@@ -408,21 +473,32 @@ export function ProductDetailsSection({
 
               <TabsContent value="details" className="mt-0 focus-visible:outline-none">
                 <div className="grid grid-cols-1 gap-16 md:grid-cols-2 lg:gap-24">
-                  {/* Cột 1: Thông số kỹ thuật chính */}
                   <div className="space-y-10">
                     <div>
                       <h4 className="mb-6 text-[11px] font-bold tracking-[0.2em] text-neutral-900 uppercase">
-                        Chất liệu & Chế tác
+                        Chất liệu &amp; Chế tác
                       </h4>
                       <div className="space-y-1">
                         {[
-                          { label: "Chất liệu bề mặt", value: "Da Calfskin nguyên tấm (Ý)" },
-                          { label: "Lớp lót nội thất", value: "Lụa Satin dệt thủ công" },
-                          { label: "Phần cứng", value: "Thép không gỉ mạ vàng 18K" },
-                          { label: "Phương pháp khâu", value: "Khâu tay thủ công (Saddle Stitch)" }
-                        ].map((item, i) => (
+                          {
+                            label: "Chất liệu bề mặt",
+                            value: "Da Calfskin nguyên tấm (Ý)"
+                          },
+                          {
+                            label: "Lớp lót nội thất",
+                            value: "Lụa Satin dệt thủ công"
+                          },
+                          {
+                            label: "Phần cứng",
+                            value: "Thép không gỉ mạ vàng 18K"
+                          },
+                          {
+                            label: "Phương pháp khâu",
+                            value: "Khâu tay thủ công (Saddle Stitch)"
+                          }
+                        ].map((item) => (
                           <div
-                            key={i}
+                            key={item.label}
                             className="group flex items-end justify-between border-b border-neutral-100 py-4 transition-colors hover:border-neutral-900"
                           >
                             <span className="text-[10px] font-medium tracking-widest text-neutral-400 uppercase group-hover:text-neutral-500">
@@ -437,11 +513,10 @@ export function ProductDetailsSection({
                     </div>
                   </div>
 
-                  {/* Cột 2: Kích thước & Trọng lượng hoặc Điểm nhấn thiết kế */}
                   <div className="space-y-10">
                     <div>
                       <h4 className="mb-6 text-[11px] font-bold tracking-[0.2em] text-neutral-900 uppercase">
-                        Kích thước & Trọng lượng
+                        Kích thước &amp; Trọng lượng
                       </h4>
                       <div className="grid grid-cols-2 gap-8">
                         <div className="border-l border-neutral-200 pl-4">
@@ -463,13 +538,12 @@ export function ProductDetailsSection({
                       </div>
                     </div>
 
-                    {/* Box ghi chú đặc biệt (Craftsmanship Note) */}
                     <div className="bg-neutral-50 p-6">
                       <div className="flex gap-4">
                         <div className="h-10 w-px bg-neutral-300" />
                         <p className="text-[11px] leading-relaxed text-neutral-500 italic">
-                          "Mỗi sản phẩm là duy nhất. Những vết hằn tự nhiên trên da không phải là
-                          lỗi, mà là minh chứng cho nguồn gốc hữu cơ và tính độc bản của chất liệu."
+                          “Mỗi sản phẩm là duy nhất. Những vết hằn tự nhiên trên da không phải là
+                          lỗi, mà là minh chứng cho nguồn gốc hữu cơ và tính độc bản của chất liệu.”
                         </p>
                       </div>
                     </div>

@@ -139,7 +139,7 @@ export type ProductAggregatePayload = {
   categoryId: number | null;
   status: 0 | 1;
   thumbnail?: string;
-  image: string;
+  image?: string[];
   attributes: Array<{
     id?: number;
     name: string;
