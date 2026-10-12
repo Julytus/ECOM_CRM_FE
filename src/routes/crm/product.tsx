@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { createProductColumns } from "@/components/crm/product/columns";
+import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 
 import {
   createInfiniteProductDetailsQueryOptions,
@@ -29,6 +30,10 @@ function AdminProducts() {
 
   const [productId, setProductId] = useAtom(selectedProductIdAtom);
   const [open, setOpen] = useAtom(productSheetOpenAtom);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
+  const [deleteProductName, setDeleteProductName] = useState<string | undefined>();
 
   // Query
   const {
@@ -57,9 +62,36 @@ function AdminProducts() {
     setOpen(true);
   };
 
+  const handleShowDeleteConfirm = (id: number, name?: string) => {
+    setDeleteProductId(id);
+    setDeleteProductName(name);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    deleteManyMutation.mutate([id], {
+      onSuccess: () => {
+        setDeleteDialogOpen(false);
+        refetch();
+        toast.success("Xóa sản phẩm thành công");
+      },
+      onError: () => {
+        toast.error("Xóa sản phẩm thất bại");
+      }
+    });
+  };
+
   const handleDeleteSelected = (ids: number[]) => {
     if (confirm(`Bạn có chắc muốn xóa ${ids.length} sản phẩm đã chọn?`)) {
-      deleteManyMutation.mutate(ids);
+      deleteManyMutation.mutate(ids, {
+        onSuccess: () => {
+          refetch();
+          toast.success("Xóa thành công");
+        },
+        onError: () => {
+          toast.error("Có lỗi xảy ra");
+        }
+      });
     }
   };
 
@@ -77,9 +109,10 @@ function AdminProducts() {
     () =>
       createProductColumns({
         onEdit: handleEdit,
-        onDelete: handleDeleteSelected
+        onDelete: handleDeleteSelected,
+        onShowDeleteConfirm: handleShowDeleteConfirm
       }),
-    [handleEdit, handleDeleteSelected]
+    [handleEdit, handleDeleteSelected, handleShowDeleteConfirm]
   );
 
   return (
@@ -101,6 +134,15 @@ function AdminProducts() {
         description="Quản lý, tạo mới, chỉnh sửa sản phẩm"
       />
       <ProductDialog onSaved={() => { void refetch(); }} />
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        itemId={deleteProductId}
+        itemName={deleteProductName}
+        itemType="sản phẩm"
+        onConfirm={handleDelete}
+        onOpenChange={setDeleteDialogOpen}
+        isLoading={deleteManyMutation.isPending}
+      />
     </>
   );
 }

@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { createCategoryColumns } from "@/components/crm/category/columns";
 import { CategoryFormDialog } from "@/components/admin/category/category-dialog";
+import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 
 import {
   createInfiniteCategoriesQueryOptions,
@@ -28,6 +29,10 @@ function AdminCategories() {
 
   const [selectedCategory, setSelectedCategory] = React.useState<CategoryDTO | null>(null);
   const [openForm, setOpenForm] = React.useState(false);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [deleteCategoryId, setDeleteCategoryId] = React.useState<number | null>(null);
+  const [deleteCategoryName, setDeleteCategoryName] = React.useState<string | undefined>();
 
   // Query
   const {
@@ -56,7 +61,13 @@ function AdminCategories() {
   const deleteMutation = useMutation({ ...deleteCategoryMutationOptions() });
 
   const handleUpdate = (values: Partial<CategoryDTO>) => {
-    upsertMutation.mutate(values as any);
+    upsertMutation.mutate(values as any, {
+      onSuccess: () => {
+        setOpenForm(false);
+        refetch();
+        toast.success("Cập nhật danh mục thành công");
+      }
+    });
   };
 
   const handleEdit = (category: CategoryDTO) => {
@@ -64,10 +75,23 @@ function AdminCategories() {
     setOpenForm(true);
   };
 
+  const handleShowDeleteConfirm = (id: number, name?: string) => {
+    setDeleteCategoryId(id);
+    setDeleteCategoryName(name);
+    setDeleteDialogOpen(true);
+  };
+
   const handleDelete = (id: number) => {
-    if (confirm("Bạn có chắc muốn xóa danh mục này?")) {
-      deleteMutation.mutate(id);
-    }
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        setDeleteDialogOpen(false);
+        refetch();
+        toast.success("Xóa danh mục thành công");
+      },
+      onError: () => {
+        toast.error("Xóa danh mục thất bại");
+      }
+    });
   };
 
   const handleDeleteSelected = (ids: number[]) => {
@@ -92,9 +116,10 @@ function AdminCategories() {
     () =>
       createCategoryColumns({
         onDelete: handleDelete,
-        onEdit: handleEdit
+        onEdit: handleEdit,
+        onShowDeleteConfirm: handleShowDeleteConfirm
       }),
-    [handleEdit, handleDelete]
+    [handleEdit, handleDelete, handleShowDeleteConfirm]
   );
 
   return (
@@ -125,6 +150,15 @@ function AdminCategories() {
         onSubmit={(values) =>
           upsertMutation.mutate(values, { onSuccess: () => setOpenForm(false) })
         }
+      />
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        itemId={deleteCategoryId}
+        itemName={deleteCategoryName}
+        itemType="danh mục"
+        onConfirm={handleDelete}
+        onOpenChange={setDeleteDialogOpen}
+        isLoading={deleteMutation.isPending}
       />
     </>
   );

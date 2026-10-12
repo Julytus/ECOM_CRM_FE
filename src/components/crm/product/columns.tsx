@@ -23,10 +23,12 @@ const formatCurrency = (value: number) => {
 
 export const createProductColumns = ({
   onEdit,
-  onDelete
+  onDelete,
+  onShowDeleteConfirm
 }: {
   onEdit: (id: number) => void;
   onDelete?: (ids: number[]) => void;
+  onShowDeleteConfirm?: (id: number, name?: string) => void;
 }): ColumnDef<ProductDTO>[] => [
   {
     id: "filter"
@@ -200,7 +202,7 @@ export const createProductColumns = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive cursor-pointer rounded-xl py-2"
-                onSelect={() => onDelete([row.original.id])}
+                onSelect={() => onShowDeleteConfirm?.(row.original.id, row.original.name)}
               >
                 <Trash2 className="mr-3 h-4 w-4" />
                 <span className="font-medium">Xóa sản phẩm</span>

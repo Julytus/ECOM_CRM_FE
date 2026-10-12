@@ -137,12 +137,7 @@ function AdminOrders() {
         onPaginationChange={handlePaginationChange}
         isLoading={isFetching}
         onRefresh={refetch}
-        onAdd={() => {
-          setSelectedOrder(null);
-          setOpenForm(true);
-        }}
         onDeleteSelected={handleDeleteSelected}
-        addLabel="Thêm đơn hàng"
         deleteLabel="Xóa đã chọn"
         title="Quản lý đơn hàng"
         description="Tạo, chỉnh sửa và quản lý các đơn hàng"

@@ -12,6 +12,7 @@ import type {
   OrderListResponseDTO
 } from "@/lib/types/order";
 import type { QueryKey } from "@tanstack/react-query";
+import type { DeleteResponse } from "../types/common";
 
 export const createOrder = async (request: CreateOrderRequest): Promise<CreateOrderResponse> => {
   const response = await axiosInstance.post<CreateOrderResponse>("/order/create", request);
@@ -69,14 +70,8 @@ export const updateOrder = async (order: OrderDTO) => {
 };
 
 export const deleteOrder = async (id: number) => {
-  const response = await axiosInstance.post<{
-    code: number;
-    message: string;
-    result: number;
-  }>("/order/delete", null, {
-    params: { id }
-  });
-  return response.data.result;
+  const res = await axiosInstance.delete<DeleteResponse>(`/order/delete/${id}`);
+  return res.data.result;
 };
 
 export const getOrderById = async (id: number) => {

@@ -17,10 +17,12 @@ import type { CategoryDTO } from "@/lib/types/category";
 
 export const createCategoryColumns = ({
   onDelete,
-  onEdit
+  onEdit,
+  onShowDeleteConfirm
 }: {
   onDelete: (id: number) => void;
   onEdit: (category: CategoryDTO) => void;
+  onShowDeleteConfirm: (id: number, name?: string) => void;
 }): ColumnDef<CategoryDTO>[] => [
   {
     id: "select",
@@ -90,7 +92,7 @@ export const createCategoryColumns = ({
           <DropdownMenuItem onClick={() => onEdit(row.original)}>Chỉnh sửa</DropdownMenuItem>
           <DropdownMenuItem>Sao chép</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive" onClick={() => onDelete(row.original.id)}>
+          <DropdownMenuItem className="text-destructive" onClick={() => onShowDeleteConfirm(row.original.id, row.original.name)}>
             Xóa
           </DropdownMenuItem>
         </DropdownMenuContent>
