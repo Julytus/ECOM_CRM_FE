@@ -19,16 +19,16 @@ export function CategoryFormDialog({
   onSubmit: (values: Partial<CategoryDTO>) => void;
 }) {
   const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState("");
+  const [featured, setFeatured] = React.useState("");
 
   React.useEffect(() => {
     setName(category?.name ?? "");
-    setDescription(category?.description ?? "");
+    setFeatured(category?.featured ?? "");
   }, [category, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ id: category?.id, name, description });
+    onSubmit({ id: category?.id, name, featured });
   };
 
   return (
@@ -36,7 +36,7 @@ export function CategoryFormDialog({
       open={open}
       onOpenChange={onOpenChange}
       title={category ? "Chỉnh sửa danh mục" : "Tạo mới danh mục"}
-      description={
+      featured={
         category ? "Cập nhật thông tin danh mục sản phẩm" : "Tạo danh mục mới để phân loại sản phẩm"
       }
       onSubmit={handleSubmit}
@@ -55,13 +55,13 @@ export function CategoryFormDialog({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="category-description">Mô tả</Label>
+        <Label htmlFor="category-featured">Mô tả</Label>
         <Textarea
-          id="category-description"
-          name="description"
+          id="category-featured"
+          name="featured"
           placeholder="Mô tả ngắn gọn về nhóm sản phẩm này..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={featured}
+          onChange={(e) => setFeatured(e.target.value)}
           className="min-h-[100px]"
         />
         <p className="text-muted-foreground text-xs text-pretty">

@@ -11,7 +11,9 @@ import {
   type GetInfiniteOrdersProps,
   updateOrder,
   getOrders,
-  getOrderById
+  getOrderById,
+  deleteOrder,
+  batchDeleteOrders
 } from "@/lib/axios/order";
 import type {
   CreateOrderRequest,
@@ -123,6 +125,32 @@ export const updateOrderMutationOptions = (): UseMutationOptions<OrderDTO, Error
       successMessage: "Cập nhật đơn hàng thành công",
       errorMessage: "Cập nhật đơn hàng thất bại",
       invalidatesQuery: [["orders"], ["order"]]
+    }
+  };
+};
+
+export const deleteOrderMutationOptions = (): UseMutationOptions<number, Error, number> => {
+  return {
+    mutationFn: deleteOrder,
+    meta: {
+      successMessage: "Xóa đơn hàng thành công",
+      errorMessage: "Xóa đơn hàng thất bại",
+      invalidatesQuery: [["orders"]]
+    }
+  };
+};
+
+export const batchDeleteOrdersMutationOptions = (): UseMutationOptions<
+  number,
+  Error,
+  number[]
+> => {
+  return {
+    mutationFn: batchDeleteOrders,
+    meta: {
+      successMessage: "Xóa đơn hàng thành công",
+      errorMessage: "Xóa đơn hàng thất bại",
+      invalidatesQuery: [["orders"]]
     }
   };
 };

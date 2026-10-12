@@ -253,30 +253,32 @@ function CartItem({
               Chỉ còn {detail?.stock} sản phẩm
             </div>
           )}
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {detail &&
+              Object.entries(detail.options ?? {}).map(([label, value]) => {
+                const isColor =
+                  label.toLowerCase().includes("color") || label.toLowerCase().includes("màu sắc");
 
-          <div className="mt-1 flex flex-wrap items-center gap-3">
-            {detail && (
-              <>
-                <div className="flex items-center gap-1.5">
+                return (
                   <div
-                    className="size-3 rounded-full border border-neutral-200"
-                    style={{ backgroundColor: COLOR_MAP[detail.options.color] || "#D1D5DB" }}
-                  />
-                  <span className="text-[10px] font-bold text-neutral-600 uppercase">
-                    {detail.options.color}
-                  </span>
-                </div>
-                <span className="size-1 rounded-full bg-neutral-300" />
-                <div className="flex items-center">
-                  <span className="mr-1 text-[10px] font-bold text-neutral-400 uppercase">
-                    Size:
-                  </span>
-                  <span className="text-[10px] font-black text-neutral-900 uppercase">
-                    {detail.options.size}
-                  </span>
-                </div>
-              </>
-            )}
+                    key={label}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1"
+                  >
+                    {isColor && (
+                      <span
+                        className="size-2.5 shrink-0 rounded-full border border-neutral-300"
+                        style={{
+                          backgroundColor: COLOR_MAP[value] ?? "#D1D5DB"
+                        }}
+                      />
+                    )}
+
+                    <span className="text-[10px] text-neutral-500">{label}:</span>
+
+                    <span className="text-[10px] font-semibold text-neutral-900">{value}</span>
+                  </div>
+                );
+              })}
           </div>
         </div>
 

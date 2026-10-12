@@ -1,54 +1,48 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import {
-  getCoreRowModel,
-  useReactTable,
-  type SortingState,
-  type PaginationState,
-  type ColumnFiltersState
-} from "@tanstack/react-table";
+"use client";
 
-import { DataTable } from "@/components/admin/table/data-table";
+import * as React from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
+import { createOrderColumns } from "@/components/crm/order/columns";
+import { OrderFormDialog } from "@/components/admin/order/order-form-dialog";
+import { DeleteOrderDialog } from "@/components/admin/order/delete-order-dialog";
+
 import {
   createInfiniteOrdersQueryOptions,
-  updateOrderMutationOptions
+  updateOrderMutationOptions,
+  deleteOrderMutationOptions,
+  batchDeleteOrdersMutationOptions
 } from "@/lib/tanstack/options/order";
-import { createOrderColumns } from "@/components/admin/order/columns";
-import { Button } from "@/components/ui/button";
-import { RefreshCcw, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import type { OrderStatus } from "@/lib/types/order";
-
-// 1. Import Shadcn Select components
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { OrderDetailSheet } from "@/components/admin/order/order-sheet";
+import type { OrderDTO } from "@/lib/types/order";
 
 export const Route = createFileRoute("/crm/order")({
-  component: CrmOrders
+  component: AdminOrders
 });
 
-function CrmOrders() {
-  const queryClient = useQueryClient();
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [pagination, setPagination] = useState<PaginationState>({
+function AdminOrders() {
+  const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10
   });
 
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | "ALL">("ALL");
+  const [selectedOrder, setSelectedOrder] = React.useState<OrderDTO | null>(null);
+  const [openForm, setOpenForm] = React.useState(false);
 
-  const { data, refetch, isFetching, isFetchingNextPage } = useInfiniteQuery(
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [deleteOrderId, setDeleteOrderId] = React.useState<number | null>(null);
+  const [deleteOrderCode, setDeleteOrderCode] = React.useState<string | undefined>();
+
+  // Query
+  const {
+    data: queryData,
+    refetch,
+    isFetching
+  } = useInfiniteQuery(
     createInfiniteOrdersQueryOptions({
       opts: {
-        orderStatus: statusFilter === "ALL" ? undefined : statusFilter,
         paging: {
           limit: pagination.pageSize,
           page: pagination.pageIndex + 1
@@ -57,92 +51,116 @@ function CrmOrders() {
     })
   );
 
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const orders = React.useMemo(
+    () => queryData?.pages.flatMap((p) => p.items) ?? [],
+    [queryData]
+  );
+  const total = React.useMemo(() => queryData?.pages[0]?.total ?? 0, [queryData]);
 
-  const orders = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
-  const total = useMemo(() => data?.pages[0]?.total ?? 0, [data]);
+  // Mutations
+  const upsertMutation = useMutation(updateOrderMutationOptions());
+  const deleteMutation = useMutation(deleteOrderMutationOptions());
+  const batchDeleteMutation = useMutation(batchDeleteOrdersMutationOptions());
 
-  const updateOrderMutation = useMutation(updateOrderMutationOptions());
+  const handleUpdate = (values: Partial<OrderDTO>) => {
+    upsertMutation.mutate(values as any, {
+      onSuccess: () => {
+        setOpenForm(false);
+        refetch();
+        toast.success("Cập nhật đơn hàng thành công");
+      },
+      onError: () => {
+        toast.error("Cập nhật đơn hàng thất bại");
+      }
+    });
+  };
 
-  const columns = useMemo(
+  const handleEdit = (order: OrderDTO) => {
+    setSelectedOrder(order);
+    setOpenForm(true);
+  };
+
+  const handleShowDeleteConfirm = (id: number, code?: string) => {
+    setDeleteOrderId(id);
+    setDeleteOrderCode(code);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        setDeleteDialogOpen(false);
+        refetch();
+        toast.success("Xóa đơn hàng thành công");
+      },
+      onError: () => {
+        toast.error("Xóa đơn hàng thất bại");
+      }
+    });
+  };
+
+  const handleDeleteSelected = (ids: number[]) => {
+    batchDeleteMutation.mutate(ids, {
+      onSuccess: () => {
+        refetch();
+        toast.success("Xóa thành công");
+      },
+      onError: () => {
+        toast.error("Có lỗi xảy ra");
+      }
+    });
+  };
+
+  const handlePaginationChange = (pageIndex: number, pageSize: number) => {
+    setPagination({ pageIndex, pageSize });
+  };
+
+  // Define columns
+  const columns = React.useMemo(
     () =>
       createOrderColumns({
-        onUpdate: (order) => updateOrderMutation.mutate(order),
-        onViewDetails: (order) => setSelectedOrderId(order.id)
+        onDelete: handleDelete,
+        onEdit: handleEdit,
+        onShowDeleteConfirm: handleShowDeleteConfirm
       }),
-    []
+    [handleEdit, handleDelete, handleShowDeleteConfirm]
   );
 
-  const table = useReactTable({
-    data: orders,
-    columns,
-    manualPagination: true,
-    manualSorting: true,
-    manualFiltering: true,
-    pageCount: Math.ceil(total / pagination.pageSize),
-    state: { pagination, sorting, columnFilters },
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel()
-  });
-
   return (
-    <div className="container mx-auto space-y-4 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Quản lý đơn hàng</h1>
-          <p className="text-muted-foreground text-sm">
-            Theo dõi, cập nhật trạng thái và xử lý đơn hàng của hệ thống.
-          </p>
-        </div>
-      </div>
-
-      <DataTable
-        table={table}
-        filterable={false}
-        toolbarLeft={
-          /* 2. Enhanced Shadcn Select Implementation */
-          <Select
-            value={statusFilter}
-            onValueChange={(value) => setStatusFilter(value as OrderStatus | "ALL")}
-          >
-            <SelectTrigger className="h-8 w-[180px]">
-              <SelectValue placeholder="Trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
-              <SelectItem value="NEW">Mới</SelectItem>
-              <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
-              <SelectItem value="SHIPPING">Đang giao</SelectItem>
-              <SelectItem value="COMPLETED">Hoàn thành</SelectItem>
-              <SelectItem value="CANCELLED">Đã hủy</SelectItem>
-              <SelectItem value="REFUNDED">Hoàn tiền</SelectItem>
-            </SelectContent>
-          </Select>
-        }
-        toolbarRight={
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
-              <RefreshCcw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-              Làm mới
-            </Button>
-          </div>
-        }
+    <>
+      <DataTableAdvanced
+        data={orders}
+        columns={columns}
+        total={total}
+        pageSize={pagination.pageSize}
+        pageIndex={pagination.pageIndex}
+        onPaginationChange={handlePaginationChange}
+        isLoading={isFetching}
+        onRefresh={refetch}
+        onAdd={() => {
+          setSelectedOrder(null);
+          setOpenForm(true);
+        }}
+        onDeleteSelected={handleDeleteSelected}
+        addLabel="Thêm đơn hàng"
+        deleteLabel="Xóa đã chọn"
+        title="Quản lý đơn hàng"
+        description="Tạo, chỉnh sửa và quản lý các đơn hàng"
       />
-
-      <OrderDetailSheet
-        orderId={selectedOrderId}
-        open={selectedOrderId !== null}
-        onOpenChange={(open) => !open && setSelectedOrderId(null)}
+      <OrderFormDialog
+        open={openForm}
+        order={selectedOrder}
+        onOpenChange={setOpenForm}
+        onSubmit={handleUpdate}
       />
-
-      {isFetching && !isFetchingNextPage && (
-        <div className="bg-background fixed right-4 bottom-4 flex items-center rounded-md border p-2 text-xs shadow-lg">
-          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-          Đang cập nhật dữ liệu...
-        </div>
-      )}
-    </div>
+      <DeleteOrderDialog
+        open={deleteDialogOpen}
+        orderId={deleteOrderId}
+        orderCode={deleteOrderCode}
+        onConfirm={handleDelete}
+        onOpenChange={setDeleteDialogOpen}
+        isLoading={deleteMutation.isPending}
+      />
+    </>
   );
 }

@@ -4,7 +4,7 @@ import type { PagingDTO } from "@/lib/types/paging";
 export interface CategoryDTO {
   id: number;
   name: string;
-  description: string | null;
+  featured: string | null;
 }
 
 export interface CategoryListApiRequest {

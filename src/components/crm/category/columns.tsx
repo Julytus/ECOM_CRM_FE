@@ -49,37 +49,27 @@ export const createCategoryColumns = ({
     enableHiding: false
   },
   {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="font-mono">
-        {row.original.id}
-      </Badge>
-    )
-  },
-  {
     accessorKey: "name",
     header: "Tên danh mục",
     cell: ({ row }) => {
       return (
-        <Button
-          variant="link"
-          className="text-foreground w-fit px-0 text-left"
-          onClick={() => onEdit(row.original)}
-        >
-          {row.original.name}
-        </Button>
+        <div className="flex flex-col truncate">
+          <span className="text-foreground max-w-[200px] truncate font-bold tracking-tight">
+            {row.original.name}
+          </span>
+          <span className="text-muted-foreground line-clamp-1 text-[11px] font-medium tracking-wider uppercase">
+            ID: {row.original.id}
+          </span>
+        </div>
       );
     },
     enableHiding: false
   },
   {
-    accessorKey: "description",
+    accessorKey: "featured",
     header: "Mô tả",
     cell: ({ row }) => (
-      <div className="text-muted-foreground max-w-md truncate">
-        {row.original.description || "—"}
-      </div>
+      <div className="text-muted-foreground max-w-md truncate">{row.original.featured || "—"}</div>
     )
   },
   {
