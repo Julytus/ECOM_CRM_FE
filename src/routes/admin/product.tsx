@@ -16,9 +16,9 @@ import {
   createInfiniteProductDetailsQueryOptions,
   deleteProductsMutationOptions
 } from "@/lib/tanstack/options/product";
-import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/admin/product/atoms";
-import { createProductColumns } from "@/components/admin/product/columns";
-import { ProductSheet } from "@/components/admin/product/product-sheet";
+import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/crm/product/atoms";
+import { createProductColumns } from "@/components/crm/product/columns";
+import { ProductSheet } from "@/components/crm/product/product-sheet";
 import { useDebounceValue } from "@/hooks/use-debounce-value";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash } from "lucide-react";

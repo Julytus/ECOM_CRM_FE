@@ -17,6 +17,7 @@ import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AdminLoading } from "@/components/admin/admin-loading";
 import { ThemeToggle } from "@/components/layout/theme/theme-toggle";
+import { AdminAccessDenied } from "@/components/admin/admin-access-denied";
 
 export const Route = createFileRoute("/crm")({
   component: CrmLayout
@@ -29,6 +30,10 @@ function CrmLayout() {
     return <AdminLoading />;
   }
 
+  if (me?.isOperator !== 1) {
+    return <AdminAccessDenied />;
+  }
+
   return (
     <SidebarProvider>
       <CrmSidebar />
@@ -37,17 +42,6 @@ function CrmLayout() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Build Your Application</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
           </div>
           <div className="ml-auto flex items-center gap-2 px-4">
             <ThemeToggle />

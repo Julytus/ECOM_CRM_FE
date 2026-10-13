@@ -15,7 +15,7 @@ import {
 
 import { productSheetOpenAtom, selectedProductIdAtom } from "./atoms";
 import { createProductDetailsQueryOptions } from "@/lib/tanstack/options/product";
-import { ProductForm } from "@/components/admin/product/product-form";
+import { ProductForm } from "@/components/crm/product/product-form";
 
 export function ProductDialog({ onSaved }: { onSaved?: () => void }) {
   const [open, setOpen] = useAtom(productSheetOpenAtom);

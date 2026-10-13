@@ -2,7 +2,7 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Pencil, Star, Eye, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Star, Eye } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,13 +22,9 @@ const formatCurrency = (value: number) => {
 };
 
 export const createProductColumns = ({
-  onEdit,
-  onDelete,
-  onShowDeleteConfirm
+  onEdit
 }: {
   onEdit: (id: number) => void;
-  onDelete?: (ids: number[]) => void;
-  onShowDeleteConfirm?: (id: number, name?: string) => void;
 }): ColumnDef<ProductDTO>[] => [
   {
     id: "filter"
@@ -197,18 +193,6 @@ export const createProductColumns = ({
             <Eye className="text-muted-foreground mr-3 h-4 w-4" />
             <span className="font-medium">Xem trên web</span>
           </DropdownMenuItem>
-          {onDelete ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive cursor-pointer rounded-xl py-2"
-                onSelect={() => onShowDeleteConfirm?.(row.original.id, row.original.name)}
-              >
-                <Trash2 className="mr-3 h-4 w-4" />
-                <span className="font-medium">Xóa sản phẩm</span>
-              </DropdownMenuItem>
-            </>
-          ) : null}
         </DropdownMenuContent>
       </DropdownMenu>
     )

@@ -15,8 +15,8 @@ import { ProductVariantTable } from "./product-variant-table";
 import type { ProductVariant } from "./product-variant-table";
 
 import { createCategoriesQueryOptions } from "@/lib/tanstack/options/product";
-import { saveProductAggregate } from "@/lib/api/product";
-import type { ProductAggregatePayload } from "@/lib/api/product";
+import { saveProductAggregate } from "@/lib/axios/product-v2";
+import type { ProductAggregatePayload } from "@/lib/axios/product-v2";
 import type { ProductDetailsDTO } from "@/lib/types/product";
 import { normalizeImages } from "@/lib/format";
 import { SelectItem } from "@/components/ui/select";

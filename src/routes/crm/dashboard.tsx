@@ -526,22 +526,6 @@ function CrmDashboard() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label>Số dòng cảnh báo</Label>
-                <Select value={inventoryLimit} onValueChange={setInventoryLimit}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Số dòng" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5">5 dòng</SelectItem>
-                    <SelectItem value="10">10 dòng</SelectItem>
-                    <SelectItem value="20">20 dòng</SelectItem>
-                    <SelectItem value="50">50 dòng</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-muted-foreground text-xs">Tham số limit của API inventory.</p>
-              </div>
-
               <div className="flex items-end">
                 <Button variant="ghost" onClick={resetFilters} className="w-full sm:w-auto">
                   Khôi phục mặc định

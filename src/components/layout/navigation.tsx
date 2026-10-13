@@ -77,7 +77,7 @@ export function Navigation() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {me.isOperator === 1 && (
-                  <DropdownMenuItem onClick={() => navigate({ to: "/admin" })}>
+                  <DropdownMenuItem onClick={() => navigate({ to: "/crm" })}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     <span>Bảng điều khiển</span>
                   </DropdownMenuItem>
@@ -89,7 +89,7 @@ export function Navigation() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600"
-                  onClick={() => navigate({ to: "/logout" })}
+                  onClick={() => navigate({ to: "/login" })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Đăng xuất</span>

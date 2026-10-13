@@ -15,6 +15,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ShopRouteImport } from './routes/_shop'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ShopIndexRouteImport } from './routes/_shop/index'
+import { Route as CrmUserRouteImport } from './routes/crm/user'
 import { Route as CrmProductRouteImport } from './routes/crm/product'
 import { Route as CrmOrderRouteImport } from './routes/crm/order'
 import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
@@ -61,6 +62,11 @@ const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ShopRoute,
+} as any)
+const CrmUserRoute = CrmUserRouteImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => CrmRoute,
 } as any)
 const CrmProductRoute = CrmProductRouteImport.update({
   id: '/product',
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/product': typeof CrmProductRoute
+  '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/login': typeof ShopAuthLoginRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/product': typeof CrmProductRoute
+  '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
   '/admin': typeof AdminIndexRoute
   '/login': typeof ShopAuthLoginRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/product': typeof CrmProductRoute
+  '/crm/user': typeof CrmUserRoute
   '/_shop/': typeof ShopIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_shop/_auth/login': typeof ShopAuthLoginRoute
@@ -237,6 +246,7 @@ export interface FileRouteTypes {
     | '/crm/dashboard'
     | '/crm/order'
     | '/crm/product'
+    | '/crm/user'
     | '/'
     | '/admin/'
     | '/login'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/crm/dashboard'
     | '/crm/order'
     | '/crm/product'
+    | '/crm/user'
     | '/'
     | '/admin'
     | '/login'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/crm/dashboard'
     | '/crm/order'
     | '/crm/product'
+    | '/crm/user'
     | '/_shop/'
     | '/admin/'
     | '/_shop/_auth/login'
@@ -346,6 +358,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof ShopIndexRouteImport
       parentRoute: typeof ShopRoute
+    }
+    '/crm/user': {
+      id: '/crm/user'
+      path: '/user'
+      fullPath: '/crm/user'
+      preLoaderRoute: typeof CrmUserRouteImport
+      parentRoute: typeof CrmRoute
     }
     '/crm/product': {
       id: '/crm/product'
@@ -520,6 +539,7 @@ interface CrmRouteChildren {
   CrmDashboardRoute: typeof CrmDashboardRoute
   CrmOrderRoute: typeof CrmOrderRoute
   CrmProductRoute: typeof CrmProductRoute
+  CrmUserRoute: typeof CrmUserRoute
 }
 
 const CrmRouteChildren: CrmRouteChildren = {
@@ -527,6 +547,7 @@ const CrmRouteChildren: CrmRouteChildren = {
   CrmDashboardRoute: CrmDashboardRoute,
   CrmOrderRoute: CrmOrderRoute,
   CrmProductRoute: CrmProductRoute,
+  CrmUserRoute: CrmUserRoute,
 }
 
 const CrmRouteWithChildren = CrmRoute._addFileChildren(CrmRouteChildren)

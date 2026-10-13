@@ -1,91 +1,68 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
-
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem
+  SidebarMenuItem
 } from "@/components/ui/sidebar";
 
-export function CrmMain({
-  items
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
-  const location = useLocation();
+export type CrmNavItem = {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  description?: string;
+};
 
-  const pathname = location.pathname;
+export function CrmMain({ items }: { items: CrmNavItem[] }) {
+  const { pathname } = useLocation();
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Chức năng chính</SidebarGroupLabel>
+    <SidebarGroup className="px-3 py-3">
+      <SidebarGroupLabel className="text-sidebar-foreground/50 px-3 pb-2 text-[11px] font-semibold tracking-[0.14em] uppercase">
+        Không gian làm việc
+      </SidebarGroupLabel>
 
-      <SidebarMenu>
+      <SidebarMenu className="gap-1.5">
         {items.map((item) => {
-          const isChildActive = item.items?.some((subItem) => pathname === subItem.url);
+          const isActive =
+            pathname === item.url || (item.url !== "/" && pathname.startsWith(`${item.url}/`));
 
-          const isParentActive = pathname === item.url || isChildActive;
           return (
-            <Collapsible key={item.title} asChild defaultOpen={item.isActive || isChildActive}>
-              <SidebarMenuItem>
-                {/* MENU CHA */}
-                <SidebarMenuButton isActive={isParentActive} asChild tooltip={item.title}>
-                  <Link to={item.url}>
-                    <item.icon />
-                    <span className="font-bold"> {item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-
-                {/* MENU CON */}
-                {item.items?.length ? (
-                  <>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuAction className="data-[state=open]:rotate-90">
-                        <ChevronRight />
-                        <span className="sr-only">Toggle</span>
-                      </SidebarMenuAction>
-                    </CollapsibleTrigger>
-
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items.map((subItem) => {
-                          const isActive = pathname === subItem.url;
-
-                          return (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild isActive={isActive}>
-                                <Link to={subItem.url}>
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          );
-                        })}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </>
-                ) : null}
-              </SidebarMenuItem>
-            </Collapsible>
+            <SidebarMenuItem key={item.url}>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive}
+                tooltip={item.title}
+                className={[
+                  "group relative h-11 rounded-xl px-3 transition-all duration-200",
+                  "hover:bg-sidebar-accent/80 hover:translate-x-0.5",
+                  "data-[active=true]:bg-sidebar-primary data-[active=true]:font-semibold",
+                  "data-[active=true]:text-sidebar-primary-foreground data-[active=true]:shadow-sm",
+                  "data-[active=true]:hover:bg-sidebar-primary"
+                ].join(" ")}
+              >
+                <Link to={item.url} aria-current={isActive ? "page" : undefined}>
+                  <item.icon
+                    className={[
+                      "size-[18px] shrink-0 transition-transform duration-200",
+                      "group-hover:scale-105"
+                    ].join(" ")}
+                    strokeWidth={isActive ? 2.3 : 1.8}
+                  />
+                  <span className="text-sm">{item.title}</span>
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="bg-sidebar-primary-foreground/90 absolute right-2 h-1.5 w-1.5 rounded-full"
+                    />
+                  )}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           );
         })}
       </SidebarMenu>

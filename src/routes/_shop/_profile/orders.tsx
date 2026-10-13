@@ -10,13 +10,7 @@ import { createInfiniteOrdersQueryOptions } from "@/lib/tanstack/options/order";
 import { QueryBoundary } from "@/components/boundary";
 import { PageWrapper } from "@/components/layout/page-warper";
 import { ProfileNavigation } from "@/components/shop/profile/navigation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
+
 import { Button } from "@/components/ui/button";
 import type { OrderDTO, OrderStatus } from "@/lib/types/order";
 import { Separator } from "@/components/ui/separator";
@@ -87,26 +81,6 @@ function OrdersPage() {
                       <p className="text-muted-foreground text-sm">
                         Theo dõi và quản lý các đơn hàng bạn đã đặt.
                       </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium whitespace-nowrap">Lọc:</span>
-                      <Select
-                        value={statusFilter}
-                        onValueChange={(value) => setStatusFilter(value as OrderStatus | "ALL")}
-                      >
-                        <SelectTrigger className="w-[160px] rounded-full">
-                          <SelectValue placeholder="Trạng thái" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ALL">Tất cả</SelectItem>
-                          <SelectItem value="NEW">Chờ xử lý</SelectItem>
-                          <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
-                          <SelectItem value="SHIPPING">Đang giao</SelectItem>
-                          <SelectItem value="COMPLETED">Hoàn thành</SelectItem>
-                          <SelectItem value="CANCELLED">Đã hủy</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
                   </header>
 

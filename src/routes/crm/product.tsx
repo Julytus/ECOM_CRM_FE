@@ -15,8 +15,8 @@ import {
   createInfiniteProductDetailsQueryOptions,
   deleteProductsMutationOptions
 } from "@/lib/tanstack/options/product";
-import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/admin/product/atoms";
-import { ProductDialog } from "@/components/admin/product/product-dialog";
+import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/crm/product/atoms";
+import { ProductDialog } from "@/components/crm/product/product-dialog";
 
 export const Route = createFileRoute("/crm/product")({
   component: AdminProducts
@@ -133,7 +133,11 @@ function AdminProducts() {
         title="Quản lý sản phẩm"
         description="Quản lý, tạo mới, chỉnh sửa sản phẩm"
       />
-      <ProductDialog onSaved={() => { void refetch(); }} />
+      <ProductDialog
+        onSaved={() => {
+          void refetch();
+        }}
+      />
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         itemId={deleteProductId}
