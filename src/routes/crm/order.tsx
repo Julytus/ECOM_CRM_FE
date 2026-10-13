@@ -9,6 +9,7 @@ import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced"
 import { createOrderColumns } from "@/components/crm/order/columns";
 import { OrderFormDialog } from "@/components/admin/order/order-form-dialog";
 import { DeleteOrderDialog } from "@/components/admin/order/delete-order-dialog";
+import { OrderDetailSheet } from "@/components/admin/order/order-sheet";
 
 import {
   createInfiniteOrdersQueryOptions,
@@ -35,6 +36,9 @@ function AdminOrders() {
   const [deleteOrderId, setDeleteOrderId] = React.useState<number | null>(null);
   const [deleteOrderCode, setDeleteOrderCode] = React.useState<string | undefined>();
 
+  const [detailSheetOpen, setDetailSheetOpen] = React.useState(false);
+  const [detailOrderId, setDetailOrderId] = React.useState<number | null>(null);
+
   // Query
   const {
     data: queryData,
@@ -51,10 +55,7 @@ function AdminOrders() {
     })
   );
 
-  const orders = React.useMemo(
-    () => queryData?.pages.flatMap((p) => p.items) ?? [],
-    [queryData]
-  );
+  const orders = React.useMemo(() => queryData?.pages.flatMap((p) => p.items) ?? [], [queryData]);
   const total = React.useMemo(() => queryData?.pages[0]?.total ?? 0, [queryData]);
 
   // Mutations
@@ -86,15 +87,16 @@ function AdminOrders() {
     setDeleteDialogOpen(true);
   };
 
+  const handleViewDetails = (order: OrderDTO) => {
+    setDetailOrderId(order.id);
+    setDetailSheetOpen(true);
+  };
+
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         setDeleteDialogOpen(false);
         refetch();
-        toast.success("Xóa đơn hàng thành công");
-      },
-      onError: () => {
-        toast.error("Xóa đơn hàng thất bại");
       }
     });
   };
@@ -120,10 +122,11 @@ function AdminOrders() {
     () =>
       createOrderColumns({
         onDelete: handleDelete,
-        onEdit: handleEdit,
-        onShowDeleteConfirm: handleShowDeleteConfirm
+        onUpdate: handleUpdate,
+        onShowDeleteConfirm: handleShowDeleteConfirm,
+        onViewDetails: handleViewDetails
       }),
-    [handleEdit, handleDelete, handleShowDeleteConfirm]
+    [handleUpdate, handleDelete, handleShowDeleteConfirm, handleViewDetails]
   );
 
   return (
@@ -140,7 +143,7 @@ function AdminOrders() {
         onDeleteSelected={handleDeleteSelected}
         deleteLabel="Xóa đã chọn"
         title="Quản lý đơn hàng"
-        description="Tạo, chỉnh sửa và quản lý các đơn hàng"
+        description="Theo dõi, cập nhật trạng thái và xử lý đơn hàng của hệ thống."
       />
       <OrderFormDialog
         open={openForm}
@@ -155,6 +158,11 @@ function AdminOrders() {
         onConfirm={handleDelete}
         onOpenChange={setDeleteDialogOpen}
         isLoading={deleteMutation.isPending}
+      />
+      <OrderDetailSheet
+        orderId={detailOrderId}
+        open={detailSheetOpen}
+        onOpenChange={setDetailSheetOpen}
       />
     </>
   );

@@ -17,6 +17,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ShopIndexRouteImport } from './routes/_shop/index'
 import { Route as CrmProductRouteImport } from './routes/crm/product'
 import { Route as CrmOrderRouteImport } from './routes/crm/order'
+import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
 import { Route as CrmCategoryRouteImport } from './routes/crm/category'
 import { Route as AdminUserRouteImport } from './routes/admin/user'
 import { Route as AdminProductRouteImport } from './routes/admin/product'
@@ -69,6 +70,11 @@ const CrmProductRoute = CrmProductRouteImport.update({
 const CrmOrderRoute = CrmOrderRouteImport.update({
   id: '/order',
   path: '/order',
+  getParentRoute: () => CrmRoute,
+} as any)
+const CrmDashboardRoute = CrmDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => CrmRoute,
 } as any)
 const CrmCategoryRoute = CrmCategoryRouteImport.update({
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/admin/product': typeof AdminProductRoute
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
+  '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/product': typeof CrmProductRoute
   '/': typeof ShopIndexRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/admin/product': typeof AdminProductRoute
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
+  '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/product': typeof CrmProductRoute
   '/': typeof ShopIndexRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/admin/product': typeof AdminProductRoute
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
+  '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/product': typeof CrmProductRoute
   '/_shop/': typeof ShopIndexRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/admin/product'
     | '/admin/user'
     | '/crm/category'
+    | '/crm/dashboard'
     | '/crm/order'
     | '/crm/product'
     | '/'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/admin/product'
     | '/admin/user'
     | '/crm/category'
+    | '/crm/dashboard'
     | '/crm/order'
     | '/crm/product'
     | '/'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/admin/product'
     | '/admin/user'
     | '/crm/category'
+    | '/crm/dashboard'
     | '/crm/order'
     | '/crm/product'
     | '/_shop/'
@@ -347,6 +359,13 @@ declare module '@tanstack/react-router' {
       path: '/order'
       fullPath: '/crm/order'
       preLoaderRoute: typeof CrmOrderRouteImport
+      parentRoute: typeof CrmRoute
+    }
+    '/crm/dashboard': {
+      id: '/crm/dashboard'
+      path: '/dashboard'
+      fullPath: '/crm/dashboard'
+      preLoaderRoute: typeof CrmDashboardRouteImport
       parentRoute: typeof CrmRoute
     }
     '/crm/category': {
@@ -498,12 +517,14 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface CrmRouteChildren {
   CrmCategoryRoute: typeof CrmCategoryRoute
+  CrmDashboardRoute: typeof CrmDashboardRoute
   CrmOrderRoute: typeof CrmOrderRoute
   CrmProductRoute: typeof CrmProductRoute
 }
 
 const CrmRouteChildren: CrmRouteChildren = {
   CrmCategoryRoute: CrmCategoryRoute,
+  CrmDashboardRoute: CrmDashboardRoute,
   CrmOrderRoute: CrmOrderRoute,
   CrmProductRoute: CrmProductRoute,
 }
