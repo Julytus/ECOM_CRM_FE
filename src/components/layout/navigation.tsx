@@ -89,7 +89,7 @@ export function Navigation() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="text-red-600"
-                  onClick={() => navigate({ to: "/login" })}
+                  onClick={() => navigate({ to: "/logout" })}
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Đăng xuất</span>

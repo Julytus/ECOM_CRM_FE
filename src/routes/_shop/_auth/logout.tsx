@@ -6,15 +6,29 @@ import { useCartStore } from "@/lib/stores/cart";
 
 export const Route = createFileRoute("/_shop/_auth/logout")({
   beforeLoad: async () => {
-    useAuthStore.getState().clear?.();
+    try {
+      // Clear auth store (this also clears localStorage and cookies)
+      useAuthStore.getState().clear?.();
 
-    useCartStore.getState().clearCart?.();
+      // Clear cart store if exists
+      useCartStore.getState().clearCart?.();
 
-    queryClient.clear();
+      // Invalidate and remove "me" query specifically
+      queryClient.removeQueries({ queryKey: ["me"] });
 
-    toast.info("Đăng xuất thành công");
+      // Clear all react query cache
+      queryClient.clear();
 
+      // Show success message
+      toast.success("Đăng xuất thành công");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Có lỗi xảy ra khi đăng xuất");
+    }
+
+    // Redirect to home
     throw redirect({ to: "/" });
   },
   component: () => null
 });
+

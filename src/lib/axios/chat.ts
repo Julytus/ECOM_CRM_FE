@@ -1,41 +1,57 @@
-import axiosInstance from "@/lib/axios/instance"; // Đường dẫn tới file instance của bạn
+import axiosInstance from "@/lib/axios/instance";
 
-export interface ProductData {
+export type ProductData = {
   id: number;
   name: string;
-  description: string;
+  image?: string | null;
+  thumbnail?: string | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  [key: string]: unknown;
+};
 
-  categoryId: number;
-  categoryName: string | null;
+export type ChatTurn = {
+  role: "user" | "assistant";
+  content: string;
+};
 
-  avgRating: number;
+export type ProductRecommendation = {
+  product: ProductData;
+  reason: string;
+};
 
-  image: string; // JSON string, e.g. "[]", '["url"]'
-  thumbnail: string;
+export type ChatApiResponse =
+  | {
+      type: "CHAT";
+      message: string;
+      suggestions?: string[];
+    }
+  | {
+      type: "NO_RESULT";
+      message: string;
+      suggestions?: string[];
+    }
+  | {
+      type: "PRODUCTS";
+      message: string;
+      data: ProductRecommendation[];
+      suggestions?: string[];
+    }
+  // Backward compatibility while older backend instances are still deployed.
+  | {
+      type: "PRODUCT";
+      message?: string;
+      data: ProductData;
+      suggestions?: string[];
+    };
 
-  active: 0 | 1; // backend uses int flag
-
-  minPrice: number;
-  maxPrice: number;
-
-  originalMinPrice: number;
-  originalMaxPrice: number;
-}
-
-export type SearchResponse = ProductSearchResponse | ChatSearchResponse;
-
-export interface ProductSearchResponse {
-  type: "PRODUCT";
-  data: ProductData;
-}
-
-export interface ChatSearchResponse {
-  type: "CHAT";
-
-  message: string;
-}
-
-export const searchProduct = async (message: string): Promise<SearchResponse> => {
-  const response = await axiosInstance.post("/ai/product/search", { message });
-  return response.data;
+export const searchProduct = async (
+  message: string,
+  history: ChatTurn[] = []
+): Promise<ChatApiResponse> => {
+  const res = await axiosInstance.post<ChatApiResponse>("/ai/product/search", {
+    message,
+    history: history.slice(-10)
+  });
+  return res.data;
 };
