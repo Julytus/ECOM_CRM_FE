@@ -2,32 +2,32 @@
 
 import * as React from "react";
 import {
-  BookOpen,
-  Bot,
   Cog,
   Command,
-  Frame,
+  Database,
+  KeySquare,
   LifeBuoy,
-  Map,
-  PieChart,
   Send,
-  Settings2,
+  ShieldCheck,
   ShoppingCart,
-  SquareTerminal
+  Users
 } from "lucide-react";
+import { Link, useLocation } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 
 import { CrmMain } from "@/components/crm/crm-main";
-import { CrmProjects } from "@/components/crm/crm-projects";
 import { CrmSecondary } from "@/components/crm/crm-secondary";
 import {
   Sidebar,
   SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem
 } from "@/components/ui/sidebar";
-import { useLocation } from "node_modules/@tanstack/react-router/dist/esm/useLocation";
+import { permissionResourceQueryOptions } from "@/lib/tanstack/options/permission";
 
 const data = {
   navMain: [
@@ -55,52 +55,6 @@ const data = {
           url: "/crm/category"
         }
       ]
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#"
-        },
-        {
-          title: "Get Started",
-          url: "#"
-        },
-        {
-          title: "Tutorials",
-          url: "#"
-        },
-        {
-          title: "Changelog",
-          url: "#"
-        }
-      ]
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#"
-        },
-        {
-          title: "Team",
-          url: "#"
-        },
-        {
-          title: "Billing",
-          url: "#"
-        },
-        {
-          title: "Limits",
-          url: "#"
-        }
-      ]
     }
   ],
   navSecondary: [
@@ -114,28 +68,42 @@ const data = {
       url: "#",
       icon: Send
     }
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map
-    }
   ]
 };
 
+/**
+ * 4 mục quản trị hệ thống — ẩn/hiện theo quyền VIEW thật của role đăng nhập
+ * (so khớp `code` với kết quả `/permission/resource`, phase 2). `code` khớp
+ * đúng 4 mã resource hệ thống xác nhận trong seed `crm_jlt.sql`.
+ */
+const ADMIN_NAV_ITEMS = [
+  { code: "USER", title: "Người dùng", url: "/crm/user", icon: Users },
+  { code: "RESOURCE", title: "Tài nguyên", url: "/crm/resource", icon: Database },
+  { code: "ROLE", title: "Chức vụ", url: "/crm/role", icon: ShieldCheck },
+  { code: "PERMISSION", title: "Phân quyền", url: "/crm/permission", icon: KeySquare }
+] as const;
+
 export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   //   const { data: me } = useQuery(meQueryOptions);
+
+  const location = useLocation();
+  const { data: permissionResources, isError: isPermissionError } = useQuery({
+    ...permissionResourceQueryOptions(),
+    retry: 1
+  });
+
+  // Fail-open CHỈ khi query thật sự lỗi (không phải lúc đang tải lần đầu —
+  // nếu không, mọi user bị giới hạn quyền đều thấy đủ 4 mục trong thời gian
+  // chờ response, dù chỉ vài trăm ms). Lúc đang tải, `permissionResources`
+  // là `undefined` → `.some()` không chạy → mục tạm ẩn hết thay vì hiện sai.
+  // Backend vẫn chặn ở API nên đây chỉ là ẩn/hiện UI, không phải lớp bảo vệ.
+  const visibleAdminItems = isPermissionError
+    ? ADMIN_NAV_ITEMS
+    : ADMIN_NAV_ITEMS.filter((item) =>
+        permissionResources?.some(
+          (resource) => resource.code === item.code && resource.actions.includes("VIEW")
+        )
+      );
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -158,7 +126,29 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <CrmMain items={data.navMain} />
-        <CrmProjects projects={data.projects} />
+
+        {visibleAdminItems.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Quản trị hệ thống</SidebarGroupLabel>
+            <SidebarMenu>
+              {visibleAdminItems.map((item) => (
+                <SidebarMenuItem key={item.code}>
+                  <SidebarMenuButton
+                    isActive={location.pathname === item.url}
+                    asChild
+                    tooltip={item.title}
+                  >
+                    <Link to={item.url}>
+                      <item.icon />
+                      <span className="font-bold">{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+
         <CrmSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       {/* <SidebarFooter>

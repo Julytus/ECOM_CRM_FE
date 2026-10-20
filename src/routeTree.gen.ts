@@ -15,7 +15,11 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ShopRouteImport } from './routes/_shop'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ShopIndexRouteImport } from './routes/_shop/index'
+import { Route as CrmUserRouteImport } from './routes/crm/user'
+import { Route as CrmRoleRouteImport } from './routes/crm/role'
+import { Route as CrmResourceRouteImport } from './routes/crm/resource'
 import { Route as CrmProductRouteImport } from './routes/crm/product'
+import { Route as CrmPermissionRouteImport } from './routes/crm/permission'
 import { Route as CrmOrderRouteImport } from './routes/crm/order'
 import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
 import { Route as CrmCategoryRouteImport } from './routes/crm/category'
@@ -62,9 +66,29 @@ const ShopIndexRoute = ShopIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ShopRoute,
 } as any)
+const CrmUserRoute = CrmUserRouteImport.update({
+  id: '/user',
+  path: '/user',
+  getParentRoute: () => CrmRoute,
+} as any)
+const CrmRoleRoute = CrmRoleRouteImport.update({
+  id: '/role',
+  path: '/role',
+  getParentRoute: () => CrmRoute,
+} as any)
+const CrmResourceRoute = CrmResourceRouteImport.update({
+  id: '/resource',
+  path: '/resource',
+  getParentRoute: () => CrmRoute,
+} as any)
 const CrmProductRoute = CrmProductRouteImport.update({
   id: '/product',
   path: '/product',
+  getParentRoute: () => CrmRoute,
+} as any)
+const CrmPermissionRoute = CrmPermissionRouteImport.update({
+  id: '/permission',
+  path: '/permission',
   getParentRoute: () => CrmRoute,
 } as any)
 const CrmOrderRoute = CrmOrderRouteImport.update({
@@ -161,7 +185,11 @@ export interface FileRoutesByFullPath {
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
+  '/crm/permission': typeof CrmPermissionRoute
   '/crm/product': typeof CrmProductRoute
+  '/crm/resource': typeof CrmResourceRoute
+  '/crm/role': typeof CrmRoleRoute
+  '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/login': typeof ShopAuthLoginRoute
@@ -184,7 +212,11 @@ export interface FileRoutesByTo {
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
+  '/crm/permission': typeof CrmPermissionRoute
   '/crm/product': typeof CrmProductRoute
+  '/crm/resource': typeof CrmResourceRoute
+  '/crm/role': typeof CrmRoleRoute
+  '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
   '/admin': typeof AdminIndexRoute
   '/login': typeof ShopAuthLoginRoute
@@ -210,7 +242,11 @@ export interface FileRoutesById {
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/order': typeof CrmOrderRoute
+  '/crm/permission': typeof CrmPermissionRoute
   '/crm/product': typeof CrmProductRoute
+  '/crm/resource': typeof CrmResourceRoute
+  '/crm/role': typeof CrmRoleRoute
+  '/crm/user': typeof CrmUserRoute
   '/_shop/': typeof ShopIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_shop/_auth/login': typeof ShopAuthLoginRoute
@@ -236,7 +272,11 @@ export interface FileRouteTypes {
     | '/crm/category'
     | '/crm/dashboard'
     | '/crm/order'
+    | '/crm/permission'
     | '/crm/product'
+    | '/crm/resource'
+    | '/crm/role'
+    | '/crm/user'
     | '/'
     | '/admin/'
     | '/login'
@@ -259,7 +299,11 @@ export interface FileRouteTypes {
     | '/crm/category'
     | '/crm/dashboard'
     | '/crm/order'
+    | '/crm/permission'
     | '/crm/product'
+    | '/crm/resource'
+    | '/crm/role'
+    | '/crm/user'
     | '/'
     | '/admin'
     | '/login'
@@ -284,7 +328,11 @@ export interface FileRouteTypes {
     | '/crm/category'
     | '/crm/dashboard'
     | '/crm/order'
+    | '/crm/permission'
     | '/crm/product'
+    | '/crm/resource'
+    | '/crm/role'
+    | '/crm/user'
     | '/_shop/'
     | '/admin/'
     | '/_shop/_auth/login'
@@ -347,11 +395,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopIndexRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/crm/user': {
+      id: '/crm/user'
+      path: '/user'
+      fullPath: '/crm/user'
+      preLoaderRoute: typeof CrmUserRouteImport
+      parentRoute: typeof CrmRoute
+    }
+    '/crm/role': {
+      id: '/crm/role'
+      path: '/role'
+      fullPath: '/crm/role'
+      preLoaderRoute: typeof CrmRoleRouteImport
+      parentRoute: typeof CrmRoute
+    }
+    '/crm/resource': {
+      id: '/crm/resource'
+      path: '/resource'
+      fullPath: '/crm/resource'
+      preLoaderRoute: typeof CrmResourceRouteImport
+      parentRoute: typeof CrmRoute
+    }
     '/crm/product': {
       id: '/crm/product'
       path: '/product'
       fullPath: '/crm/product'
       preLoaderRoute: typeof CrmProductRouteImport
+      parentRoute: typeof CrmRoute
+    }
+    '/crm/permission': {
+      id: '/crm/permission'
+      path: '/permission'
+      fullPath: '/crm/permission'
+      preLoaderRoute: typeof CrmPermissionRouteImport
       parentRoute: typeof CrmRoute
     }
     '/crm/order': {
@@ -519,14 +595,22 @@ interface CrmRouteChildren {
   CrmCategoryRoute: typeof CrmCategoryRoute
   CrmDashboardRoute: typeof CrmDashboardRoute
   CrmOrderRoute: typeof CrmOrderRoute
+  CrmPermissionRoute: typeof CrmPermissionRoute
   CrmProductRoute: typeof CrmProductRoute
+  CrmResourceRoute: typeof CrmResourceRoute
+  CrmRoleRoute: typeof CrmRoleRoute
+  CrmUserRoute: typeof CrmUserRoute
 }
 
 const CrmRouteChildren: CrmRouteChildren = {
   CrmCategoryRoute: CrmCategoryRoute,
   CrmDashboardRoute: CrmDashboardRoute,
   CrmOrderRoute: CrmOrderRoute,
+  CrmPermissionRoute: CrmPermissionRoute,
   CrmProductRoute: CrmProductRoute,
+  CrmResourceRoute: CrmResourceRoute,
+  CrmRoleRoute: CrmRoleRoute,
+  CrmUserRoute: CrmUserRoute,
 }
 
 const CrmRouteWithChildren = CrmRoute._addFileChildren(CrmRouteChildren)
