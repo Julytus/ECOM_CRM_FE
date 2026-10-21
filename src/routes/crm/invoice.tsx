@@ -28,7 +28,7 @@ const DEFAULT_FILTERS: InvoiceListParams = {
   page: 1,
   limit: 10,
   sortBy: "createdTime",
-  sortDir: "DESC"
+  sortDir: "desc"
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -65,6 +65,7 @@ function InvoicePage() {
       ]);
       toast.success("Đã cập nhật hóa đơn.");
     },
+    onError: (error) => toast.error(getErrorMessage(error, "Không thể cập nhật hóa đơn."))
   });
 
   React.useEffect(() => {
@@ -168,11 +169,11 @@ function InvoicePage() {
         </div>
         <div className="space-y-2">
           <Label>Thứ tự</Label>
-          <Select value={filters.sortDir ?? "DESC"} onValueChange={(value) => updateFilter({ sortDir: value })}>
+          <Select value={filters.sortDir ?? "desc"} onValueChange={(value) => updateFilter({ sortDir: value as "asc" | "desc" })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="DESC">Mới nhất</SelectItem>
-              <SelectItem value="ASC">Cũ nhất</SelectItem>
+              <SelectItem value="desc">Mới nhất</SelectItem>
+              <SelectItem value="asc">Cũ nhất</SelectItem>
             </SelectContent>
           </Select>
         </div>

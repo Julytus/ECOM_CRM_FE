@@ -17,7 +17,7 @@ export type InvoiceListParams = {
   toDate?: string;
   orderCode?: string;
   sortBy?: InvoiceSortBy;
-  sortDir?: string;
+  sortDir?: "asc" | "desc";
   page?: number;
   offset?: number;
   limit?: number;
