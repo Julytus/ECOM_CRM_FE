@@ -38,6 +38,8 @@ export const getResources = async (
     params: {
       keyword: params.keyword,
       active: params.active,
+      moduleId: params.moduleId,
+      unassigned: params.unassigned,
       page: params.paging?.page,
       limit: params.paging?.limit
     }

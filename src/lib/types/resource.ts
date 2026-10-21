@@ -15,6 +15,7 @@ export interface ResourceDTO {
   uri: string;
   actions: string[];
   active?: number;
+  moduleId?: number | null;
 }
 
 /** Shape thật trên dây (`actions` chưa parse) — chỉ dùng trong lớp axios. */
@@ -23,6 +24,8 @@ export type ResourceWireDTO = Omit<ResourceDTO, "actions"> & { actions: string |
 export interface ResourceListApiRequest {
   keyword?: string;
   active?: number;
+  moduleId?: number;
+  unassigned?: boolean;
   paging?: PagingDTO;
 }
 
