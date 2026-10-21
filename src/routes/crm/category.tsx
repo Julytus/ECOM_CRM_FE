@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { useBulkDelete } from "@/hooks/use-bulk-delete";
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { createCategoryColumns } from "@/components/crm/category/columns";
 import { CategoryFormDialog } from "@/components/admin/category/category-dialog";
@@ -96,18 +97,11 @@ function AdminCategories() {
     });
   };
 
-  const handleDeleteSelected = (ids: number[]) => {
-    if (confirm(`Bạn có chắc muốn xóa ${ids.length} danh mục đã chọn?`)) {
-      Promise.all(ids.map((id) => deleteMutation.mutateAsync(id)))
-        .then(() => {
-          toast.success("Xóa thành công");
-          refetch();
-        })
-        .catch(() => {
-          toast.error("Có lỗi xảy ra");
-        });
-    }
-  };
+  const { run: handleDeleteSelected, isPending: isBulkDeleting } = useBulkDelete({
+    deleteOne: deleteMutation.mutateAsync,
+    onSettled: refetch,
+    label: "danh mục"
+  });
 
   const handlePaginationChange = (pageIndex: number, pageSize: number) => {
     setPagination({ pageIndex, pageSize });
@@ -133,7 +127,7 @@ function AdminCategories() {
         pageSize={pagination.pageSize}
         pageIndex={pagination.pageIndex}
         onPaginationChange={handlePaginationChange}
-        isLoading={isFetching}
+        isLoading={isFetching || isBulkDeleting}
         onRefresh={refetch}
         onAdd={() => {
           setSelectedCategory(null);

@@ -102,6 +102,7 @@ function AdminOrders() {
   };
 
   const handleDeleteSelected = (ids: number[]) => {
+    if (!confirm(`Bạn có chắc muốn xóa ${ids.length} đơn hàng đã chọn?`)) return;
     batchDeleteMutation.mutate(ids, {
       onSuccess: () => {
         refetch();
@@ -109,6 +110,7 @@ function AdminOrders() {
       },
       onError: () => {
         toast.error("Có lỗi xảy ra");
+        refetch();
       }
     });
   };

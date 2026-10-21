@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { useBulkDelete } from "@/hooks/use-bulk-delete";
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { createCrmUserColumns } from "@/components/crm/user/columns";
 import { CrmUserFormDialog } from "@/components/admin/crm-user/crm-user-dialog";
@@ -83,18 +84,11 @@ function AdminCrmUsers() {
     });
   };
 
-  const handleDeleteSelected = (ids: number[]) => {
-    if (confirm(`Bạn có chắc muốn xóa ${ids.length} người dùng đã chọn?`)) {
-      Promise.all(ids.map((id) => deleteMutation.mutateAsync(id)))
-        .then(() => {
-          toast.success("Xóa thành công");
-          refetch();
-        })
-        .catch(() => {
-          toast.error("Có lỗi xảy ra");
-        });
-    }
-  };
+  const { run: handleDeleteSelected, isPending: isBulkDeleting } = useBulkDelete({
+    deleteOne: deleteMutation.mutateAsync,
+    onSettled: refetch,
+    label: "người dùng"
+  });
 
   const handlePaginationChange = (pageIndex: number, pageSize: number) => {
     setPagination({ pageIndex, pageSize });
@@ -119,7 +113,7 @@ function AdminCrmUsers() {
         pageSize={pagination.pageSize}
         pageIndex={pagination.pageIndex}
         onPaginationChange={handlePaginationChange}
-        isLoading={isFetching}
+        isLoading={isFetching || isBulkDeleting}
         onRefresh={refetch}
         onAdd={() => {
           setSelectedUser(null);

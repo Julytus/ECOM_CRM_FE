@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { useBulkDelete } from "@/hooks/use-bulk-delete";
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { createModuleColumns } from "@/components/crm/module/columns";
@@ -95,6 +96,12 @@ function AdminModules() {
     });
   };
 
+  const { run: handleDeleteSelected, isPending: isBulkDeleting } = useBulkDelete({
+    deleteOne: deleteMutation.mutateAsync,
+    onSettled: refetch,
+    label: "module"
+  });
+
   const handleToggleActive = React.useCallback(
     (module: ModuleDTO, active: boolean) => {
       updateModuleStatus(
@@ -144,7 +151,8 @@ function AdminModules() {
         pageSize={pagination.pageSize}
         pageIndex={pagination.pageIndex}
         onPaginationChange={(pageIndex, pageSize) => setPagination({ pageIndex, pageSize })}
-        isLoading={isFetching}
+        isLoading={isFetching || isBulkDeleting}
+        onDeleteSelected={handleDeleteSelected}
         onRefresh={() => void refetch()}
         onAdd={() => {
           setSelectedModule(null);

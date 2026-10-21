@@ -5,6 +5,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { useBulkDelete } from "@/hooks/use-bulk-delete";
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { createRoleColumns } from "@/components/crm/role/columns";
 import { RoleFormDialog } from "@/components/admin/role/role-dialog";
@@ -98,18 +99,11 @@ function AdminRoles() {
     });
   };
 
-  const handleDeleteSelected = (ids: number[]) => {
-    if (confirm(`Bạn có chắc muốn xóa ${ids.length} chức vụ đã chọn?`)) {
-      Promise.all(ids.map((id) => deleteMutation.mutateAsync(id)))
-        .then(() => {
-          toast.success("Xóa thành công");
-          refetch();
-        })
-        .catch(() => {
-          toast.error("Có lỗi xảy ra");
-        });
-    }
-  };
+  const { run: handleDeleteSelected, isPending: isBulkDeleting } = useBulkDelete({
+    deleteOne: deleteMutation.mutateAsync,
+    onSettled: refetch,
+    label: "chức vụ"
+  });
 
   const handlePaginationChange = (pageIndex: number, pageSize: number) => {
     setPagination({ pageIndex, pageSize });
@@ -135,7 +129,7 @@ function AdminRoles() {
         pageSize={pagination.pageSize}
         pageIndex={pagination.pageIndex}
         onPaginationChange={handlePaginationChange}
-        isLoading={isFetching}
+        isLoading={isFetching || isBulkDeleting}
         onRefresh={refetch}
         onAdd={() => {
           setSelectedRole(null);

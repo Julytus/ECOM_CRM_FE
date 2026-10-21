@@ -10,6 +10,7 @@ import {
   type InvoiceAction
 } from "@/components/crm/invoice/columns";
 import { InvoiceActionDialogs } from "@/components/crm/invoice/invoice-action-dialogs";
+import { InvoiceStatusFilter } from "@/components/crm/invoice/status-filter";
 import { InvoiceDetailSheet } from "@/components/crm/invoice/invoice-detail-sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,21 +116,11 @@ function InvoicePage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="invoice-status">Trạng thái</Label>
-          <select
+          <InvoiceStatusFilter
             id="invoice-status"
-            multiple
-            value={(filters.status ?? []).map(String)}
-            onChange={(event) => updateFilter({ status: Array.from(event.currentTarget.selectedOptions, (option) => Number(option.value)) })}
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
-            aria-label="Trạng thái hóa đơn"
-          >
-            <option value="0">Nháp</option>
-            <option value="1">Hoàn tất</option>
-            <option value="2">Đã hủy</option>
-            <option value="3">Chưa thanh toán</option>
-            <option value="4">Hoàn tiền</option>
-          </select>
-          <p className="text-muted-foreground text-xs">Giữ Ctrl/Cmd để chọn nhiều trạng thái.</p>
+            value={filters.status ?? []}
+            onChange={(status) => updateFilter({ status: status.length ? status : undefined })}
+          />
         </div>
         <div className="space-y-2">
           <Label>Phương thức thanh toán</Label>

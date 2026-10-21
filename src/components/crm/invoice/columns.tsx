@@ -30,12 +30,13 @@ export function createInvoiceColumns({
   return [
     {
       accessorKey: "invoiceCode",
-      header: "Mã hóa đơn",
+      header: "Mã hóa đơn / Đơn hàng",
       cell: ({ row }) => (
         <div>
           <div className="font-semibold">{row.original.invoiceCode || `#${row.original.id}`}</div>
           <div className="text-muted-foreground text-xs">
-            {row.original.orderCode || (row.original.orderId ? `Đơn #${row.original.orderId}` : "POS")}
+            {row.original.orderCode ||
+              (row.original.orderId ? `Đơn #${row.original.orderId}` : "POS")}
           </div>
         </div>
       )
@@ -74,9 +75,7 @@ export function createInvoiceColumns({
       accessorKey: "createdTime",
       header: "Ngày tạo",
       cell: ({ row }) =>
-        row.original.createdTime
-          ? new Date(row.original.createdTime).toLocaleString("vi-VN")
-          : "—"
+        row.original.createdTime ? new Date(row.original.createdTime).toLocaleString("vi-VN") : "—"
     },
     {
       id: "actions",

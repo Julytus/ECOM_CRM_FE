@@ -13,7 +13,6 @@ import { Route as CrmRouteImport } from './routes/crm'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ShopRouteImport } from './routes/_shop'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ShopIndexRouteImport } from './routes/_shop/index'
 import { Route as CrmUserRouteImport } from './routes/crm/user'
 import { Route as CrmRoleRouteImport } from './routes/crm/role'
@@ -26,10 +25,6 @@ import { Route as CrmModuleRouteImport } from './routes/crm/module'
 import { Route as CrmInvoiceRouteImport } from './routes/crm/invoice'
 import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
 import { Route as CrmCategoryRouteImport } from './routes/crm/category'
-import { Route as AdminUserRouteImport } from './routes/admin/user'
-import { Route as AdminProductRouteImport } from './routes/admin/product'
-import { Route as AdminOrderRouteImport } from './routes/admin/order'
-import { Route as AdminCategoryRouteImport } from './routes/admin/category'
 import { Route as ShopWishlistRouteImport } from './routes/_shop/wishlist'
 import { Route as ShopSearchRouteImport } from './routes/_shop/search'
 import { Route as ShopCheckoutIndexRouteImport } from './routes/_shop/checkout/index'
@@ -60,11 +55,6 @@ const AboutRoute = AboutRouteImport.update({
 const ShopRoute = ShopRouteImport.update({
   id: '/_shop',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
 } as any)
 const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/',
@@ -126,26 +116,6 @@ const CrmCategoryRoute = CrmCategoryRouteImport.update({
   path: '/category',
   getParentRoute: () => CrmRoute,
 } as any)
-const AdminUserRoute = AdminUserRouteImport.update({
-  id: '/user',
-  path: '/user',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProductRoute = AdminProductRouteImport.update({
-  id: '/product',
-  path: '/product',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminOrderRoute = AdminOrderRouteImport.update({
-  id: '/order',
-  path: '/order',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCategoryRoute = AdminCategoryRouteImport.update({
-  id: '/category',
-  path: '/category',
-  getParentRoute: () => AdminRoute,
-} as any)
 const ShopWishlistRoute = ShopWishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
@@ -204,14 +174,10 @@ const ShopAuthLoginRoute = ShopAuthLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/admin': typeof AdminRoute
   '/crm': typeof CrmRouteWithChildren
   '/search': typeof ShopSearchRoute
   '/wishlist': typeof ShopWishlistRoute
-  '/admin/category': typeof AdminCategoryRoute
-  '/admin/order': typeof AdminOrderRoute
-  '/admin/product': typeof AdminProductRoute
-  '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/invoice': typeof CrmInvoiceRoute
@@ -224,7 +190,6 @@ export interface FileRoutesByFullPath {
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
-  '/admin/': typeof AdminIndexRoute
   '/login': typeof ShopAuthLoginRoute
   '/logout': typeof ShopAuthLogoutRoute
   '/register': typeof ShopAuthRegisterRoute
@@ -237,13 +202,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/crm': typeof CrmRouteWithChildren
   '/search': typeof ShopSearchRoute
   '/wishlist': typeof ShopWishlistRoute
-  '/admin/category': typeof AdminCategoryRoute
-  '/admin/order': typeof AdminOrderRoute
-  '/admin/product': typeof AdminProductRoute
-  '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/invoice': typeof CrmInvoiceRoute
@@ -256,7 +218,6 @@ export interface FileRoutesByTo {
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
-  '/admin': typeof AdminIndexRoute
   '/login': typeof ShopAuthLoginRoute
   '/logout': typeof ShopAuthLogoutRoute
   '/register': typeof ShopAuthRegisterRoute
@@ -271,14 +232,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_shop': typeof ShopRouteWithChildren
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/admin': typeof AdminRoute
   '/crm': typeof CrmRouteWithChildren
   '/_shop/search': typeof ShopSearchRoute
   '/_shop/wishlist': typeof ShopWishlistRoute
-  '/admin/category': typeof AdminCategoryRoute
-  '/admin/order': typeof AdminOrderRoute
-  '/admin/product': typeof AdminProductRoute
-  '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/invoice': typeof CrmInvoiceRoute
@@ -291,7 +248,6 @@ export interface FileRoutesById {
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
   '/_shop/': typeof ShopIndexRoute
-  '/admin/': typeof AdminIndexRoute
   '/_shop/_auth/login': typeof ShopAuthLoginRoute
   '/_shop/_auth/logout': typeof ShopAuthLogoutRoute
   '/_shop/_auth/register': typeof ShopAuthRegisterRoute
@@ -310,10 +266,6 @@ export interface FileRouteTypes {
     | '/crm'
     | '/search'
     | '/wishlist'
-    | '/admin/category'
-    | '/admin/order'
-    | '/admin/product'
-    | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
     | '/crm/invoice'
@@ -326,7 +278,6 @@ export interface FileRouteTypes {
     | '/crm/role'
     | '/crm/user'
     | '/'
-    | '/admin/'
     | '/login'
     | '/logout'
     | '/register'
@@ -339,13 +290,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
+    | '/admin'
     | '/crm'
     | '/search'
     | '/wishlist'
-    | '/admin/category'
-    | '/admin/order'
-    | '/admin/product'
-    | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
     | '/crm/invoice'
@@ -358,7 +306,6 @@ export interface FileRouteTypes {
     | '/crm/role'
     | '/crm/user'
     | '/'
-    | '/admin'
     | '/login'
     | '/logout'
     | '/register'
@@ -376,10 +323,6 @@ export interface FileRouteTypes {
     | '/crm'
     | '/_shop/search'
     | '/_shop/wishlist'
-    | '/admin/category'
-    | '/admin/order'
-    | '/admin/product'
-    | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
     | '/crm/invoice'
@@ -392,7 +335,6 @@ export interface FileRouteTypes {
     | '/crm/role'
     | '/crm/user'
     | '/_shop/'
-    | '/admin/'
     | '/_shop/_auth/login'
     | '/_shop/_auth/logout'
     | '/_shop/_auth/register'
@@ -407,7 +349,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   ShopRoute: typeof ShopRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRouteWithChildren
+  AdminRoute: typeof AdminRoute
   CrmRoute: typeof CrmRouteWithChildren
   PaymentOrderCodeCancelRoute: typeof PaymentOrderCodeCancelRoute
   PaymentOrderCodeReturnRoute: typeof PaymentOrderCodeReturnRoute
@@ -442,13 +384,6 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
     }
     '/_shop/': {
       id: '/_shop/'
@@ -533,34 +468,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/crm/category'
       preLoaderRoute: typeof CrmCategoryRouteImport
       parentRoute: typeof CrmRoute
-    }
-    '/admin/user': {
-      id: '/admin/user'
-      path: '/user'
-      fullPath: '/admin/user'
-      preLoaderRoute: typeof AdminUserRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/product': {
-      id: '/admin/product'
-      path: '/product'
-      fullPath: '/admin/product'
-      preLoaderRoute: typeof AdminProductRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/order': {
-      id: '/admin/order'
-      path: '/order'
-      fullPath: '/admin/order'
-      preLoaderRoute: typeof AdminOrderRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/category': {
-      id: '/admin/category'
-      path: '/category'
-      fullPath: '/admin/category'
-      preLoaderRoute: typeof AdminCategoryRouteImport
-      parentRoute: typeof AdminRoute
     }
     '/_shop/wishlist': {
       id: '/_shop/wishlist'
@@ -670,24 +577,6 @@ const ShopRouteChildren: ShopRouteChildren = {
 
 const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
 
-interface AdminRouteChildren {
-  AdminCategoryRoute: typeof AdminCategoryRoute
-  AdminOrderRoute: typeof AdminOrderRoute
-  AdminProductRoute: typeof AdminProductRoute
-  AdminUserRoute: typeof AdminUserRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminCategoryRoute: AdminCategoryRoute,
-  AdminOrderRoute: AdminOrderRoute,
-  AdminProductRoute: AdminProductRoute,
-  AdminUserRoute: AdminUserRoute,
-  AdminIndexRoute: AdminIndexRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
 interface CrmRouteChildren {
   CrmCategoryRoute: typeof CrmCategoryRoute
   CrmDashboardRoute: typeof CrmDashboardRoute
@@ -721,7 +610,7 @@ const CrmRouteWithChildren = CrmRoute._addFileChildren(CrmRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRouteWithChildren,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRouteWithChildren,
+  AdminRoute: AdminRoute,
   CrmRoute: CrmRouteWithChildren,
   PaymentOrderCodeCancelRoute: PaymentOrderCodeCancelRoute,
   PaymentOrderCodeReturnRoute: PaymentOrderCodeReturnRoute,
