@@ -17,3 +17,25 @@ export async function login(page: Page, identifier: string, password: string) {
   await page.getByLabel("Mật khẩu*").fill(password);
   await page.getByRole("button", { name: "Đăng nhập" }).click();
 }
+
+export async function loginAsSeededUser(page: Page) {
+  await login(page, E2E_USER.identifier!, E2E_USER.password!);
+  await page.waitForURL((url) => !url.pathname.endsWith("/login"));
+}
+
+export async function getAccessToken(page: Page) {
+  return page.evaluate(() => {
+    const persistedAuth = localStorage.getItem("auth-storage");
+    if (!persistedAuth) return null;
+
+    try {
+      const parsed: unknown = JSON.parse(persistedAuth);
+      if (typeof parsed !== "object" || parsed === null || !("state" in parsed)) return null;
+      const state = parsed.state;
+      if (typeof state !== "object" || state === null || !("accessToken" in state)) return null;
+      return typeof state.accessToken === "string" ? state.accessToken : null;
+    } catch {
+      return null;
+    }
+  });
+}
