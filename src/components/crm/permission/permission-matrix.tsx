@@ -18,13 +18,15 @@ interface PermissionMatrixProps {
   modules: ModuleDTO[];
   isMutating?: boolean;
   onToggle: (resourceId: number, action: string, checked: boolean) => void;
+  onToggleMany: (items: { resourceId: number; actions: string[] }[], checked: boolean) => void;
 }
 
 export function PermissionMatrix({
   resources,
   modules,
   isMutating,
-  onToggle
+  onToggle,
+  onToggleMany
 }: PermissionMatrixProps) {
   const [collapsedModules, setCollapsedModules] = React.useState<Set<number>>(() => new Set());
 
@@ -55,11 +57,60 @@ export function PermissionMatrix({
     });
   };
 
+  const getToggleActions = (resource: ResourceInfoDTO, checked: boolean) =>
+    ACTIONS.filter((action) =>
+      checked
+        ? resource.actions.includes(action) && !resource.permission.actions.includes(action)
+        : resource.permission.actions.includes(action)
+    );
+
+  const getSelectionState = (groupResources: ResourceInfoDTO[]) => {
+    const selectableActions = groupResources.flatMap((resource) =>
+      ACTIONS.filter(
+        (action) =>
+          resource.actions.includes(action) || resource.permission.actions.includes(action)
+      ).map((action) => ({ resource, action }))
+    );
+    const checkedCount = selectableActions.filter(({ resource, action }) =>
+      resource.permission.actions.includes(action)
+    ).length;
+
+    return {
+      checked: checkedCount === 0 ? false : checkedCount === selectableActions.length ? true : "indeterminate",
+      disabled: selectableActions.length === 0 || isMutating
+    } as const;
+  };
+
+  const renderGroupCheckbox = (label: string, groupResources: ResourceInfoDTO[]) => {
+    const selection = getSelectionState(groupResources);
+    return (
+      <Checkbox
+        aria-label={label}
+        disabled={selection.disabled}
+        checked={selection.checked}
+        onCheckedChange={(value) =>
+          onToggleMany(
+            groupResources
+              .map((resource) => ({
+                resourceId: resource.id,
+                actions: getToggleActions(resource, value === true)
+              }))
+              .filter((item) => item.actions.length > 0),
+            value === true
+          )
+        }
+      />
+    );
+  };
+
   const renderResource = (resource: ResourceInfoDTO) => (
     <TableRow key={resource.id} data-testid={`resource-row-${resource.id}`}>
       <TableCell>
         <div className="font-medium">{resource.name}</div>
         <div className="text-muted-foreground text-xs">{resource.code}</div>
+      </TableCell>
+      <TableCell className="text-center">
+        {renderGroupCheckbox(`Tất cả ${resource.code}`, [resource])}
       </TableCell>
       {ACTIONS.map((action) => {
         // chỉ cho tick action mà resource này tự khai báo hỗ trợ (vd REPORT chỉ có VIEW).
@@ -87,6 +138,7 @@ export function PermissionMatrix({
       <TableHeader>
         <TableRow>
           <TableHead>Tài nguyên</TableHead>
+          <TableHead className="text-center">Tất cả</TableHead>
           {ACTIONS.map((action) => (
             <TableHead key={action} className="text-center">
               {action}
@@ -103,16 +155,19 @@ export function PermissionMatrix({
           return (
             <React.Fragment key={module.id}>
               <TableRow data-testid={`module-group-${module.id}`}>
-                <TableCell colSpan={ACTIONS.length + 1} className="bg-muted/50">
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-between text-left font-semibold"
-                    aria-expanded={!isCollapsed}
-                    onClick={() => toggleModule(module.id)}
-                  >
-                    <span>{module.name} ({moduleResources.length} tài nguyên)</span>
-                    <span aria-hidden="true">{isCollapsed ? "▶" : "▼"}</span>
-                  </button>
+                <TableCell colSpan={ACTIONS.length + 2} className="bg-muted/50">
+                  <div className="flex items-center justify-between gap-4">
+                    <button
+                      type="button"
+                      className="flex flex-1 items-center justify-between text-left font-semibold"
+                      aria-expanded={!isCollapsed}
+                      onClick={() => toggleModule(module.id)}
+                    >
+                      <span>{module.name} ({moduleResources.length} tài nguyên)</span>
+                      <span aria-hidden="true">{isCollapsed ? "▶" : "▼"}</span>
+                    </button>
+                    {renderGroupCheckbox(`Tất cả module ${module.name}`, moduleResources)}
+                  </div>
                 </TableCell>
               </TableRow>
               {!isCollapsed && moduleResources.map(renderResource)}
@@ -122,10 +177,13 @@ export function PermissionMatrix({
         {unassignedResources.length > 0 && (
           <React.Fragment>
             <TableRow data-testid="module-group-none">
-              <TableCell colSpan={ACTIONS.length + 1} className="bg-muted/50">
-                <span className="font-semibold">
-                  Chưa phân module ({unassignedResources.length} tài nguyên)
-                </span>
+              <TableCell colSpan={ACTIONS.length + 2} className="bg-muted/50">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-semibold">
+                    Chưa phân module ({unassignedResources.length} tài nguyên)
+                  </span>
+                  {renderGroupCheckbox("Tất cả module Chưa phân module", unassignedResources)}
+                </div>
               </TableCell>
             </TableRow>
             {unassignedResources.map(renderResource)}

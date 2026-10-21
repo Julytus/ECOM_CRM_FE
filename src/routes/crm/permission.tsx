@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import {
   Select,
@@ -13,6 +14,7 @@ import { PermissionMatrix } from "@/components/crm/permission/permission-matrix"
 
 import { getRoles } from "@/lib/axios/role";
 import { getModules } from "@/lib/axios/module";
+import { addPermission, removePermission } from "@/lib/axios/permission";
 import {
   addPermissionMutationOptions,
   permissionInfoQueryOptions,
@@ -52,9 +54,11 @@ function PermissionPage() {
   }, [navigate, roleId, roles]);
 
   const { data: resources = [], isFetching } = useQuery(permissionInfoQueryOptions(roleId));
+  const queryClient = useQueryClient();
 
   const addMutation = useMutation(addPermissionMutationOptions());
   const removeMutation = useMutation(removePermissionMutationOptions());
+  const [isBulkPending, setIsBulkPending] = React.useState(false);
 
   const handleToggle = (resourceId: number, action: string, checked: boolean) => {
     if (!roleId) return;
@@ -63,6 +67,37 @@ function PermissionPage() {
       addMutation.mutate(payload);
     } else {
       removeMutation.mutate(payload);
+    }
+  };
+
+  const handleToggleMany = async (
+    items: { resourceId: number; actions: string[] }[],
+    checked: boolean
+  ) => {
+    if (!roleId || items.length === 0 || isBulkPending) return;
+
+    setIsBulkPending(true);
+    try {
+      const results = await Promise.all(
+        items.map(async ({ resourceId, actions }) => {
+          try {
+            const payload = { resourceId, roleId, actions };
+            if (checked) await addPermission(payload);
+            else await removePermission(payload);
+            return true;
+          } catch {
+            return false;
+          }
+        })
+      );
+
+      await queryClient.invalidateQueries({ queryKey: ["permission-info"] });
+      if (results.every(Boolean)) toast.success("Cập nhật quyền thành công");
+      else toast.error("Không thể cập nhật quyền");
+    } catch {
+      toast.error("Không thể cập nhật quyền");
+    } finally {
+      setIsBulkPending(false);
     }
   };
 
@@ -101,8 +136,9 @@ function PermissionPage() {
       <PermissionMatrix
         resources={resources}
         modules={modules}
-        isMutating={addMutation.isPending || removeMutation.isPending}
+        isMutating={addMutation.isPending || removeMutation.isPending || isBulkPending}
         onToggle={handleToggle}
+        onToggleMany={handleToggleMany}
       />
 
       {isFetching && <p className="text-muted-foreground text-sm">Đang tải...</p>}
