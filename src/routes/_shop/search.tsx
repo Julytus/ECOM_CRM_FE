@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Search, X, Loader2, SearchX, RotateCcw, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowUpDown,
+  Search,
+  X,
+  Loader2,
+  SearchX,
+  RotateCcw,
+  SlidersHorizontal
+} from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -92,6 +100,9 @@ function ProductSearchPage() {
   }, [productsPages]);
 
   const totalResults = productsPages?.pages[0]?.total ?? 0;
+  // UI-only indicator derived from existing filter state (default price range = [0, 50_000_000]).
+  const activeFilterCount =
+    (priceRange[0] !== 0 || priceRange[1] !== 50000000 ? 1 : 0) + (minRating > 0 ? 1 : 0);
 
   const handleFilterChange = (updates: Partial<ProductListDetailsApiRequest>) => {
     setFilters((prev) => ({ ...prev, ...updates }));
@@ -115,28 +126,42 @@ function ProductSearchPage() {
       image="/page-title/page-title-6.jpg"
       breadcrumbItems={[{ label: "Trang chủ", href: "/" }, { label: "Sản phẩm" }]}
     >
-      <div className="bg-background container mx-auto px-4 py-8 md:px-12 lg:px-16">
+      <div className="container mx-auto px-4 py-8 sm:px-6 md:px-12 md:py-12 lg:px-16">
         {/* --- Toolbar --- */}
-        <div className="mb-8 flex flex-col gap-4 border-b pb-6 md:flex-row md:items-center md:justify-between">
-          <div className="relative max-w-md flex-1">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+        <div
+          role="search"
+          className="border-border mb-6 flex flex-col gap-3 border-b pb-6 md:flex-row md:items-center md:justify-between md:gap-4"
+        >
+          <div className="relative w-full md:max-w-md md:flex-1">
+            <label htmlFor="shop-search-keyword" className="sr-only">
+              Tìm kiếm sản phẩm
+            </label>
+            <Search
+              aria-hidden="true"
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2"
+            />
             <Input
+              id="shop-search-keyword"
+              type="search"
+              autoComplete="off"
               placeholder="Tìm kiếm sản phẩm..."
-              className="bg-muted/40 h-11 pl-10"
+              className="bg-card h-11 rounded-full pr-11 pl-10 [&::-webkit-search-cancel-button]:hidden"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
             {keyword && (
               <button
+                type="button"
+                aria-label="Xoá từ khoá tìm kiếm"
                 onClick={() => setKeyword("")}
-                className="hover:text-destructive absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                className="text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-ring/60 absolute top-1/2 right-1.5 flex size-8 -translate-y-1/2 items-center justify-center rounded-full transition-colors outline-none focus-visible:ring-2"
               >
-                <X className="text-muted-foreground h-4 w-4" />
+                <X aria-hidden="true" className="size-4" />
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
             <Select
               value={`${filters.sortBy}-${filters.sortDir}`}
               onValueChange={(val) => {
@@ -144,7 +169,11 @@ function ProductSearchPage() {
                 handleFilterChange({ sortBy, sortDir });
               }}
             >
-              <SelectTrigger className="h-11! w-[180px]">
+              <SelectTrigger
+                aria-label="Sắp xếp sản phẩm"
+                className="bg-card h-11! w-full rounded-full px-4 sm:w-[190px]"
+              >
+                <ArrowUpDown aria-hidden="true" className="text-muted-foreground size-4" />
                 <SelectValue placeholder="Sắp xếp" />
               </SelectTrigger>
               <SelectContent>
@@ -164,17 +193,50 @@ function ProductSearchPage() {
               </SelectContent>
             </Select>
 
-            <Button variant="outline" className="h-11 gap-2" onClick={() => setIsFilterOpen(true)}>
-              <SlidersHorizontal className="h-4 w-4" />
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 gap-2 rounded-full px-5"
+              aria-haspopup="dialog"
+              aria-expanded={isFilterOpen}
+              onClick={() => setIsFilterOpen(true)}
+            >
+              <SlidersHorizontal aria-hidden="true" className="size-4" />
               Bộ lọc
+              {activeFilterCount > 0 && (
+                <span className="bg-primary text-primary-foreground flex size-5 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums">
+                  {activeFilterCount}
+                  <span className="sr-only"> bộ lọc đang áp dụng</span>
+                </span>
+              )}
             </Button>
           </div>
         </div>
 
-        <div className="mb-6 flex items-center justify-between">
-          <p className="text-muted-foreground text-sm">
-            Tìm thấy <span className="text-foreground font-semibold">{totalResults}</span> sản phẩm
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 md:mb-8">
+          <p className="text-muted-foreground text-sm" aria-live="polite">
+            Tìm thấy{" "}
+            <span className="text-foreground font-semibold tabular-nums">{totalResults}</span> sản
+            phẩm
+            {debouncedKeyword && (
+              <>
+                {" "}
+                cho “<span className="text-foreground font-medium">{debouncedKeyword}</span>”
+              </>
+            )}
           </p>
+          {(activeFilterCount > 0 || keyword) && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={resetAllFilters}
+              className="text-muted-foreground hover:text-foreground h-9 gap-1.5"
+            >
+              <RotateCcw aria-hidden="true" className="size-3.5" />
+              Xoá bộ lọc
+            </Button>
+          )}
         </div>
 
         <ProductGridSection
@@ -184,22 +246,23 @@ function ProductSearchPage() {
           error={error}
           onRetry={refetch}
           emptyFallback={<SearchEmptyState onReset={resetAllFilters} />}
-          className="my-0 px-0 md:px-0 lg:px-0 xl:px-0"
+          className="my-0 px-0 sm:px-0 md:px-0 lg:px-0 xl:px-0"
         />
 
         <div
           ref={loadMoreRef}
+          aria-live="polite"
           className="mt-12 flex min-h-[120px] flex-col items-center justify-center"
         >
           {isFetchingNextPage ? (
-            <div className="flex flex-col items-center gap-2">
-              <Loader2 className="text-primary h-8 w-8 animate-spin" />
-              <p className="text-muted-foreground animate-pulse text-sm">Đang tải thêm...</p>
+            <div role="status" className="flex flex-col items-center gap-2">
+              <Loader2 aria-hidden="true" className="text-foreground size-6 animate-spin" />
+              <p className="text-muted-foreground text-sm">Đang tải thêm...</p>
             </div>
           ) : !hasNextPage && products.length > 0 ? (
-            <div className="flex w-full items-center gap-4 opacity-50">
+            <div className="flex w-full items-center gap-4">
               <div className="bg-border h-px flex-1" />
-              <p className="text-sm font-medium italic">Bạn đã khám phá hết sản phẩm</p>
+              <p className="text-muted-foreground text-sm">Bạn đã khám phá hết sản phẩm</p>
               <div className="bg-border h-px flex-1" />
             </div>
           ) : null}
@@ -220,20 +283,27 @@ function ProductSearchPage() {
 
 function SearchEmptyState({ onReset }: { onReset: () => void }) {
   return (
-    <Empty className="animate-in fade-in zoom-in duration-300">
+    <Empty className="animate-in fade-in zoom-in-95 border-border rounded-2xl border border-dashed py-16 duration-300 motion-reduce:animate-none">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <SearchX />
+        <EmptyMedia variant="icon" className="size-14 rounded-full">
+          <SearchX aria-hidden="true" />
         </EmptyMedia>
-        <EmptyTitle>Không tìm thấy sản phẩm</EmptyTitle>
+        <EmptyTitle className="font-display text-2xl font-semibold">
+          Không tìm thấy sản phẩm
+        </EmptyTitle>
         <EmptyDescription>
           Rất tiếc, chúng tôi không tìm thấy sản phẩm nào khớp với lựa chọn của bạn. Vui lòng thử
           thay đổi bộ lọc hoặc từ khóa.
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button variant="outline" onClick={onReset} className="gap-2">
-          <RotateCcw className="h-4 w-4" />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onReset}
+          className="h-11 gap-2 rounded-full px-6"
+        >
+          <RotateCcw aria-hidden="true" className="size-4" />
           Thiết lập lại bộ lọc
         </Button>
       </EmptyContent>

@@ -1,19 +1,13 @@
 import { FeaturesSection } from "@/components/layout/features";
-import { Footer } from "@/components/layout/footer";
 import HeroCarousel from "@/components/layout/hero";
 import { InstagramSection } from "@/components/layout/instagram";
 import { LookbookSection } from "@/components/layout/product/lookbook";
 import { ProductGridSection } from "@/components/layout/product/products-section";
-import { ProductCard } from "@/components/shop/product/product-card";
-import { QuickViewSheet } from "@/components/layout/product/product-quickview";
 import { Separator } from "@/components/ui/separator";
-import { quickViewProductIdAtom } from "@/lib/atom/quickview";
 import { createInfiniteProductDetailsQueryOptions } from "@/lib/tanstack/options/product";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useAtom } from "jotai";
-import { Circle, Instagram } from "lucide-react";
-import React, { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { LazyMount } from "@/components/lazy";
 
 export const Route = createFileRoute("/_shop/")({
@@ -48,6 +42,7 @@ export default function ShopHomePage() {
           error={error}
           onRetry={refetch}
           limit={8}
+          spacing="large"
           // showVariantPicker={true}
         />
       </LazyMount>
@@ -66,6 +61,7 @@ export default function ShopHomePage() {
           viewAllText="Xem Tất Cả Sản Phẩm"
           onViewAllClick={() => naviagate({ to: "/search" })}
           limit={8}
+          spacing="large"
         />
       </LazyMount>
       <Separator />

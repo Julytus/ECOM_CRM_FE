@@ -7,59 +7,61 @@ import { COLOR_MAP } from "@/lib/color";
 import { motion } from "motion/react";
 
 const pickerVariants = cva(
-  "relative transition-all duration-200 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed disabled:opacity-30",
+  "relative flex cursor-pointer items-center justify-center transition-all duration-200 outline-none focus-visible:ring-ring/60 focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40",
   {
     variants: {
+      // Kept for API compatibility; colours now come from theme tokens in every context.
       context: {
-        default: "text-muted-foreground",
-        overImage: "text-white drop-shadow-md"
+        default: "",
+        overImage: ""
       },
       variant: {
-        swatch: "h-7 w-7 rounded-full border shrink-0",
+        swatch: "size-9 shrink-0 rounded-full border-2",
         button:
-          "min-w-[42px] rounded-lg border px-3 py-1.5 text-[11px] font-bold uppercase tracking-tight",
-        pill: "rounded-full border px-4 py-1 text-[10px] font-medium"
+          "h-10 min-w-11 rounded-lg border px-3 text-xs font-semibold tracking-tight uppercase",
+        pill: "h-9 rounded-full border px-4 text-xs font-medium"
       },
       state: {
-        inactive: "border-neutral-200 text-neutral-500 hover:border-black hover:text-black",
+        inactive:
+          "border-border bg-background text-muted-foreground hover:border-foreground hover:text-foreground",
         active: "",
-        disabled: "grayscale"
+        disabled: "grayscale line-through"
       },
       size: {
         default: "",
-        compact: "min-w-[32px] h-7 px-1.5 text-[9px]"
+        compact: "h-7 min-w-8 px-1.5 text-[10px]"
       }
     },
     compoundVariants: [
       {
         variant: "swatch",
         state: "inactive",
-        className: "border-transparent hover:scale-110"
+        className: "border-transparent bg-transparent hover:scale-110 motion-reduce:hover:scale-100"
       },
       {
         variant: "swatch",
         state: "active",
-        className: "border-black p-0.5 rounded-full"
+        className: "border-foreground p-0.5"
       },
       {
         variant: "swatch",
         size: "compact",
-        className: "h-5 w-5 rounded-full"
+        className: "size-6 min-w-0 px-0"
       },
       {
         variant: "button",
         state: "active",
-        className: "border-black bg-black text-white shadow-sm"
+        className: "border-primary bg-primary text-primary-foreground shadow-sm"
       },
       {
         variant: "button",
         size: "compact",
-        className: "h-6 rounded-md"
+        className: "h-7 rounded-md"
       },
       {
         variant: "pill",
         state: "active",
-        className: "border-primary bg-primary/5 text-primary"
+        className: "border-primary bg-primary/10 text-foreground"
       }
     ],
     defaultVariants: {
@@ -90,14 +92,28 @@ export function VariantPicker({
   size,
   className
 }: VariantPickerProps) {
+  const labelId = React.useId();
+  const isCompact = size === "compact";
+
   return (
-    <div className={cn("space-y-1", className)}>
-      <div className="flex items-center justify-between leading-none">
-        <span className="text-[8px] font-bold tracking-[0.15em] uppercase">{label}</span>
+    <div className={cn(isCompact ? "space-y-1.5" : "space-y-3", className)}>
+      <div className="flex items-center justify-between gap-3 leading-none">
+        <span
+          id={labelId}
+          className={cn(
+            "text-muted-foreground font-semibold tracking-[0.12em] uppercase",
+            isCompact ? "text-[10px]" : "text-xs"
+          )}
+        >
+          {label}
+          {!isCompact && value && (
+            <span className="text-foreground ml-2 tracking-normal normal-case">{value}</span>
+          )}
+        </span>
         {renderHeaderRight && <div className="flex items-center">{renderHeaderRight}</div>}
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
+      <div role="group" aria-labelledby={labelId} className="flex flex-wrap gap-2">
         {options.map((opt) => {
           const isSelected = value === opt.value;
           const state = opt.disabled ? "disabled" : isSelected ? "active" : "inactive";
@@ -107,7 +123,11 @@ export function VariantPicker({
               key={opt.id}
               type="button"
               disabled={opt.disabled}
+              aria-pressed={isSelected}
+              aria-label={variant === "swatch" ? `${label}: ${opt.value}` : undefined}
+              title={variant === "swatch" ? opt.value : undefined}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 onChange(opt.value);
               }}
@@ -116,13 +136,15 @@ export function VariantPicker({
               {variant === "swatch" ? (
                 <>
                   <span
-                    className="block h-full w-full rounded-full border border-black/5"
+                    aria-hidden="true"
+                    className="border-foreground/15 block h-full w-full rounded-full border"
                     style={{ backgroundColor: COLOR_MAP[opt.value] || opt.value }}
                   />
                   {isSelected && (
-                    <motion.div
-                      layoutId={`${label}-active-glow`}
-                      className="absolute -inset-0.5 rounded-full border border-black/30"
+                    <motion.span
+                      aria-hidden="true"
+                      layoutId={`${labelId}-active-glow`}
+                      className="border-foreground/30 absolute -inset-1 rounded-full border"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}

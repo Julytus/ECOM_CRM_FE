@@ -9,10 +9,10 @@ const infoFeatureVariants = cva(
   {
     variants: {
       theme: {
-        neutral: "bg-neutral-50 text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400",
+        neutral: "bg-muted text-foreground",
         luxury:
-          "bg-white border border-neutral-100 text-neutral-900 shadow-sm group-hover:border-neutral-900",
-        emerald: "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
+          "bg-card border border-border text-foreground shadow-xs group-hover:border-foreground",
+        emerald: "bg-success/10 text-success",
         blue: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"
       },
       size: {
@@ -22,7 +22,7 @@ const infoFeatureVariants = cva(
       },
       shape: {
         circle: "rounded-full",
-        square: "rounded-none"
+        square: "rounded-lg"
       }
     },
     defaultVariants: {
@@ -54,15 +54,18 @@ export function InfoFeature({
     <div className={cn("group flex items-center gap-4", className)} {...props}>
       {/* Icon Container */}
       <div className={cn(infoFeatureVariants({ theme, size, shape }))}>
-        <Icon className={cn(size === "sm" ? "size-3" : size === "lg" ? "size-5" : "size-4")} />
+        <Icon
+          aria-hidden="true"
+          className={cn(size === "sm" ? "size-3" : size === "lg" ? "size-5" : "size-4")}
+        />
       </div>
 
       {/* Text Content */}
-      <div className="flex flex-col space-y-0.5">
-        <span className="text-[10px] leading-none font-bold tracking-[0.15em] text-neutral-900 uppercase dark:text-neutral-100">
+      <div className="flex flex-col gap-1">
+        <span className="text-foreground text-xs leading-tight font-semibold tracking-[0.08em] uppercase">
           {title}
         </span>
-        <span className="text-[11px] leading-tight font-light text-neutral-500">{subtitle}</span>
+        <span className="text-muted-foreground text-xs leading-snug">{subtitle}</span>
       </div>
     </div>
   );

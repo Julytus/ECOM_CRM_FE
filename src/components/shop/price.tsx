@@ -3,14 +3,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { formatVnd } from "@/lib/format";
 
-const priceVariants = cva("inline-flex items-baseline font-sans", {
+const priceVariants = cva("inline-flex items-baseline font-sans tabular-nums", {
   variants: {
     variant: {
-      default: "text-neutral-900 font-semibold",
+      default: "text-foreground font-semibold",
       muted: "text-muted-foreground",
-      original: "text-neutral-400 line-through font-normal decoration-neutral-300",
-      discount: "text-red-600 font-bold",
-      hero: "text-3xl font-medium tracking-tight text-neutral-900"
+      original: "text-muted-foreground line-through font-normal decoration-muted-foreground/70",
+      discount: "text-sale font-bold",
+      hero: "text-3xl font-medium tracking-tight text-foreground"
     },
     size: {
       xs: "text-xs",
@@ -47,10 +47,10 @@ const discountBadgeVariants = cva(
   {
     variants: {
       variant: {
-        solid: "bg-red-500 text-white hover:bg-red-600 border-none",
-        outline: "border border-red-500 text-red-500 bg-transparent",
-        ghost: "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400",
-        minimal: "text-red-600 p-0 tracking-widest text-[10px]" // Just text
+        solid: "bg-sale text-sale-foreground border-none",
+        outline: "border border-sale text-sale bg-transparent",
+        ghost: "bg-sale/10 text-sale",
+        minimal: "text-sale p-0 tracking-widest text-[10px]" // Just text
       },
       size: {
         sm: "text-[9px] px-1.5 py-0.5",
@@ -88,7 +88,7 @@ export function DiscountBadge({
 
   return (
     <div className={cn(discountBadgeVariants({ variant, size, shape }), className)} {...props}>
-      -{percentage}%
+      <span className="sr-only">Giảm </span>-{percentage}%
     </div>
   );
 }

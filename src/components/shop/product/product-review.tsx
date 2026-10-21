@@ -3,19 +3,12 @@
 import * as React from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "motion/react";
-import { Star, MessageSquare, ChevronDown, Filter, User } from "lucide-react";
+import { Star, MessageSquare, ChevronDown, User } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { createInfiniteProductReviewsQueryOptions } from "@/lib/tanstack/options/review";
 
@@ -34,14 +27,11 @@ interface ReviewItemDTO {
 }
 
 const RatingStars = ({ rating }: { rating: number }) => (
-  <div className="flex gap-1">
+  <div className="flex gap-1" role="img" aria-label={`${rating} trên 5 sao`}>
     {[1, 2, 3, 4, 5].map((s) => (
       <Star
         key={s}
-        className={cn(
-          "size-3",
-          s <= rating ? "fill-neutral-900 text-neutral-900" : "text-neutral-200"
-        )}
+        className={cn("size-3", s <= rating ? "fill-warning text-warning" : "text-border")}
       />
     ))}
   </div>
@@ -70,22 +60,22 @@ export function ProductReviews({
   const totalCount = data?.pages[0]?.total ?? 0;
 
   return (
-    <section className="bg-background border-t border-neutral-100 py-24">
+    <section className="bg-background border-border border-t py-16 md:py-24">
       <div className="container mx-auto max-w-6xl px-4">
-        <div className="grid grid-cols-1 gap-20 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-20">
           {/* LEFT: Summary & Stats */}
           <div className="space-y-10 lg:col-span-4">
-            <div className="sticky top-40">
-              <span className="mb-4 block text-[10px] font-bold tracking-[0.4em] text-neutral-400 uppercase">
+            <div className="lg:sticky lg:top-40">
+              <span className="text-muted-foreground mb-4 block text-xs font-semibold tracking-[0.3em] uppercase">
                 Xếp hạng & Nhận xét
               </span>
               <div className="mb-8 flex items-baseline gap-4">
-                <h2 className="text-7xl font-light tracking-tighter text-neutral-900">
+                <h2 className="text-foreground text-6xl font-light tracking-tighter tabular-nums md:text-7xl">
                   {avgRating.toFixed(1)}
                 </h2>
                 <div className="space-y-1">
                   <RatingStars rating={Math.round(avgRating)} />
-                  <p className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase">
+                  <p className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
                     {totalCount} Đánh giá
                   </p>
                 </div>
@@ -94,10 +84,13 @@ export function ProductReviews({
               <div className="space-y-4">
                 {[5, 4, 3, 2, 1].map((star) => (
                   <div key={star} className="flex items-center gap-4">
-                    <span className="w-2 text-[10px] font-bold text-neutral-900">{star}</span>
+                    <span className="text-foreground w-3 text-xs font-semibold tabular-nums">
+                      {star}
+                    </span>
                     <Progress
                       value={star === 5 ? 70 : star === 4 ? 20 : 5}
-                      className="h-[2px] bg-neutral-100 [&>div]:bg-neutral-900"
+                      aria-label={`Tỷ lệ ${star} sao`}
+                      className="bg-muted [&>div]:bg-foreground h-1"
                     />
                   </div>
                 ))}
@@ -111,8 +104,8 @@ export function ProductReviews({
 
           {/* RIGHT: Review List */}
           <div className="lg:col-span-8">
-            <div className="mb-12 flex items-center justify-between border-b border-neutral-100 pb-8">
-              <h3 className="text-[11px] font-bold tracking-[0.2em] text-neutral-900 uppercase">
+            <div className="border-border mb-10 flex items-center justify-between border-b pb-6">
+              <h3 className="text-foreground text-sm font-semibold tracking-[0.15em] uppercase">
                 Tất cả đánh giá ({totalCount})
               </h3>
               {/* <Select defaultValue="latest">
@@ -128,7 +121,7 @@ export function ProductReviews({
               </Select> */}
             </div>
 
-            <div className="space-y-16">
+            <div className="space-y-10">
               <AnimatePresence mode="popLayout">
                 {allReviews.map((review: ReviewItemDTO, i) => {
                   const images = review.files ? review.files.split(",") : [];
@@ -143,14 +136,14 @@ export function ProductReviews({
                     >
                       <div className="mb-4 flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="flex size-10 items-center justify-center rounded-full border border-neutral-100 bg-neutral-50">
-                            <User className="size-4 text-neutral-400" />
+                          <div className="border-border bg-muted flex size-10 items-center justify-center rounded-full border">
+                            <User aria-hidden="true" className="text-muted-foreground size-4" />
                           </div>
                           <div>
-                            <span className="block text-[11px] font-bold tracking-tight text-neutral-900 uppercase">
+                            <span className="text-foreground block text-sm font-semibold">
                               Người dùng #{review.userId}
                             </span>
-                            <span className="text-[9px] tracking-wider text-neutral-400 uppercase">
+                            <span className="text-muted-foreground text-xs">
                               {new Date(review.createdAt).toLocaleDateString("vi-VN")}
                             </span>
                           </div>
@@ -159,7 +152,7 @@ export function ProductReviews({
                       </div>
 
                       <div className="pl-13">
-                        <p className="mb-6 text-sm leading-relaxed font-light text-neutral-600">
+                        <p className="text-foreground/85 mb-6 text-sm leading-relaxed">
                           {review.comment || "Không có nội dung bình luận."}
                         </p>
 
@@ -168,11 +161,12 @@ export function ProductReviews({
                             {images.map((img, idx) => (
                               <div
                                 key={idx}
-                                className="size-20 overflow-hidden border border-neutral-100 bg-neutral-50"
+                                className="border-border bg-muted size-20 overflow-hidden rounded-lg border"
                               >
                                 <img
                                   src={img}
-                                  alt="Review attachment"
+                                  alt={`Ảnh đính kèm ${idx + 1} của đánh giá`}
+                                  loading="lazy"
                                   className="h-full w-full object-cover"
                                 />
                               </div>
@@ -180,7 +174,7 @@ export function ProductReviews({
                           </div>
                         )}
                       </div>
-                      <Separator className="bg-neutral-50" />
+                      <Separator />
                     </motion.div>
                   );
                 })}
@@ -193,18 +187,21 @@ export function ProductReviews({
                     animate={{ rotate: 360 }}
                     transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                   >
-                    <MessageSquare className="size-5 text-neutral-300" />
+                    <MessageSquare
+                      aria-label="Đang tải đánh giá"
+                      className="text-muted-foreground size-5"
+                    />
                   </motion.div>
                 ) : hasNextPage ? (
                   <Button
                     variant="ghost"
                     onClick={() => fetchNextPage()}
-                    className="text-[10px] font-bold tracking-[0.2em] text-neutral-400 uppercase hover:text-neutral-900"
+                    className="text-muted-foreground hover:text-foreground text-xs font-semibold tracking-[0.2em] uppercase"
                   >
                     Xem thêm <ChevronDown className="ml-2 size-3" />
                   </Button>
                 ) : (
-                  <span className="text-[9px] font-bold tracking-[0.3em] text-neutral-200 uppercase">
+                  <span className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
                     Hết danh sách đánh giá
                   </span>
                 )}

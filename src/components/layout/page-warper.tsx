@@ -13,8 +13,8 @@ const pageWrapperVariants = cva("flex min-h-screen flex-col", {
   variants: {
     theme: {
       default: "bg-background",
-      luxury: "bg-white selection:bg-neutral-900 selection:text-white",
-      minimal: "bg-neutral-50/30"
+      luxury: "bg-background selection:bg-primary selection:text-primary-foreground",
+      minimal: "bg-background selection:bg-primary selection:text-primary-foreground"
     }
   },
   defaultVariants: {
@@ -80,7 +80,7 @@ export function PageWrapper({
         {/* Subtle separator for luxury theme when image is present */}
         {hasImage && theme === "luxury" && (
           <div className="container mx-auto px-6">
-            <div className="h-px w-full bg-neutral-100" />
+            <div className="bg-border h-px w-full" />
           </div>
         )}
 
@@ -89,7 +89,8 @@ export function PageWrapper({
 
       {/* Atmospheric Texture Overlay */}
       <div
-        className="pointer-events-none fixed inset-0 z-[999] opacity-[0.03] mix-blend-multiply"
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-[999] opacity-[0.03] mix-blend-multiply dark:mix-blend-soft-light"
         style={{
           backgroundImage: `url('https://grainy-gradients.vercel.app/noise.svg')`,
           filter: "contrast(150%) brightness(100%)"

@@ -43,6 +43,12 @@
   --destructive: oklch(0.577 0.245 27.325); /* Professional red */
   --destructive-foreground: oklch(0.985 0.002 250);
 
+  /* Shop status tokens — text-safe on background/card (>= 4.5:1) */
+  --sale: oklch(0.55 0.22 27);
+  --sale-foreground: oklch(0.985 0.002 250);
+  --success: oklch(0.5 0.12 160);
+  --warning: oklch(0.53 0.14 60);
+
   --border: oklch(0.9 0.003 250);
   --input: oklch(0.93 0.003 250);
   --ring: oklch(0.35 0.005 250);
@@ -92,6 +98,11 @@
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: var(--foreground);
 
+  --sale: oklch(0.72 0.16 22);
+  --sale-foreground: oklch(0.18 0.003 250);
+  --success: oklch(0.76 0.14 160);
+  --warning: oklch(0.82 0.15 80);
+
   --border: oklch(0.35 0.003 250);
   --input: oklch(0.32 0.003 250);
   --ring: oklch(0.7 0.003 250);
@@ -131,6 +142,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-sale: var(--sale);
+  --color-sale-foreground: var(--sale-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

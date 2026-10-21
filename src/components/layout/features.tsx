@@ -27,20 +27,32 @@ export function FeaturesSection() {
   ];
 
   return (
-    <section className="flat-spacing-2 from-background bg-gradient-to-b to-gray-100 py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <section
+      aria-label="Cam kết dịch vụ"
+      className="flat-spacing-2 from-background to-muted/60 bg-gradient-to-b py-12 md:py-16"
+    >
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24">
+        <ul role="list" className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           {features.map((feature, idx) => (
-            <div
+            <li
               key={idx}
-              className="flex flex-col items-center rounded-xl bg-white p-6 text-center shadow transition-shadow duration-300 hover:shadow-lg"
+              className="bg-card text-card-foreground border-border flex flex-col items-center rounded-2xl border p-4 text-center shadow-xs transition-shadow duration-300 hover:shadow-md sm:p-6"
             >
-              <div className="text-primary mb-4">{feature.icon}</div>
-              <h5 className="mb-2 text-lg font-semibold">{feature.title}</h5>
-              <p className="text-muted-foreground text-sm">{feature.description}</p>
-            </div>
+              <div
+                aria-hidden="true"
+                className="bg-muted text-foreground mb-4 flex size-14 items-center justify-center rounded-full [&_svg]:size-6"
+              >
+                {feature.icon}
+              </div>
+              <h3 className="mb-1.5 font-sans text-sm font-semibold sm:text-base">
+                {feature.title}
+              </h3>
+              <p className="text-muted-foreground text-xs leading-relaxed sm:text-sm">
+                {feature.description}
+              </p>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

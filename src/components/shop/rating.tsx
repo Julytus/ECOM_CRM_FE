@@ -15,7 +15,7 @@ const ratingBadgeVariants = cva(
         outline: "border border-input bg-background text-foreground",
         ghost: "bg-primary/5 text-primary",
         minimal: "bg-transparent p-0 text-foreground font-medium",
-        star: "bg-amber-400/10 text-amber-600 dark:bg-amber-400/20 dark:text-amber-400 backdrop-blur-sm"
+        star: "bg-background/85 text-foreground [&_svg]:text-warning shadow-sm backdrop-blur-sm"
       },
       size: {
         xs: "text-[10px] px-1.5 py-0.5 [&_svg]:size-2.5",
@@ -62,8 +62,12 @@ export function RatingBadge({
   return (
     <div className="flex items-center gap-1.5">
       <div className={cn(ratingBadgeVariants({ variant, size, shape }), className)} {...props}>
-        {showIcon && <Star className="fill-current" />}
-        <span className="tabular-nums">{displayRating}</span>
+        {showIcon && <Star aria-hidden="true" className="fill-current" />}
+        <span className="tabular-nums">
+          <span className="sr-only">Đánh giá </span>
+          {displayRating}
+          <span className="sr-only">/{maxRating}</span>
+        </span>
       </div>
 
       {count !== undefined && (

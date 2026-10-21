@@ -126,10 +126,12 @@ export default function HeroCarousel() {
                           isActive ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
                         }`}
                       >
-                        <Link to="/search">
-                          <button className="rounded-full bg-white px-8 py-3 font-semibold text-gray-900 shadow-lg transition-colors duration-200 hover:bg-gray-100 hover:shadow-xl">
-                            Tới bộ sưu tập
-                          </button>
+                        <Link
+                          to="/search"
+                          tabIndex={isActive ? 0 : -1}
+                          className="inline-flex h-12 items-center rounded-full bg-white px-8 font-semibold text-neutral-900 shadow-lg transition-all duration-200 outline-none hover:bg-white/90 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+                        >
+                          Tới bộ sưu tập
                         </Link>
                       </div>
                     </div>
@@ -144,35 +146,44 @@ export default function HeroCarousel() {
         <button
           onClick={prevSlide}
           disabled={isAnimating}
-          className="absolute top-1/2 left-4 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white opacity-60 shadow-lg transition-all duration-200 hover:bg-gray-100 disabled:opacity-30 md:left-8"
-          aria-label="Previous slide"
+          type="button"
+          className="bg-background/80 text-foreground hover:bg-background focus-visible:ring-ring absolute top-1/2 left-3 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 outline-none focus-visible:ring-2 disabled:opacity-40 md:left-8 md:size-12"
+          aria-label="Slide trước"
         >
-          <ChevronLeft className="h-6 w-6 text-gray-900" />
+          <ChevronLeft aria-hidden="true" className="size-6" />
         </button>
 
         <button
           onClick={nextSlide}
           disabled={isAnimating}
-          className="absolute top-1/2 right-4 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white opacity-60 shadow-lg transition-all duration-200 hover:bg-gray-100 disabled:opacity-30 md:right-8"
-          aria-label="Next slide"
+          type="button"
+          className="bg-background/80 text-foreground hover:bg-background focus-visible:ring-ring absolute top-1/2 right-3 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 outline-none focus-visible:ring-2 disabled:opacity-40 md:right-8 md:size-12"
+          aria-label="Slide tiếp theo"
         >
-          <ChevronRight className="h-6 w-6 text-gray-900" />
+          <ChevronRight aria-hidden="true" className="size-6" />
         </button>
       </div>
 
       {/* Dots Indicator */}
-      <div className="mt-8 flex justify-center gap-3">
+      <div className="mt-6 flex justify-center gap-1 md:mt-8">
         {slides.map((_, index) => (
           <button
             key={index}
+            type="button"
             onClick={() => goToSlide(index)}
-            className={`rounded-full transition-all duration-300 ${
-              index === currentIndex
-                ? "h-3 w-10 bg-gray-900"
-                : "h-3 w-3 bg-gray-300 hover:bg-gray-400"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
+            aria-label={`Tới slide ${index + 1}`}
+            aria-current={index === currentIndex ? "true" : undefined}
+            className="group focus-visible:ring-ring flex h-6 items-center justify-center rounded-full px-1 outline-none focus-visible:ring-2"
+          >
+            <span
+              aria-hidden="true"
+              className={`block h-2.5 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? "bg-foreground w-10"
+                  : "bg-muted-foreground/40 group-hover:bg-muted-foreground w-2.5"
+              }`}
+            />
+          </button>
         ))}
       </div>
     </div>

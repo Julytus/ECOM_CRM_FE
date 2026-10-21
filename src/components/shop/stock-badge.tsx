@@ -9,9 +9,9 @@ const badgeVariants = cva(
   {
     variants: {
       status: {
-        inStock: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400",
-        outOfStock: "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400",
-        lowStock: "bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400"
+        inStock: "bg-success/10 text-success",
+        outOfStock: "bg-sale/10 text-sale",
+        lowStock: "bg-warning/10 text-warning"
       }
     },
     defaultVariants: {
@@ -23,9 +23,9 @@ const badgeVariants = cva(
 const dotVariants = cva("h-1.5 w-1.5 rounded-full", {
   variants: {
     status: {
-      inStock: "bg-emerald-500 animate-pulse",
-      outOfStock: "bg-red-500",
-      lowStock: "bg-amber-500 animate-bounce"
+      inStock: "bg-success motion-safe:animate-pulse",
+      outOfStock: "bg-sale",
+      lowStock: "bg-warning motion-safe:animate-bounce"
     }
   },
   defaultVariants: {
@@ -47,7 +47,7 @@ export function StockBadge({ status, className, count }: StockBadgeProps) {
 
   return (
     <div className={cn(badgeVariants({ status }), className)}>
-      <span className={cn(dotVariants({ status }))} />
+      <span aria-hidden="true" className={cn(dotVariants({ status }))} />
       {label}
     </div>
   );

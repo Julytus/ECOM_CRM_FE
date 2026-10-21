@@ -4,7 +4,6 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { DiscountBadge, Price } from "@/components/shop/price";
-import { Badge } from "@/components/ui/badge";
 
 const priceGroupVariants = cva("flex items-baseline gap-3", {
   variants: {
@@ -42,18 +41,12 @@ export function ProductPriceDisplay({
       <Price
         value={currentPrice}
         size={layout === "vertical" ? "lg" : "xl"}
-        variant="hero"
-        className="text-neutral-900 dark:text-neutral-50"
+        variant={hasDiscount ? "discount" : "hero"}
       />
 
       {originalPrice != null && originalPrice > currentPrice && (
         <div className="flex items-center gap-2">
-          <Price
-            value={originalPrice}
-            variant="original"
-            size="sm"
-            className="text-neutral-400 decoration-neutral-300 dark:text-neutral-500"
-          />
+          <Price value={originalPrice} variant="original" size="sm" />
 
           {hasDiscount && (
             <DiscountBadge percentage={discountPercentage} variant="ghost" size="md" shape="pill" />

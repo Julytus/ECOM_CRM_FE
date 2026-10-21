@@ -10,6 +10,8 @@ type ProductImageGalleryScrollProps = {
   images: string[];
   className?: string;
   aspectRatio?: number;
+  /** Product name, used to build descriptive alt text. */
+  alt?: string;
 };
 
 /** Product gallery with a bounded, vertically scrollable thumbnail rail. */
@@ -17,10 +19,11 @@ export function ProductImageGalleryScroll({
   images,
   className,
   aspectRatio = 4 / 5,
+  alt = "Sản phẩm"
 }: ProductImageGalleryScrollProps) {
   const uniqueImages = React.useMemo(
     () => [...new Set(images.filter((image) => image?.trim()))],
-    [images],
+    [images]
   );
   const [selectedImage, setSelectedImage] = React.useState(uniqueImages[0] ?? "");
   const thumbnailViewportRef = React.useRef<HTMLDivElement>(null);
@@ -32,12 +35,12 @@ export function ProductImageGalleryScroll({
   const scrollThumbnails = (direction: "up" | "down") => {
     thumbnailViewportRef.current?.scrollBy({
       top: direction === "up" ? -240 : 240,
-      behavior: "smooth",
+      behavior: "smooth"
     });
   };
 
   if (!uniqueImages.length) {
-    return <div className={cn("aspect-[4/5] rounded-xl bg-neutral-50", className)} />;
+    return <div className={cn("bg-muted aspect-[4/5] rounded-xl", className)} />;
   }
 
   return (
@@ -51,7 +54,7 @@ export function ProductImageGalleryScroll({
               variant="outline"
               size="icon"
               aria-label="Cuộn ảnh lên"
-              className="size-8 shrink-0 rounded-full bg-background"
+              className="bg-background size-8 shrink-0 rounded-full"
               onClick={() => scrollThumbnails("up")}
             >
               <ChevronUp className="size-4" />
@@ -60,23 +63,29 @@ export function ProductImageGalleryScroll({
 
           <div
             ref={thumbnailViewportRef}
-            className="flex max-h-[500px] min-h-0 w-full flex-col items-center gap-2 overflow-y-auto overscroll-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex max-h-[500px] min-h-0 w-full flex-col items-center gap-2 overflow-y-auto overscroll-contain scroll-smooth py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {uniqueImages.map((image, index) => (
               <button
                 key={`${image}-${index}`}
                 type="button"
-                aria-label={`Xem ảnh ${index + 1}`}
+                aria-label={`Xem ảnh ${index + 1} của ${alt}`}
                 aria-pressed={selectedImage === image}
                 onClick={() => setSelectedImage(image)}
                 className={cn(
-                  "relative aspect-[4/5] w-12 shrink-0 overflow-hidden rounded-lg border-2 bg-neutral-50 transition-all",
+                  "bg-muted focus-visible:ring-ring/60 focus-visible:ring-offset-background relative aspect-[4/5] w-12 shrink-0 overflow-hidden rounded-lg border-2 transition-all outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
                   selectedImage === image
-                    ? "border-neutral-900 opacity-100"
-                    : "border-transparent opacity-70 hover:opacity-100",
+                    ? "border-foreground opacity-100"
+                    : "border-transparent opacity-70 hover:opacity-100"
                 )}
               >
-                <img src={image} alt={`Ảnh sản phẩm ${index + 1}`} className="size-full object-cover" loading="lazy" />
+                <img
+                  src={image}
+                  alt=""
+                  aria-hidden="true"
+                  className="size-full object-cover"
+                  loading="lazy"
+                />
               </button>
             ))}
           </div>
@@ -87,7 +96,7 @@ export function ProductImageGalleryScroll({
               variant="outline"
               size="icon"
               aria-label="Cuộn ảnh xuống"
-              className="size-8 shrink-0 rounded-full bg-background"
+              className="bg-background size-8 shrink-0 rounded-full"
               onClick={() => scrollThumbnails("down")}
             >
               <ChevronDown className="size-4" />
@@ -97,32 +106,38 @@ export function ProductImageGalleryScroll({
 
         {/* Main image */}
         <div
-          className="relative min-w-0 overflow-hidden rounded-xl bg-neutral-50"
+          className="bg-muted relative min-w-0 overflow-hidden rounded-xl"
           style={{ aspectRatio }}
         >
           <img
             key={selectedImage}
             src={selectedImage}
-            alt="Ảnh sản phẩm đang chọn"
+            alt={`${alt} – ảnh ${Math.max(uniqueImages.indexOf(selectedImage), 0) + 1}/${uniqueImages.length}`}
             className="size-full object-contain transition-opacity duration-200"
           />
         </div>
 
         {/* Mobile: horizontal thumbnail scroller */}
-        <div className="flex gap-2 overflow-x-auto pb-2 sm:hidden [scrollbar-width:thin]">
+        <div className="flex gap-2 overflow-x-auto p-1 pb-2 [scrollbar-width:thin] sm:hidden">
           {uniqueImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
-              aria-label={`Xem ảnh ${index + 1}`}
+              aria-label={`Xem ảnh ${index + 1} của ${alt}`}
               aria-pressed={selectedImage === image}
               onClick={() => setSelectedImage(image)}
               className={cn(
-                "size-16 shrink-0 overflow-hidden rounded-lg border-2 bg-neutral-50",
-                selectedImage === image ? "border-neutral-900" : "border-transparent opacity-70",
+                "bg-muted focus-visible:ring-ring/60 size-16 shrink-0 overflow-hidden rounded-lg border-2 outline-none focus-visible:ring-2",
+                selectedImage === image ? "border-foreground" : "border-transparent opacity-70"
               )}
             >
-              <img src={image} alt={`Ảnh sản phẩm ${index + 1}`} className="size-full object-cover" loading="lazy" />
+              <img
+                src={image}
+                alt=""
+                aria-hidden="true"
+                className="size-full object-cover"
+                loading="lazy"
+              />
             </button>
           ))}
         </div>
