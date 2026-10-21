@@ -150,28 +150,31 @@ export function PermissionMatrix({
     return (
       <React.Fragment key={key}>
         <TableRow data-testid={testId}>
-          <TableCell colSpan={ACTIONS.length + 2} className="bg-muted/50">
-            <div className="flex items-center justify-between gap-4">
+          <TableCell className="bg-muted/50">
+            <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left font-semibold"
+                className="flex min-w-0 flex-1 items-center gap-2 text-left font-semibold"
                 aria-expanded={!isCollapsed}
                 onClick={() => onToggleModule(key)}
               >
-                <span className="truncate">
-                  {label} ({resourcesInGroup.length} tài nguyên)
-                </span>
                 <ChevronDown
                   aria-hidden="true"
                   className={`size-4 shrink-0 transition-transform ${isCollapsed ? "-rotate-90" : ""}`}
                 />
+                <span className="truncate">
+                  {label} ({resourcesInGroup.length} tài nguyên)
+                </span>
               </button>
               <Badge variant="secondary">
                 {granted}/{total}
               </Badge>
-              {renderGroupCheckbox(`Tất cả module ${label}`, resourcesInGroup)}
             </div>
           </TableCell>
+          <TableCell className="bg-muted/50 text-center">
+            {renderGroupCheckbox(`Tất cả module ${label}`, resourcesInGroup)}
+          </TableCell>
+          <TableCell colSpan={ACTIONS.length} className="bg-muted/50" />
         </TableRow>
         {!isCollapsed && resourcesInGroup.map(renderResource)}
       </React.Fragment>
