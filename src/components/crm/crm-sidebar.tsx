@@ -9,6 +9,7 @@ import {
   KeySquare,
   LifeBuoy,
   Receipt,
+  ChartNoAxesCombined,
   Send,
   ShieldCheck,
   ShoppingCart,
@@ -56,6 +57,11 @@ const data = {
         {
           title: "Danh mục",
           url: "/crm/category"
+        },
+        {
+          title: "Doanh thu",
+          url: "/crm/revenue",
+          icon: ChartNoAxesCombined
         }
       ]
     }
