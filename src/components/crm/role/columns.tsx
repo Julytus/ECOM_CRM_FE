@@ -14,9 +14,11 @@ import {
 import type { RoleDTO } from "@/lib/types/role";
 
 export const createRoleColumns = ({
+  onPermission,
   onEdit,
   onShowDeleteConfirm
 }: {
+  onPermission: (role: RoleDTO) => void;
   onEdit: (role: RoleDTO) => void;
   onShowDeleteConfirm: (id: number, name?: string) => void;
 }): ColumnDef<RoleDTO>[] => [
@@ -73,6 +75,7 @@ export const createRoleColumns = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
+          <DropdownMenuItem onClick={() => onPermission(row.original)}>Phân quyền</DropdownMenuItem>
           <DropdownMenuItem onClick={() => onEdit(row.original)}>Chỉnh sửa</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

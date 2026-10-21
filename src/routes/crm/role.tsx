@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/crm/role")({
 });
 
 function AdminRoles() {
+  const navigate = useNavigate();
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10
@@ -42,6 +43,11 @@ function AdminRoles() {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [deleteRoleId, setDeleteRoleId] = React.useState<number | null>(null);
   const [deleteRoleName, setDeleteRoleName] = React.useState<string | undefined>();
+
+  const handlePermission = React.useCallback(
+    (role: RoleDTO) => navigate({ to: "/crm/permission", search: { roleId: role.id } }),
+    [navigate]
+  );
 
   // Query
   const {
@@ -66,16 +72,16 @@ function AdminRoles() {
   const upsertMutation = useMutation({ ...upsertRoleMutationOptions() });
   const deleteMutation = useMutation({ ...deleteRoleMutationOptions() });
 
-  const handleEdit = (role: RoleDTO) => {
+  const handleEdit = React.useCallback((role: RoleDTO) => {
     setSelectedRole(role);
     setOpenForm(true);
-  };
+  }, []);
 
-  const handleShowDeleteConfirm = (id: number, name?: string) => {
+  const handleShowDeleteConfirm = React.useCallback((id: number, name?: string) => {
     setDeleteRoleId(id);
     setDeleteRoleName(name);
     setDeleteDialogOpen(true);
-  };
+  }, []);
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id, {
@@ -111,10 +117,11 @@ function AdminRoles() {
   const columns = React.useMemo(
     () =>
       createRoleColumns({
+        onPermission: handlePermission,
         onEdit: handleEdit,
         onShowDeleteConfirm: handleShowDeleteConfirm
       }),
-    [handleEdit, handleShowDeleteConfirm]
+    [handlePermission, handleEdit, handleShowDeleteConfirm]
   );
 
   return (
