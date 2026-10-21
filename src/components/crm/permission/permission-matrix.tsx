@@ -1,6 +1,8 @@
 import * as React from "react";
+import { ChevronDown, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import type { ResourceInfoDTO } from "@/lib/types/permission";
 import type { ModuleDTO } from "@/lib/types/module";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
@@ -12,24 +14,39 @@ import {
 } from "@/components/ui/table";
 
 const ACTIONS = ["VIEW", "ADD", "UPDATE", "DELETE"] as const;
+const ACTION_ICONS = { VIEW: Eye, ADD: Plus, UPDATE: Pencil, DELETE: Trash2 } as const;
 
 interface PermissionMatrixProps {
   resources: ResourceInfoDTO[];
   modules: ModuleDTO[];
+  collapsedModules: Set<string>;
   isMutating?: boolean;
+  onToggleModule: (moduleKey: string) => void;
   onToggle: (resourceId: number, action: string, checked: boolean) => void;
   onToggleMany: (items: { resourceId: number; actions: string[] }[], checked: boolean) => void;
+}
+
+function getProgress(resources: ResourceInfoDTO[]) {
+  const pairs = resources.flatMap((resource) =>
+    ACTIONS.filter(
+      (action) => resource.actions.includes(action) || resource.permission.actions.includes(action)
+    ).map((action) => ({ resource, action }))
+  );
+  const granted = pairs.filter(({ resource, action }) =>
+    resource.permission.actions.includes(action)
+  ).length;
+  return { granted, total: pairs.length };
 }
 
 export function PermissionMatrix({
   resources,
   modules,
+  collapsedModules,
   isMutating,
+  onToggleModule,
   onToggle,
   onToggleMany
 }: PermissionMatrixProps) {
-  const [collapsedModules, setCollapsedModules] = React.useState<Set<number>>(() => new Set());
-
   if (resources.length === 0) {
     return <p className="text-muted-foreground text-sm">Không có tài nguyên nào.</p>;
   }
@@ -48,15 +65,6 @@ export function PermissionMatrix({
     resourcesByModule.set(resource.moduleId, moduleResources);
   }
 
-  const toggleModule = (moduleId: number) => {
-    setCollapsedModules((current) => {
-      const next = new Set(current);
-      if (next.has(moduleId)) next.delete(moduleId);
-      else next.add(moduleId);
-      return next;
-    });
-  };
-
   const getToggleActions = (resource: ResourceInfoDTO, checked: boolean) =>
     ACTIONS.filter((action) =>
       checked
@@ -65,19 +73,10 @@ export function PermissionMatrix({
     );
 
   const getSelectionState = (groupResources: ResourceInfoDTO[]) => {
-    const selectableActions = groupResources.flatMap((resource) =>
-      ACTIONS.filter(
-        (action) =>
-          resource.actions.includes(action) || resource.permission.actions.includes(action)
-      ).map((action) => ({ resource, action }))
-    );
-    const checkedCount = selectableActions.filter(({ resource, action }) =>
-      resource.permission.actions.includes(action)
-    ).length;
-
+    const { granted, total } = getProgress(groupResources);
     return {
-      checked: checkedCount === 0 ? false : checkedCount === selectableActions.length ? true : "indeterminate",
-      disabled: selectableActions.length === 0 || isMutating
+      checked: granted === 0 ? false : granted === total ? true : "indeterminate",
+      disabled: total === 0 || isMutating
     } as const;
   };
 
@@ -104,7 +103,11 @@ export function PermissionMatrix({
   };
 
   const renderResource = (resource: ResourceInfoDTO) => (
-    <TableRow key={resource.id} data-testid={`resource-row-${resource.id}`}>
+    <TableRow
+      key={resource.id}
+      data-testid={`resource-row-${resource.id}`}
+      className="hover:bg-muted/40"
+    >
       <TableCell>
         <div className="font-medium">{resource.name}</div>
         <div className="text-muted-foreground text-xs">{resource.code}</div>
@@ -113,83 +116,109 @@ export function PermissionMatrix({
         {renderGroupCheckbox(`Tất cả ${resource.code}`, [resource])}
       </TableCell>
       {ACTIONS.map((action) => {
-        // chỉ cho tick action mà resource này tự khai báo hỗ trợ (vd REPORT chỉ có VIEW).
-        // Nhưng nếu action đã được cấp từ trước rồi resource bị sửa bỏ hỗ trợ action đó
-        // (vd xoá DELETE khỏi resource ở trang Resource), permission tồn đọng (`checked`)
-        // vẫn phải cho bỏ tick được — nếu không, quyền thừa không có đường gỡ qua UI.
+        // Quyền đã cấp vẫn có thể gỡ dù action sau đó không còn được hỗ trợ.
         const supported = resource.actions.includes(action);
         const checked = resource.permission.actions.includes(action);
         return (
           <TableCell key={action} className="text-center">
-            <Checkbox
-              aria-label={`${action} ${resource.code}`}
-              disabled={(!supported && !checked) || isMutating}
-              checked={checked}
-              onCheckedChange={(value) => onToggle(resource.id, action, value === true)}
-            />
+            {supported || checked ? (
+              <Checkbox
+                aria-label={`${action} ${resource.code}`}
+                disabled={(!supported && !checked) || isMutating}
+                checked={checked}
+                onCheckedChange={(value) => onToggle(resource.id, action, value === true)}
+              />
+            ) : (
+              <span className="text-muted-foreground" aria-hidden="true">
+                –
+              </span>
+            )}
           </TableCell>
         );
       })}
     </TableRow>
   );
 
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Tài nguyên</TableHead>
-          <TableHead className="text-center">Tất cả</TableHead>
-          {ACTIONS.map((action) => (
-            <TableHead key={action} className="text-center">
-              {action}
-            </TableHead>
-          ))}
+  const renderGroup = (
+    key: string,
+    testId: string,
+    label: string,
+    resourcesInGroup: ResourceInfoDTO[]
+  ) => {
+    const isCollapsed = collapsedModules.has(key);
+    const { granted, total } = getProgress(resourcesInGroup);
+    return (
+      <React.Fragment key={key}>
+        <TableRow data-testid={testId}>
+          <TableCell className="bg-muted/50">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="flex min-w-0 flex-1 items-center gap-2 text-left font-semibold"
+                aria-expanded={!isCollapsed}
+                onClick={() => onToggleModule(key)}
+              >
+                <ChevronDown
+                  aria-hidden="true"
+                  className={`size-4 shrink-0 transition-transform ${isCollapsed ? "-rotate-90" : ""}`}
+                />
+                <span className="truncate">
+                  {label} ({resourcesInGroup.length} tài nguyên)
+                </span>
+              </button>
+              <Badge variant="secondary">
+                {granted}/{total}
+              </Badge>
+            </div>
+          </TableCell>
+          <TableCell className="bg-muted/50 text-center">
+            {renderGroupCheckbox(`Tất cả module ${label}`, resourcesInGroup)}
+          </TableCell>
+          <TableCell colSpan={ACTIONS.length} className="bg-muted/50" />
         </TableRow>
-      </TableHeader>
-      <TableBody>
-        {modules.map((module) => {
-          const moduleResources = resourcesByModule.get(module.id) ?? [];
-          if (moduleResources.length === 0) return null;
+        {!isCollapsed && resourcesInGroup.map(renderResource)}
+      </React.Fragment>
+    );
+  };
 
-          const isCollapsed = collapsedModules.has(module.id);
-          return (
-            <React.Fragment key={module.id}>
-              <TableRow data-testid={`module-group-${module.id}`}>
-                <TableCell colSpan={ACTIONS.length + 2} className="bg-muted/50">
-                  <div className="flex items-center justify-between gap-4">
-                    <button
-                      type="button"
-                      className="flex flex-1 items-center justify-between text-left font-semibold"
-                      aria-expanded={!isCollapsed}
-                      onClick={() => toggleModule(module.id)}
-                    >
-                      <span>{module.name} ({moduleResources.length} tài nguyên)</span>
-                      <span aria-hidden="true">{isCollapsed ? "▶" : "▼"}</span>
-                    </button>
-                    {renderGroupCheckbox(`Tất cả module ${module.name}`, moduleResources)}
-                  </div>
-                </TableCell>
-              </TableRow>
-              {!isCollapsed && moduleResources.map(renderResource)}
-            </React.Fragment>
-          );
-        })}
-        {unassignedResources.length > 0 && (
-          <React.Fragment>
-            <TableRow data-testid="module-group-none">
-              <TableCell colSpan={ACTIONS.length + 2} className="bg-muted/50">
-                <div className="flex items-center justify-between gap-4">
-                  <span className="font-semibold">
-                    Chưa phân module ({unassignedResources.length} tài nguyên)
+  return (
+    <div className="w-full overflow-x-auto rounded-lg border">
+      <Table className="min-w-[44rem]">
+        <TableHeader className="bg-background sticky top-0 z-10">
+          <TableRow>
+            <TableHead className="w-[40%]">Tài nguyên</TableHead>
+            <TableHead className="text-center">Tất cả</TableHead>
+            {ACTIONS.map((action) => {
+              const Icon = ACTION_ICONS[action];
+              return (
+                <TableHead
+                  key={action}
+                  className={`text-center ${action === "DELETE" ? "text-destructive" : ""}`}
+                >
+                  <span className="inline-flex items-center justify-center gap-1.5">
+                    <Icon aria-hidden="true" className="size-4" />
+                    {action}
                   </span>
-                  {renderGroupCheckbox("Tất cả module Chưa phân module", unassignedResources)}
-                </div>
-              </TableCell>
-            </TableRow>
-            {unassignedResources.map(renderResource)}
-          </React.Fragment>
-        )}
-      </TableBody>
-    </Table>
+                </TableHead>
+              );
+            })}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {modules.map((module) => {
+            const moduleResources = resourcesByModule.get(module.id) ?? [];
+            if (moduleResources.length === 0) return null;
+            return renderGroup(
+              String(module.id),
+              `module-group-${module.id}`,
+              module.name,
+              moduleResources
+            );
+          })}
+          {unassignedResources.length > 0 &&
+            renderGroup("none", "module-group-none", "Chưa phân module", unassignedResources)}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
