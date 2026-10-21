@@ -17,11 +17,13 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ShopIndexRouteImport } from './routes/_shop/index'
 import { Route as CrmUserRouteImport } from './routes/crm/user'
 import { Route as CrmRoleRouteImport } from './routes/crm/role'
+import { Route as CrmRevenueRouteImport } from './routes/crm/revenue'
 import { Route as CrmResourceRouteImport } from './routes/crm/resource'
 import { Route as CrmProductRouteImport } from './routes/crm/product'
 import { Route as CrmPermissionRouteImport } from './routes/crm/permission'
 import { Route as CrmOrderRouteImport } from './routes/crm/order'
 import { Route as CrmModuleRouteImport } from './routes/crm/module'
+import { Route as CrmInvoiceRouteImport } from './routes/crm/invoice'
 import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
 import { Route as CrmCategoryRouteImport } from './routes/crm/category'
 import { Route as AdminUserRouteImport } from './routes/admin/user'
@@ -31,6 +33,8 @@ import { Route as AdminCategoryRouteImport } from './routes/admin/category'
 import { Route as ShopWishlistRouteImport } from './routes/_shop/wishlist'
 import { Route as ShopSearchRouteImport } from './routes/_shop/search'
 import { Route as ShopCheckoutIndexRouteImport } from './routes/_shop/checkout/index'
+import { Route as PaymentOrderCodeReturnRouteImport } from './routes/payment.$orderCode.return'
+import { Route as PaymentOrderCodeCancelRouteImport } from './routes/payment.$orderCode.cancel'
 import { Route as ShopProductIdRouteImport } from './routes/_shop/product.$id'
 import { Route as ShopProfileProfileRouteImport } from './routes/_shop/_profile/profile'
 import { Route as ShopProfileOrdersRouteImport } from './routes/_shop/_profile/orders'
@@ -77,6 +81,11 @@ const CrmRoleRoute = CrmRoleRouteImport.update({
   path: '/role',
   getParentRoute: () => CrmRoute,
 } as any)
+const CrmRevenueRoute = CrmRevenueRouteImport.update({
+  id: '/revenue',
+  path: '/revenue',
+  getParentRoute: () => CrmRoute,
+} as any)
 const CrmResourceRoute = CrmResourceRouteImport.update({
   id: '/resource',
   path: '/resource',
@@ -100,6 +109,11 @@ const CrmOrderRoute = CrmOrderRouteImport.update({
 const CrmModuleRoute = CrmModuleRouteImport.update({
   id: '/module',
   path: '/module',
+  getParentRoute: () => CrmRoute,
+} as any)
+const CrmInvoiceRoute = CrmInvoiceRouteImport.update({
+  id: '/invoice',
+  path: '/invoice',
   getParentRoute: () => CrmRoute,
 } as any)
 const CrmDashboardRoute = CrmDashboardRouteImport.update({
@@ -147,6 +161,16 @@ const ShopCheckoutIndexRoute = ShopCheckoutIndexRouteImport.update({
   path: '/checkout/',
   getParentRoute: () => ShopRoute,
 } as any)
+const PaymentOrderCodeReturnRoute = PaymentOrderCodeReturnRouteImport.update({
+  id: '/payment/$orderCode/return',
+  path: '/payment/$orderCode/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentOrderCodeCancelRoute = PaymentOrderCodeCancelRouteImport.update({
+  id: '/payment/$orderCode/cancel',
+  path: '/payment/$orderCode/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopProductIdRoute = ShopProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
@@ -190,11 +214,13 @@ export interface FileRoutesByFullPath {
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
+  '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
   '/crm/product': typeof CrmProductRoute
   '/crm/resource': typeof CrmResourceRoute
+  '/crm/revenue': typeof CrmRevenueRoute
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
@@ -205,6 +231,8 @@ export interface FileRoutesByFullPath {
   '/orders': typeof ShopProfileOrdersRoute
   '/profile': typeof ShopProfileProfileRoute
   '/product/$id': typeof ShopProductIdRoute
+  '/payment/$orderCode/cancel': typeof PaymentOrderCodeCancelRoute
+  '/payment/$orderCode/return': typeof PaymentOrderCodeReturnRoute
   '/checkout': typeof ShopCheckoutIndexRoute
 }
 export interface FileRoutesByTo {
@@ -218,11 +246,13 @@ export interface FileRoutesByTo {
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
+  '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
   '/crm/product': typeof CrmProductRoute
   '/crm/resource': typeof CrmResourceRoute
+  '/crm/revenue': typeof CrmRevenueRoute
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
   '/': typeof ShopIndexRoute
@@ -233,6 +263,8 @@ export interface FileRoutesByTo {
   '/orders': typeof ShopProfileOrdersRoute
   '/profile': typeof ShopProfileProfileRoute
   '/product/$id': typeof ShopProductIdRoute
+  '/payment/$orderCode/cancel': typeof PaymentOrderCodeCancelRoute
+  '/payment/$orderCode/return': typeof PaymentOrderCodeReturnRoute
   '/checkout': typeof ShopCheckoutIndexRoute
 }
 export interface FileRoutesById {
@@ -249,11 +281,13 @@ export interface FileRoutesById {
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
+  '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
   '/crm/product': typeof CrmProductRoute
   '/crm/resource': typeof CrmResourceRoute
+  '/crm/revenue': typeof CrmRevenueRoute
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
   '/_shop/': typeof ShopIndexRoute
@@ -264,6 +298,8 @@ export interface FileRoutesById {
   '/_shop/_profile/orders': typeof ShopProfileOrdersRoute
   '/_shop/_profile/profile': typeof ShopProfileProfileRoute
   '/_shop/product/$id': typeof ShopProductIdRoute
+  '/payment/$orderCode/cancel': typeof PaymentOrderCodeCancelRoute
+  '/payment/$orderCode/return': typeof PaymentOrderCodeReturnRoute
   '/_shop/checkout/': typeof ShopCheckoutIndexRoute
 }
 export interface FileRouteTypes {
@@ -280,11 +316,13 @@ export interface FileRouteTypes {
     | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
+    | '/crm/invoice'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
     | '/crm/product'
     | '/crm/resource'
+    | '/crm/revenue'
     | '/crm/role'
     | '/crm/user'
     | '/'
@@ -295,6 +333,8 @@ export interface FileRouteTypes {
     | '/orders'
     | '/profile'
     | '/product/$id'
+    | '/payment/$orderCode/cancel'
+    | '/payment/$orderCode/return'
     | '/checkout'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -308,11 +348,13 @@ export interface FileRouteTypes {
     | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
+    | '/crm/invoice'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
     | '/crm/product'
     | '/crm/resource'
+    | '/crm/revenue'
     | '/crm/role'
     | '/crm/user'
     | '/'
@@ -323,6 +365,8 @@ export interface FileRouteTypes {
     | '/orders'
     | '/profile'
     | '/product/$id'
+    | '/payment/$orderCode/cancel'
+    | '/payment/$orderCode/return'
     | '/checkout'
   id:
     | '__root__'
@@ -338,11 +382,13 @@ export interface FileRouteTypes {
     | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
+    | '/crm/invoice'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
     | '/crm/product'
     | '/crm/resource'
+    | '/crm/revenue'
     | '/crm/role'
     | '/crm/user'
     | '/_shop/'
@@ -353,6 +399,8 @@ export interface FileRouteTypes {
     | '/_shop/_profile/orders'
     | '/_shop/_profile/profile'
     | '/_shop/product/$id'
+    | '/payment/$orderCode/cancel'
+    | '/payment/$orderCode/return'
     | '/_shop/checkout/'
   fileRoutesById: FileRoutesById
 }
@@ -361,6 +409,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   CrmRoute: typeof CrmRouteWithChildren
+  PaymentOrderCodeCancelRoute: typeof PaymentOrderCodeCancelRoute
+  PaymentOrderCodeReturnRoute: typeof PaymentOrderCodeReturnRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -421,6 +471,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CrmRoleRouteImport
       parentRoute: typeof CrmRoute
     }
+    '/crm/revenue': {
+      id: '/crm/revenue'
+      path: '/revenue'
+      fullPath: '/crm/revenue'
+      preLoaderRoute: typeof CrmRevenueRouteImport
+      parentRoute: typeof CrmRoute
+    }
     '/crm/resource': {
       id: '/crm/resource'
       path: '/resource'
@@ -454,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/module'
       fullPath: '/crm/module'
       preLoaderRoute: typeof CrmModuleRouteImport
+      parentRoute: typeof CrmRoute
+    }
+    '/crm/invoice': {
+      id: '/crm/invoice'
+      path: '/invoice'
+      fullPath: '/crm/invoice'
+      preLoaderRoute: typeof CrmInvoiceRouteImport
       parentRoute: typeof CrmRoute
     }
     '/crm/dashboard': {
@@ -518,6 +582,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/checkout'
       preLoaderRoute: typeof ShopCheckoutIndexRouteImport
       parentRoute: typeof ShopRoute
+    }
+    '/payment/$orderCode/return': {
+      id: '/payment/$orderCode/return'
+      path: '/payment/$orderCode/return'
+      fullPath: '/payment/$orderCode/return'
+      preLoaderRoute: typeof PaymentOrderCodeReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/$orderCode/cancel': {
+      id: '/payment/$orderCode/cancel'
+      path: '/payment/$orderCode/cancel'
+      fullPath: '/payment/$orderCode/cancel'
+      preLoaderRoute: typeof PaymentOrderCodeCancelRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_shop/product/$id': {
       id: '/_shop/product/$id'
@@ -613,11 +691,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface CrmRouteChildren {
   CrmCategoryRoute: typeof CrmCategoryRoute
   CrmDashboardRoute: typeof CrmDashboardRoute
+  CrmInvoiceRoute: typeof CrmInvoiceRoute
   CrmModuleRoute: typeof CrmModuleRoute
   CrmOrderRoute: typeof CrmOrderRoute
   CrmPermissionRoute: typeof CrmPermissionRoute
   CrmProductRoute: typeof CrmProductRoute
   CrmResourceRoute: typeof CrmResourceRoute
+  CrmRevenueRoute: typeof CrmRevenueRoute
   CrmRoleRoute: typeof CrmRoleRoute
   CrmUserRoute: typeof CrmUserRoute
 }
@@ -625,11 +705,13 @@ interface CrmRouteChildren {
 const CrmRouteChildren: CrmRouteChildren = {
   CrmCategoryRoute: CrmCategoryRoute,
   CrmDashboardRoute: CrmDashboardRoute,
+  CrmInvoiceRoute: CrmInvoiceRoute,
   CrmModuleRoute: CrmModuleRoute,
   CrmOrderRoute: CrmOrderRoute,
   CrmPermissionRoute: CrmPermissionRoute,
   CrmProductRoute: CrmProductRoute,
   CrmResourceRoute: CrmResourceRoute,
+  CrmRevenueRoute: CrmRevenueRoute,
   CrmRoleRoute: CrmRoleRoute,
   CrmUserRoute: CrmUserRoute,
 }
@@ -641,6 +723,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   CrmRoute: CrmRouteWithChildren,
+  PaymentOrderCodeCancelRoute: PaymentOrderCodeCancelRoute,
+  PaymentOrderCodeReturnRoute: PaymentOrderCodeReturnRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

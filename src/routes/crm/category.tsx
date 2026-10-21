@@ -26,6 +26,7 @@ function AdminCategories() {
     pageIndex: 0,
     pageSize: 10
   });
+  const [filters, setFilters] = React.useState<Record<string, string>>({ keyword: "" });
 
   const [selectedCategory, setSelectedCategory] = React.useState<CategoryDTO | null>(null);
   const [openForm, setOpenForm] = React.useState(false);
@@ -42,6 +43,7 @@ function AdminCategories() {
   } = useInfiniteQuery(
     createInfiniteCategoriesQueryOptions({
       opts: {
+        keyword: filters.keyword.trim() || undefined,
         paging: {
           limit: pagination.pageSize,
           page: pagination.pageIndex + 1
@@ -142,6 +144,14 @@ function AdminCategories() {
         deleteLabel="Xóa đã chọn"
         title="Quản lý danh mục"
         description="Tạo, chỉnh sửa và sắp xếp các danh mục sản phẩm"
+        filter={{
+          fields: [{ key: "keyword", label: "Từ khóa", placeholder: "Tìm danh mục..." }],
+          values: filters,
+          onChange: (values) => {
+            setFilters(values);
+            setPagination((current) => ({ ...current, pageIndex: 0 }));
+          }
+        }}
       />
       <CategoryFormDialog
         open={openForm}

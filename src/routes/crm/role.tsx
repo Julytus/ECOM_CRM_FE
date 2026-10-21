@@ -36,6 +36,7 @@ function AdminRoles() {
     pageIndex: 0,
     pageSize: 10
   });
+  const [filters, setFilters] = React.useState<Record<string, string>>({ keyword: "" });
 
   const [selectedRole, setSelectedRole] = React.useState<RoleDTO | null>(null);
   const [openForm, setOpenForm] = React.useState(false);
@@ -57,6 +58,7 @@ function AdminRoles() {
   } = useInfiniteQuery(
     createInfiniteRolesQueryOptions({
       opts: {
+        keyword: filters.keyword.trim() || undefined,
         paging: {
           limit: pagination.pageSize,
           page: pagination.pageIndex + 1
@@ -144,6 +146,14 @@ function AdminRoles() {
         deleteLabel="Xóa đã chọn"
         title="Quản lý chức vụ"
         description="Khai báo chức vụ để gán phân quyền cho người dùng"
+        filter={{
+          fields: [{ key: "keyword", label: "Từ khóa", placeholder: "Tìm chức vụ..." }],
+          values: filters,
+          onChange: (values) => {
+            setFilters(values);
+            setPagination((current) => ({ ...current, pageIndex: 0 }));
+          }
+        }}
       />
       <RoleFormDialog
         open={openForm}

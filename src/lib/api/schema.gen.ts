@@ -753,6 +753,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/checkout/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/checkout/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/customer/ai/{id}/context": {
         parameters: {
             query?: never;
@@ -1064,7 +1096,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["topProducts"];
+        get: operations["topProducts_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1147,6 +1179,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["delete_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invoice/confirmPayment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["confirmPayment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1307,6 +1355,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["recalculate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invoice/refund/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["refund"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2817,6 +2881,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/report/revenue/by-payment-method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["byPaymentMethod"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/report/revenue/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/report/revenue/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["summary_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/report/revenue/top-products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["topProducts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/resource/delete/{id}": {
         parameters: {
             query?: never;
@@ -3668,6 +3796,20 @@ export interface components {
             message?: string;
             result?: components["schemas"]["ChatView"];
         };
+        ApiResponseCheckoutPreviewResponse: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["CheckoutPreviewResponse"];
+        };
+        ApiResponseCheckoutResponse: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["CheckoutResponse"];
+        };
         ApiResponseCursorChatView: {
             /** Format: int32 */
             code?: number;
@@ -3880,12 +4022,26 @@ export interface components {
             message?: string;
             result?: components["schemas"]["ResourceInfo"][];
         };
+        ApiResponseListRevenueBucket: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["RevenueBucket"][];
+        };
         ApiResponseListRevenueHourChart: {
             /** Format: int32 */
             code?: number;
             errors?: Record<string, never>;
             message?: string;
             result?: components["schemas"]["RevenueHourChart"][];
+        };
+        ApiResponseListRevenuePaymentMethod: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["RevenuePaymentMethod"][];
         };
         ApiResponseListRevenueStatistic: {
             /** Format: int32 */
@@ -4315,6 +4471,13 @@ export interface components {
             message?: string;
             result?: components["schemas"]["Resource"];
         };
+        ApiResponseRevenueSummary: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["RevenueSummary"];
+        };
         ApiResponseRevenueToday: {
             /** Format: int32 */
             code?: number;
@@ -4654,6 +4817,47 @@ export interface components {
             /** Format: date-time */
             updatedAt?: string;
         };
+        CheckoutPreviewResponse: {
+            /** Format: double */
+            discount?: number;
+            /** Format: double */
+            finalAmount?: number;
+            /** Format: double */
+            shippingFee?: number;
+            /** Format: double */
+            subtotal?: number;
+            voucherCode?: string;
+        };
+        CheckoutRequest: {
+            addressLine?: string;
+            /** Format: int32 */
+            branchId?: number;
+            buyerEmail?: string;
+            buyerName?: string;
+            buyerPhone?: string;
+            /** Format: int32 */
+            customerId?: number;
+            items?: components["schemas"]["OrderItemRequest"][];
+            note?: string;
+            paymentMethod?: string;
+            receiverName?: string;
+            receiverPhone?: string;
+            voucherCode?: string;
+        };
+        CheckoutResponse: {
+            checkoutUrl?: string;
+            /** Format: double */
+            finalAmount?: number;
+            invoiceCode?: string;
+            /** Format: int32 */
+            invoiceId?: number;
+            orderCode?: string;
+            /** Format: int32 */
+            orderId?: number;
+            paymentMethod?: string;
+            paymentStatus?: string;
+            qrCode?: string;
+        };
         CreateChatRequest: {
             groupChatImage?: string;
             groupChatName?: string;
@@ -4870,6 +5074,8 @@ export interface components {
             amountCard?: number;
             /** Format: int32 */
             branchId?: number;
+            buyerName?: string;
+            buyerPhone?: string;
             /** Format: date-time */
             createdTime?: string;
             /** Format: int32 */
@@ -4885,13 +5091,20 @@ export interface components {
             id?: number;
             invoiceCode?: string;
             invoiceType?: string;
+            orderCode?: string;
+            /** Format: int32 */
+            orderId?: number;
+            orderStatus?: string;
             /** Format: double */
             paid?: number;
+            paymentMethod?: string;
             /** Format: int32 */
             paymentType?: number;
             /** Format: date-time */
             receiptDate?: string;
             receiptImage?: string;
+            /** Format: double */
+            shippingFee?: number;
             /** Format: int32 */
             status?: number;
             /** Format: int32 */
@@ -4928,8 +5141,12 @@ export interface components {
         };
         InvoiceResponse: {
             invoice?: components["schemas"]["Invoice"];
+            order?: components["schemas"]["Order"];
+            orderItems?: components["schemas"]["OrderItem"][];
+            payments?: components["schemas"]["Payment"][];
             products?: components["schemas"]["BoughtProduct"][];
             services?: components["schemas"]["BoughtService"][];
+            voucher?: components["schemas"]["VoucherSummary"];
         };
         Message: {
             /** Format: int32 */
@@ -5086,9 +5303,16 @@ export interface components {
         };
         Order: {
             address?: string;
+            /** Format: int32 */
+            branchId?: number;
+            buyerEmail?: string;
+            buyerName?: string;
+            buyerPhone?: string;
             code?: string;
             /** Format: date-time */
             createdAt?: string;
+            /** Format: int32 */
+            customerId?: number;
             /** Format: double */
             discountAmount?: number;
             /** Format: double */
@@ -5098,6 +5322,10 @@ export interface components {
             note?: string;
             paymentMethod?: string;
             paymentStatus?: string;
+            receiverName?: string;
+            receiverPhone?: string;
+            /** Format: double */
+            shippingFee?: number;
             status?: string;
             /** Format: double */
             totalAmount?: number;
@@ -5105,6 +5333,9 @@ export interface components {
             updatedAt?: string;
             /** Format: int32 */
             userId?: number;
+            voucherCode?: string;
+            /** Format: int32 */
+            voucherId?: number;
         };
         OrderItem: {
             /** Format: int32 */
@@ -5133,9 +5364,16 @@ export interface components {
         };
         OrderRequest: {
             address?: string;
+            /** Format: int32 */
+            branchId?: number;
+            buyerEmail?: string;
+            buyerName?: string;
+            buyerPhone?: string;
             code?: string;
             /** Format: date-time */
             createdAt?: string;
+            /** Format: int32 */
+            customerId?: number;
             /** Format: double */
             discountAmount?: number;
             /** Format: double */
@@ -5147,6 +5385,10 @@ export interface components {
             paymentMethod?: string;
             paymentReturnUrl?: string;
             paymentStatus?: string;
+            receiverName?: string;
+            receiverPhone?: string;
+            /** Format: double */
+            shippingFee?: number;
             status?: string;
             /** Format: double */
             totalAmount?: number;
@@ -5154,12 +5396,22 @@ export interface components {
             updatedAt?: string;
             /** Format: int32 */
             userId?: number;
+            voucherCode?: string;
+            /** Format: int32 */
+            voucherId?: number;
         };
         OrderResponse: {
             address?: string;
+            /** Format: int32 */
+            branchId?: number;
+            buyerEmail?: string;
+            buyerName?: string;
+            buyerPhone?: string;
             code?: string;
             /** Format: date-time */
             createdAt?: string;
+            /** Format: int32 */
+            customerId?: number;
             /** Format: double */
             discountAmount?: number;
             /** Format: double */
@@ -5170,6 +5422,10 @@ export interface components {
             note?: string;
             paymentMethod?: string;
             paymentStatus?: string;
+            receiverName?: string;
+            receiverPhone?: string;
+            /** Format: double */
+            shippingFee?: number;
             status?: string;
             /** Format: double */
             totalAmount?: number;
@@ -5177,6 +5433,9 @@ export interface components {
             updatedAt?: string;
             /** Format: int32 */
             userId?: number;
+            voucherCode?: string;
+            /** Format: int32 */
+            voucherId?: number;
         };
         OrderStatusStatistic: {
             /** Format: double */
@@ -5460,6 +5719,8 @@ export interface components {
             invoiceId?: number;
             /** Format: int64 */
             orderCode?: number;
+            /** Format: int32 */
+            orderId?: number;
             paymentLinkId?: string;
             paymentProvider?: string;
             paymentType?: string;
@@ -5716,6 +5977,13 @@ export interface components {
             permission?: components["schemas"]["PermissionInfo"];
             uri?: string;
         };
+        RevenueBucket: {
+            bucket?: string;
+            /** Format: int64 */
+            invoiceCount?: number;
+            /** Format: double */
+            revenue?: number;
+        };
         RevenueHourChart: {
             /** Format: int32 */
             hour?: number;
@@ -5724,11 +5992,56 @@ export interface components {
             /** Format: int32 */
             totalInvoice?: number;
         };
+        RevenuePaymentMethod: {
+            /** Format: int64 */
+            invoiceCount?: number;
+            method?: string;
+            /** Format: double */
+            revenue?: number;
+        };
         RevenueStatistic: {
             period?: string;
             revenue?: number;
             /** Format: int32 */
             totalOrders?: number;
+        };
+        RevenueSummary: {
+            /** Format: double */
+            avgOrderValue?: number;
+            /** Format: int64 */
+            cancelledCount?: number;
+            /** Format: double */
+            discountTotal?: number;
+            /** Format: int64 */
+            invoiceCount?: number;
+            /** Format: double */
+            invoiceCountChangePercent?: number;
+            /** Format: double */
+            previousAvgOrderValue?: number;
+            /** Format: int64 */
+            previousCancelledCount?: number;
+            /** Format: double */
+            previousDiscountTotal?: number;
+            /** Format: int64 */
+            previousInvoiceCount?: number;
+            /** Format: double */
+            previousRefundedAmount?: number;
+            /** Format: double */
+            previousShippingTotal?: number;
+            /** Format: double */
+            previousTotalRevenue?: number;
+            /** Format: double */
+            previousUnpaidAmount?: number;
+            /** Format: double */
+            refundedAmount?: number;
+            /** Format: double */
+            shippingTotal?: number;
+            /** Format: double */
+            totalRevenue?: number;
+            /** Format: double */
+            totalRevenueChangePercent?: number;
+            /** Format: double */
+            unpaidAmount?: number;
         };
         RevenueToday: {
             /** Format: double */
@@ -6006,6 +6319,11 @@ export interface components {
             updatedAt?: string;
             /** Format: int32 */
             usageQuantity?: number;
+        };
+        VoucherSummary: {
+            code?: string;
+            /** Format: double */
+            discountAmount?: number;
         };
     };
     responses: never;
@@ -7102,6 +7420,54 @@ export interface operations {
             };
         };
     };
+    preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseCheckoutPreviewResponse"];
+                };
+            };
+        };
+    };
+    submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseCheckoutResponse"];
+                };
+            };
+        };
+    };
     getAiContext: {
         parameters: {
             query?: never;
@@ -7543,7 +7909,7 @@ export interface operations {
             };
         };
     };
-    topProducts: {
+    topProducts_1: {
         parameters: {
             query: {
                 fromDate: string;
@@ -7755,6 +8121,28 @@ export interface operations {
             };
         };
     };
+    confirmPayment: {
+        parameters: {
+            query: {
+                invoiceId: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseInteger"];
+                };
+            };
+        };
+    };
     create_2: {
         parameters: {
             query?: never;
@@ -7933,11 +8321,20 @@ export interface operations {
     };
     list_15: {
         parameters: {
-            query: {
+            query?: {
                 keyword?: string;
                 customerId?: number;
                 status?: number[];
-                pageable: components["schemas"]["Pageable"];
+                paymentMethod?: string;
+                fromDate?: string;
+                toDate?: string;
+                orderCode?: string;
+                sortBy?: string;
+                sortDir?: string;
+                page?: number;
+                offset?: number;
+                limit?: number;
+                total?: number;
             };
             header?: never;
             path?: never;
@@ -7975,6 +8372,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseInvoice"];
+                };
+            };
+        };
+    };
+    refund: {
+        parameters: {
+            query?: {
+                reason?: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseInteger"];
                 };
             };
         };
@@ -10168,6 +10589,100 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseInvoiceMonthlyRevenueReport"];
+                };
+            };
+        };
+    };
+    byPaymentMethod: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseListRevenuePaymentMethod"];
+                };
+            };
+        };
+    };
+    series: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+                groupBy?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseListRevenueBucket"];
+                };
+            };
+        };
+    };
+    summary_1: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRevenueSummary"];
+                };
+            };
+        };
+    };
+    topProducts: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseListTopProductStatistic"];
                 };
             };
         };
