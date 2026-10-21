@@ -247,6 +247,42 @@
         },
         "type": "object"
       },
+      "ApiResponseCheckoutPreviewResponse": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/CheckoutPreviewResponse"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseCheckoutResponse": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/CheckoutResponse"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseCursorChatView": {
         "properties": {
           "code": {
@@ -837,6 +873,27 @@
         },
         "type": "object"
       },
+      "ApiResponseListRevenueBucket": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "items": {
+              "$ref": "#/components/schemas/RevenueBucket"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseListRevenueHourChart": {
         "properties": {
           "code": {
@@ -852,6 +909,27 @@
           "result": {
             "items": {
               "$ref": "#/components/schemas/RevenueHourChart"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseListRevenuePaymentMethod": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "items": {
+              "$ref": "#/components/schemas/RevenuePaymentMethod"
             },
             "type": "array"
           }
@@ -1969,6 +2047,24 @@
         },
         "type": "object"
       },
+      "ApiResponseRevenueSummary": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/RevenueSummary"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseRevenueToday": {
         "properties": {
           "code": {
@@ -2778,6 +2874,111 @@
         },
         "type": "object"
       },
+      "CheckoutPreviewResponse": {
+        "properties": {
+          "discount": {
+            "format": "double",
+            "type": "number"
+          },
+          "finalAmount": {
+            "format": "double",
+            "type": "number"
+          },
+          "shippingFee": {
+            "format": "double",
+            "type": "number"
+          },
+          "subtotal": {
+            "format": "double",
+            "type": "number"
+          },
+          "voucherCode": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CheckoutRequest": {
+        "properties": {
+          "addressLine": {
+            "type": "string"
+          },
+          "branchId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "buyerEmail": {
+            "type": "string"
+          },
+          "buyerName": {
+            "type": "string"
+          },
+          "buyerPhone": {
+            "type": "string"
+          },
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItemRequest"
+            },
+            "type": "array"
+          },
+          "note": {
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "receiverName": {
+            "type": "string"
+          },
+          "receiverPhone": {
+            "type": "string"
+          },
+          "voucherCode": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CheckoutResponse": {
+        "properties": {
+          "checkoutUrl": {
+            "type": "string"
+          },
+          "finalAmount": {
+            "format": "double",
+            "type": "number"
+          },
+          "invoiceCode": {
+            "type": "string"
+          },
+          "invoiceId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "orderCode": {
+            "type": "string"
+          },
+          "orderId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "paymentStatus": {
+            "type": "string"
+          },
+          "qrCode": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "CreateChatRequest": {
         "properties": {
           "groupChatImage": {
@@ -3291,6 +3492,12 @@
             "format": "int32",
             "type": "integer"
           },
+          "buyerName": {
+            "type": "string"
+          },
+          "buyerPhone": {
+            "type": "string"
+          },
           "createdTime": {
             "format": "date-time",
             "type": "string"
@@ -3324,9 +3531,22 @@
           "invoiceType": {
             "type": "string"
           },
+          "orderCode": {
+            "type": "string"
+          },
+          "orderId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "orderStatus": {
+            "type": "string"
+          },
           "paid": {
             "format": "double",
             "type": "number"
+          },
+          "paymentMethod": {
+            "type": "string"
           },
           "paymentType": {
             "format": "int32",
@@ -3338,6 +3558,10 @@
           },
           "receiptImage": {
             "type": "string"
+          },
+          "shippingFee": {
+            "format": "double",
+            "type": "number"
           },
           "status": {
             "format": "int32",
@@ -3418,6 +3642,21 @@
           "invoice": {
             "$ref": "#/components/schemas/Invoice"
           },
+          "order": {
+            "$ref": "#/components/schemas/Order"
+          },
+          "orderItems": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "type": "array"
+          },
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/Payment"
+            },
+            "type": "array"
+          },
           "products": {
             "items": {
               "$ref": "#/components/schemas/BoughtProduct"
@@ -3429,6 +3668,9 @@
               "$ref": "#/components/schemas/BoughtService"
             },
             "type": "array"
+          },
+          "voucher": {
+            "$ref": "#/components/schemas/VoucherSummary"
           }
         },
         "type": "object"
@@ -3792,12 +4034,29 @@
           "address": {
             "type": "string"
           },
+          "branchId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "buyerEmail": {
+            "type": "string"
+          },
+          "buyerName": {
+            "type": "string"
+          },
+          "buyerPhone": {
+            "type": "string"
+          },
           "code": {
             "type": "string"
           },
           "createdAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
           },
           "discountAmount": {
             "format": "double",
@@ -3820,6 +4079,16 @@
           "paymentStatus": {
             "type": "string"
           },
+          "receiverName": {
+            "type": "string"
+          },
+          "receiverPhone": {
+            "type": "string"
+          },
+          "shippingFee": {
+            "format": "double",
+            "type": "number"
+          },
           "status": {
             "type": "string"
           },
@@ -3832,6 +4101,13 @@
             "type": "string"
           },
           "userId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "voucherCode": {
+            "type": "string"
+          },
+          "voucherId": {
             "format": "int32",
             "type": "integer"
           }
@@ -3898,12 +4174,29 @@
           "address": {
             "type": "string"
           },
+          "branchId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "buyerEmail": {
+            "type": "string"
+          },
+          "buyerName": {
+            "type": "string"
+          },
+          "buyerPhone": {
+            "type": "string"
+          },
           "code": {
             "type": "string"
           },
           "createdAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
           },
           "discountAmount": {
             "format": "double",
@@ -3935,6 +4228,16 @@
           "paymentStatus": {
             "type": "string"
           },
+          "receiverName": {
+            "type": "string"
+          },
+          "receiverPhone": {
+            "type": "string"
+          },
+          "shippingFee": {
+            "format": "double",
+            "type": "number"
+          },
           "status": {
             "type": "string"
           },
@@ -3949,6 +4252,13 @@
           "userId": {
             "format": "int32",
             "type": "integer"
+          },
+          "voucherCode": {
+            "type": "string"
+          },
+          "voucherId": {
+            "format": "int32",
+            "type": "integer"
           }
         },
         "type": "object"
@@ -3958,12 +4268,29 @@
           "address": {
             "type": "string"
           },
+          "branchId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "buyerEmail": {
+            "type": "string"
+          },
+          "buyerName": {
+            "type": "string"
+          },
+          "buyerPhone": {
+            "type": "string"
+          },
           "code": {
             "type": "string"
           },
           "createdAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
           },
           "discountAmount": {
             "format": "double",
@@ -3992,6 +4319,16 @@
           "paymentStatus": {
             "type": "string"
           },
+          "receiverName": {
+            "type": "string"
+          },
+          "receiverPhone": {
+            "type": "string"
+          },
+          "shippingFee": {
+            "format": "double",
+            "type": "number"
+          },
           "status": {
             "type": "string"
           },
@@ -4004,6 +4341,13 @@
             "type": "string"
           },
           "userId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "voucherCode": {
+            "type": "string"
+          },
+          "voucherId": {
             "format": "int32",
             "type": "integer"
           }
@@ -4759,6 +5103,10 @@
             "format": "int64",
             "type": "integer"
           },
+          "orderId": {
+            "format": "int32",
+            "type": "integer"
+          },
           "paymentLinkId": {
             "type": "string"
           },
@@ -5389,6 +5737,22 @@
         },
         "type": "object"
       },
+      "RevenueBucket": {
+        "properties": {
+          "bucket": {
+            "type": "string"
+          },
+          "invoiceCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "revenue": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "RevenueHourChart": {
         "properties": {
           "hour": {
@@ -5406,6 +5770,22 @@
         },
         "type": "object"
       },
+      "RevenuePaymentMethod": {
+        "properties": {
+          "invoiceCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "method": {
+            "type": "string"
+          },
+          "revenue": {
+            "format": "double",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
       "RevenueStatistic": {
         "properties": {
           "period": {
@@ -5417,6 +5797,83 @@
           "totalOrders": {
             "format": "int32",
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "RevenueSummary": {
+        "properties": {
+          "avgOrderValue": {
+            "format": "double",
+            "type": "number"
+          },
+          "cancelledCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "discountTotal": {
+            "format": "double",
+            "type": "number"
+          },
+          "invoiceCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "invoiceCountChangePercent": {
+            "format": "double",
+            "type": "number"
+          },
+          "previousAvgOrderValue": {
+            "format": "double",
+            "type": "number"
+          },
+          "previousCancelledCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "previousDiscountTotal": {
+            "format": "double",
+            "type": "number"
+          },
+          "previousInvoiceCount": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "previousRefundedAmount": {
+            "format": "double",
+            "type": "number"
+          },
+          "previousShippingTotal": {
+            "format": "double",
+            "type": "number"
+          },
+          "previousTotalRevenue": {
+            "format": "double",
+            "type": "number"
+          },
+          "previousUnpaidAmount": {
+            "format": "double",
+            "type": "number"
+          },
+          "refundedAmount": {
+            "format": "double",
+            "type": "number"
+          },
+          "shippingTotal": {
+            "format": "double",
+            "type": "number"
+          },
+          "totalRevenue": {
+            "format": "double",
+            "type": "number"
+          },
+          "totalRevenueChangePercent": {
+            "format": "double",
+            "type": "number"
+          },
+          "unpaidAmount": {
+            "format": "double",
+            "type": "number"
           }
         },
         "type": "object"
@@ -6065,6 +6522,18 @@
           "usageQuantity": {
             "format": "int32",
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "VoucherSummary": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "discountAmount": {
+            "format": "double",
+            "type": "number"
           }
         },
         "type": "object"
@@ -7753,6 +8222,66 @@
         ]
       }
     },
+    "/checkout/preview": {
+      "post": {
+        "operationId": "preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCheckoutPreviewResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "checkout-controller"
+        ]
+      }
+    },
+    "/checkout/submit": {
+      "post": {
+        "operationId": "submit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCheckoutResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "checkout-controller"
+        ]
+      }
+    },
     "/customer/ai/{id}/context": {
       "get": {
         "operationId": "getAiContext",
@@ -8486,7 +9015,7 @@
     },
     "/dashboard/top-products": {
       "get": {
-        "operationId": "topProducts",
+        "operationId": "topProducts_1",
         "parameters": [
           {
             "in": "query",
@@ -8806,6 +9335,37 @@
         ]
       }
     },
+    "/invoice/confirmPayment": {
+      "post": {
+        "operationId": "confirmPayment",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "invoiceId",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseInteger"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "invoice-controller"
+        ]
+      }
+    },
     "/invoice/create": {
       "post": {
         "operationId": "create_2",
@@ -9065,10 +9625,88 @@
           },
           {
             "in": "query",
-            "name": "pageable",
-            "required": true,
+            "name": "paymentMethod",
+            "required": false,
             "schema": {
-              "$ref": "#/components/schemas/Pageable"
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fromDate",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "toDate",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "orderCode",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sortDir",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "total",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
             }
           }
         ],
@@ -9118,6 +9756,45 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponseInvoice"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "invoice-controller"
+        ]
+      }
+    },
+    "/invoice/refund/{id}": {
+      "post": {
+        "operationId": "refund",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reason",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseInteger"
                 }
               }
             },
@@ -12636,6 +13313,185 @@
         },
         "tags": [
           "report-controller"
+        ]
+      }
+    },
+    "/report/revenue/by-payment-method": {
+      "get": {
+        "operationId": "byPaymentMethod",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListRevenuePaymentMethod"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "revenue-report-controller"
+        ]
+      }
+    },
+    "/report/revenue/series": {
+      "get": {
+        "operationId": "series",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "groupBy",
+            "required": false,
+            "schema": {
+              "default": "day",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListRevenueBucket"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "revenue-report-controller"
+        ]
+      }
+    },
+    "/report/revenue/summary": {
+      "get": {
+        "operationId": "summary_1",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRevenueSummary"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "revenue-report-controller"
+        ]
+      }
+    },
+    "/report/revenue/top-products": {
+      "get": {
+        "operationId": "topProducts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListTopProductStatistic"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "revenue-report-controller"
         ]
       }
     },
