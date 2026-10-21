@@ -2,15 +2,13 @@
 
 import * as React from "react";
 import {
-  Blocks,
   Cog,
   Command,
   Database,
   KeySquare,
   LifeBuoy,
   Receipt,
-    Send,
-  ShieldCheck,
+  Send,
   ShoppingCart,
   Users
 } from "lucide-react";
@@ -29,19 +27,16 @@ import {
 } from "@/components/ui/sidebar";
 import { permissionResourceQueryOptions } from "@/lib/tanstack/options/permission";
 
-const NAV_MAIN: CrmNavItem[] = [
-  { title: "Quản lý quy trình", url: "/bussiness-process", icon: Cog },
-  {
-    title: "Bán hàng",
-    icon: ShoppingCart,
-    items: [
-      { title: "Sản phẩm", url: "/crm/product" },
-      { title: "Đơn hàng", url: "/crm/order" },
-      { title: "Danh mục", url: "/crm/category" },
-      { title: "Doanh thu", url: "/crm/revenue" }
-    ]
-  }
-];
+const NAV_SALES: CrmNavItem = {
+  title: "Bán hàng",
+  icon: ShoppingCart,
+  items: [
+    { title: "Sản phẩm", url: "/crm/product" },
+    { title: "Đơn hàng", url: "/crm/order" },
+    { title: "Danh mục", url: "/crm/category" },
+    { title: "Doanh thu", url: "/crm/revenue" }
+  ]
+};
 
 const NAV_SECONDARY = [
   { title: "Support", url: "#", icon: LifeBuoy },
@@ -49,17 +44,24 @@ const NAV_SECONDARY = [
 ];
 
 /**
- * 4 mục quản trị hệ thống — ẩn/hiện theo quyền VIEW thật của role đăng nhập
- * (so khớp `code` với kết quả `/permission/resource`, phase 2). `code` khớp
- * đúng 4 mã resource hệ thống xác nhận trong seed `crm_jlt.sql`.
+ * Mục ẩn/hiện theo quyền VIEW thật của role đăng nhập (so khớp `code` với kết
+ * quả `/permission/resource`). `code` khớp mã resource hệ thống trong seed
+ * `crm_jlt.sql`.
  */
-const ADMIN_NAV_ITEMS = [
-  { code: "USER", title: "Người dùng", url: "/crm/user", icon: Users },
-  { code: "RESOURCE", title: "Tài nguyên", url: "/crm/resource", icon: Database },
-  { code: "MODULE", title: "Module", url: "/crm/module", icon: Blocks },
-  { code: "ROLE", title: "Chức vụ", url: "/crm/role", icon: ShieldCheck },
-  { code: "PERMISSION", title: "Phân quyền", url: "/crm/permission", icon: KeySquare },
-  { code: "INVOICE", title: "Hóa đơn", url: "/crm/invoice", icon: Receipt }
+const USER_ITEM = { code: "USER", title: "Người dùng", url: "/crm/user", icon: Users } as const;
+const PERMISSION_ITEM = {
+  code: "PERMISSION",
+  title: "Phân quyền",
+  url: "/crm/permission",
+  icon: KeySquare
+} as const;
+const INVOICE_ITEM = { code: "INVOICE", title: "Hóa đơn", url: "/crm/invoice", icon: Receipt } as const;
+
+/** Nhóm gộp: tài nguyên / chức vụ / module. Hiện khi có VIEW ít nhất một mục con. */
+const SYSTEM_GROUP_ITEMS = [
+  { code: "RESOURCE", title: "Tài nguyên", url: "/crm/resource" },
+  { code: "ROLE", title: "Chức vụ", url: "/crm/role" },
+  { code: "MODULE", title: "Module", url: "/crm/module" }
 ] as const;
 
 export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -70,20 +72,33 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     retry: 1
   });
 
-  // Operator luôn thấy đủ mục quản trị, không phụ thuộc dữ liệu permission.
+  // Operator luôn thấy đủ, không phụ thuộc dữ liệu permission.
   // Người dùng thường lọc theo quyền VIEW; chỉ fail-open khi query lỗi.
   // Khi đang tải, `permissionResources` là `undefined` nên mục tạm ẩn hết.
   // Backend vẫn chặn ở API nên đây chỉ là ẩn/hiện UI, không phải lớp bảo vệ.
-  const visibleAdminItems =
-    me?.isOperator === 1
-      ? ADMIN_NAV_ITEMS
-      : isPermissionError
-        ? ADMIN_NAV_ITEMS
-        : ADMIN_NAV_ITEMS.filter((item) =>
-            permissionResources?.some(
-              (resource) => resource.code === item.code && resource.actions.includes("VIEW")
-            )
-          );
+  const canView = (code: string) =>
+    me?.isOperator === 1 ||
+    isPermissionError ||
+    !!permissionResources?.some((r) => r.code === code && r.actions.includes("VIEW"));
+
+  const systemChildren = SYSTEM_GROUP_ITEMS.filter((i) => canView(i.code)).map(
+    ({ title, url }) => ({ title, url })
+  );
+
+  const navMain: CrmNavItem[] = [
+    { title: "Quản lý quy trình", url: "/bussiness-process", icon: Cog },
+    NAV_SALES,
+    ...(canView(INVOICE_ITEM.code)
+      ? [{ title: INVOICE_ITEM.title, url: INVOICE_ITEM.url, icon: INVOICE_ITEM.icon }]
+      : []),
+    ...(systemChildren.length > 0
+      ? [{ title: "Cấu hình hệ thống", icon: Database, items: systemChildren }]
+      : [])
+  ];
+
+  const navAdmin: CrmNavItem[] = [USER_ITEM, PERMISSION_ITEM]
+    .filter((i) => canView(i.code))
+    .map(({ title, url, icon }) => ({ title, url, icon }));
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -104,14 +119,9 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <CrmMain label="Chức năng chính" items={NAV_MAIN} />
+        <CrmMain label="Chức năng chính" items={navMain} />
 
-        {visibleAdminItems.length > 0 && (
-          <CrmMain
-            label="Quản trị hệ thống"
-            items={visibleAdminItems.map(({ title, url, icon }) => ({ title, url, icon }))}
-          />
-        )}
+        {navAdmin.length > 0 && <CrmMain label="Quản trị hệ thống" items={navAdmin} />}
 
         <CrmSecondary items={NAV_SECONDARY} className="mt-auto" />
       </SidebarContent>

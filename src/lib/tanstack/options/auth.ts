@@ -5,6 +5,7 @@ import type {
   SignupApiRequest,
   SignupApiResponse
 } from "@/lib/types/auth";
+import { useAuthStore } from "@/lib/stores/auth";
 import type { ErrorResponse } from "@/lib/types/common";
 import { queryOptions, type MutationOptions, type UseQueryOptions } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
@@ -42,7 +43,9 @@ export const createSignupMutationOptions = (): MutationOptions<
 
 export const meQueryOptions = queryOptions({
   queryKey: ["me"],
-  queryFn: getMe,
+  // Không có token thì coi như chưa đăng nhập: tránh /user/info còn sống nhờ cookie
+  // (withCredentials) hoặc request đang bay làm `me` hiện lại sau khi đăng xuất.
+  queryFn: async () => (useAuthStore.getState().accessToken ? await getMe() : null),
   staleTime: 0,
   gcTime: 0
 });

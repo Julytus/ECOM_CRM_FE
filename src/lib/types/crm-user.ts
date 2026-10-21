@@ -1,6 +1,3 @@
-// Tên `crm-user` (không phải `user`) vì `lib/types/user.ts` đã thuộc domain `/admin`
-// e-commerce với contract khác hẳn (`active: boolean`, `role: "user" | "admin"`), còn đây
-// là entity CRM `auth.User` (`active: number`, `roleId`/`branchId`) — KHÔNG gộp 2 file này.
 import type { ApiResponse, Prettify } from "@/lib/types/common";
 import type { PagingDTO } from "@/lib/types/paging";
 

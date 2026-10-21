@@ -1,5 +1,6 @@
 "use client";
 
+import { useNavigate } from "@tanstack/react-router";
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +30,8 @@ export function CrmUser({
     roleName: string;
   };
 }) {
+  const navigate = useNavigate();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -87,7 +90,7 @@ export function CrmUser({
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate({ to: "/logout" })}>
           <LogOut />
           Log out
         </DropdownMenuItem>
