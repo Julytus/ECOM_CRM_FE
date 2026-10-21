@@ -26,6 +26,7 @@ function AdminCrmUsers() {
     pageIndex: 0,
     pageSize: 10
   });
+  const [filters, setFilters] = React.useState<Record<string, string>>({ keyword: "" });
 
   const [selectedUser, setSelectedUser] = React.useState<CrmUserDTO | null>(null);
   const [openForm, setOpenForm] = React.useState(false);
@@ -42,6 +43,7 @@ function AdminCrmUsers() {
   } = useInfiniteQuery(
     createInfiniteCrmUsersQueryOptions({
       opts: {
+        keyword: filters.keyword.trim() || undefined,
         paging: {
           limit: pagination.pageSize,
           page: pagination.pageIndex + 1
@@ -128,6 +130,14 @@ function AdminCrmUsers() {
         deleteLabel="Xóa đã chọn"
         title="Quản lý người dùng"
         description="Khai báo người dùng CRM và gán chức vụ tương ứng"
+        filter={{
+          fields: [{ key: "keyword", label: "Từ khóa", placeholder: "Tìm người dùng..." }],
+          values: filters,
+          onChange: (values) => {
+            setFilters(values);
+            setPagination((current) => ({ ...current, pageIndex: 0 }));
+          }
+        }}
       />
       <CrmUserFormDialog
         open={openForm}

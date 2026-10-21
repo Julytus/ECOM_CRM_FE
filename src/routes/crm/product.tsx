@@ -27,6 +27,7 @@ function AdminProducts() {
     pageIndex: 0,
     pageSize: 10
   });
+  const [filters, setFilters] = useState<Record<string, string>>({ keyword: "" });
 
   const [productId, setProductId] = useAtom(selectedProductIdAtom);
   const [open, setOpen] = useAtom(productSheetOpenAtom);
@@ -43,6 +44,7 @@ function AdminProducts() {
   } = useInfiniteQuery(
     createInfiniteProductDetailsQueryOptions({
       opts: {
+        keyword: filters.keyword.trim() || undefined,
         paging: {
           limit: pagination.pageSize,
           page: pagination.pageIndex + 1
@@ -132,8 +134,20 @@ function AdminProducts() {
         deleteLabel="Xóa đã chọn"
         title="Quản lý sản phẩm"
         description="Quản lý, tạo mới, chỉnh sửa sản phẩm"
+        filter={{
+          fields: [{ key: "keyword", label: "Từ khóa", placeholder: "Tìm sản phẩm..." }],
+          values: filters,
+          onChange: (values) => {
+            setFilters(values);
+            setPagination((current) => ({ ...current, pageIndex: 0 }));
+          }
+        }}
       />
-      <ProductDialog onSaved={() => { void refetch(); }} />
+      <ProductDialog
+        onSaved={() => {
+          void refetch();
+        }}
+      />
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         itemId={deleteProductId}

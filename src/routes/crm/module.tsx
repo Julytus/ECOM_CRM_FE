@@ -3,22 +3,13 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
+import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
 import { createModuleColumns } from "@/components/crm/module/columns";
 import { AssignResourcesDialog } from "@/components/crm/module/assign-resources-dialog";
 import { ModuleFormDialog } from "@/components/crm/module/module-dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
 import {
   createInfiniteModulesQueryOptions,
   deleteModuleMutationOptions,
@@ -34,7 +25,7 @@ export const Route = createFileRoute("/crm/module")({
 
 function AdminModules() {
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const [keyword, setKeyword] = React.useState("");
+  const [filters, setFilters] = React.useState<Record<string, string>>({ keyword: "" });
   const [selectedModule, setSelectedModule] = React.useState<ModuleDTO | null>(null);
   const [assignModule, setAssignModule] = React.useState<ModuleDTO | null>(null);
   const [openForm, setOpenForm] = React.useState(false);
@@ -49,7 +40,7 @@ function AdminModules() {
   } = useInfiniteQuery(
     createInfiniteModulesQueryOptions({
       opts: {
-        keyword: keyword.trim() || undefined,
+        keyword: filters.keyword.trim() || undefined,
         paging: { limit: pagination.pageSize, page: pagination.pageIndex + 1 }
       }
     })
@@ -79,65 +70,73 @@ function AdminModules() {
     }
   });
   const statusMutation = useMutation(statusOptions);
+  const updateModuleStatus = statusMutation.mutate;
   const assignMutation = useMutation(assignResourcesMutationOptions());
 
-  const handleEdit = (module: ModuleDTO) => {
+  const handleEdit = React.useCallback((module: ModuleDTO) => {
     setSelectedModule(module);
     setOpenForm(true);
-  };
+  }, []);
 
-  const handleShowDeleteConfirm = (id: number, name?: string) => {
+  const handleShowDeleteConfirm = React.useCallback((id: number, name?: string) => {
     setDeleteModuleId(id);
     setDeleteModuleName(name);
     setDeleteDialogOpen(true);
-  };
+  }, []);
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id, {
       onSuccess: () => {
         setDeleteDialogOpen(false);
         void refetch();
-      }
+        toast.success("Xóa module thành công");
+      },
+      onError: () => toast.error("Xóa module thất bại")
     });
   };
 
-  const handleToggleActive = (module: ModuleDTO, active: boolean) => {
-    statusMutation.mutate(
-      { id: module.id, active: active ? 1 : 0 },
-      {
-        onSuccess: () => void refetch()
-      }
-    );
-  };
+  const handleToggleActive = React.useCallback(
+    (module: ModuleDTO, active: boolean) => {
+      updateModuleStatus(
+        { id: module.id, active: active ? 1 : 0 },
+        {
+          onSuccess: () => {
+            void refetch();
+            toast.success("Cập nhật trạng thái module thành công");
+          },
+          onError: () => toast.error("Không thể cập nhật trạng thái module")
+        }
+      );
+    },
+    [refetch, updateModuleStatus]
+  );
 
   const handleAssign = (module: ModuleDTO, resourceIds: number[]) => {
     assignMutation.mutate(
       { moduleId: module.id, resourceIds },
-      { onSuccess: () => setAssignModule(null) }
+      {
+        onSuccess: () => {
+          setAssignModule(null);
+          toast.success("Gán tài nguyên cho module thành công");
+        },
+        onError: () => toast.error("Không thể gán tài nguyên cho module")
+      }
     );
   };
 
-  const columns = createModuleColumns({
-    onEdit: handleEdit,
-    onShowDeleteConfirm: handleShowDeleteConfirm,
-    onToggleActive: handleToggleActive,
-    onAssign: setAssignModule
-  });
+  const columns = React.useMemo(
+    () =>
+      createModuleColumns({
+        onEdit: handleEdit,
+        onShowDeleteConfirm: handleShowDeleteConfirm,
+        onToggleActive: handleToggleActive,
+        onAssign: setAssignModule
+      }),
+    [handleEdit, handleShowDeleteConfirm, handleToggleActive]
+  );
 
   return (
     <>
-      <div className="container mx-auto px-6 pt-6">
-        <Input
-          value={keyword}
-          onChange={(event) => {
-            setKeyword(event.target.value);
-            setPagination((current) => ({ ...current, pageIndex: 0 }));
-          }}
-          placeholder="Tìm kiếm module..."
-          aria-label="Tìm kiếm module"
-          className="max-w-sm"
-        />
-      </div>
       <DataTableAdvanced
         data={modules}
         columns={columns}
@@ -154,6 +153,14 @@ function AdminModules() {
         addLabel="Thêm module"
         title="Quản lý module"
         description="Khai báo module để nhóm các tài nguyên trong hệ thống"
+        filter={{
+          fields: [{ key: "keyword", label: "Từ khóa", placeholder: "Tìm kiếm module..." }],
+          values: filters,
+          onChange: (values) => {
+            setFilters(values);
+            setPagination((current) => ({ ...current, pageIndex: 0 }));
+          }
+        }}
       />
       <ModuleFormDialog
         open={openForm}
@@ -164,7 +171,9 @@ function AdminModules() {
             onSuccess: () => {
               setOpenForm(false);
               void refetch();
-            }
+              toast.success("Lưu module thành công");
+            },
+            onError: () => toast.error("Không thể lưu module. Mã module có thể đã tồn tại.")
           })
         }
       />
@@ -180,30 +189,15 @@ function AdminModules() {
           if (module?.id === moduleId) handleAssign(module, resourceIds);
         }}
       />
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Xóa module</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bạn có chắc muốn xóa{" "}
-              <span className="text-foreground font-semibold">
-                {deleteModuleName || "module này"}
-              </span>
-              ? Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>Hủy</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteModuleId !== null && handleDelete(deleteModuleId)}
-              disabled={deleteMutation.isPending}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              {deleteMutation.isPending ? "Đang xóa..." : "Xóa"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        itemId={deleteModuleId}
+        itemName={deleteModuleName}
+        itemType="module"
+        onConfirm={handleDelete}
+        onOpenChange={setDeleteDialogOpen}
+        isLoading={deleteMutation.isPending}
+      />
     </>
   );
 }

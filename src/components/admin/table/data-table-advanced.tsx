@@ -22,11 +22,16 @@ import {
   LayoutGrid,
   Loader2,
   Plus,
+  Search,
   RefreshCcw,
   Trash
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  TableSearchFilter,
+  type TableSearchFilterProps
+} from "@/components/admin/table/table-search-filter";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -66,6 +71,7 @@ interface DataTableAdvancedProps<TData> {
   title: string;
   description: string;
   getRowId?: (row: TData) => string;
+  filter?: TableSearchFilterProps;
 }
 
 export function DataTableAdvanced<TData extends { id: number }>({
@@ -83,6 +89,7 @@ export function DataTableAdvanced<TData extends { id: number }>({
   deleteLabel = "Xóa mục đã chọn",
   title,
   description,
+  filter,
   getRowId = (row) => row.id.toString()
 }: DataTableAdvancedProps<TData>) {
   const [rowSelection, setRowSelection] = React.useState({});
@@ -93,6 +100,16 @@ export function DataTableAdvanced<TData extends { id: number }>({
     pageIndex,
     pageSize
   });
+  const [filterOpen, setFilterOpen] = React.useState(() =>
+    Boolean(filter && Object.values(filter.values).some((value) => value.trim()))
+  );
+  const hasActiveFilter = Boolean(
+    filter && Object.values(filter.values).some((value) => value.trim())
+  );
+
+  React.useEffect(() => {
+    if (hasActiveFilter) setFilterOpen(true);
+  }, [hasActiveFilter]);
 
   React.useEffect(() => {
     setPagination({ pageIndex, pageSize });
@@ -152,6 +169,17 @@ export function DataTableAdvanced<TData extends { id: number }>({
               <span className="hidden lg:inline">Làm mới</span>
             </Button>
           )}
+          {filter && (
+            <Button
+              variant="outline"
+              size="sm"
+              aria-pressed={filterOpen}
+              onClick={() => setFilterOpen((open) => !open)}
+            >
+              <Search className="size-4" />
+              <span>Bộ lọc</span>
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -201,6 +229,16 @@ export function DataTableAdvanced<TData extends { id: number }>({
           )}
         </div>
       </div>
+
+      {filter && filterOpen && (
+        <TableSearchFilter
+          {...filter}
+          onChange={(values) => {
+            setPagination((current) => ({ ...current, pageIndex: 0 }));
+            filter.onChange(values);
+          }}
+        />
+      )}
 
       <div className="overflow-hidden rounded-lg border">
         <Table>

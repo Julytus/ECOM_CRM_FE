@@ -27,6 +27,7 @@ function AdminResources() {
     pageIndex: 0,
     pageSize: 10
   });
+  const [filters, setFilters] = React.useState<Record<string, string>>({ keyword: "" });
 
   const [selectedResource, setSelectedResource] = React.useState<ResourceDTO | null>(null);
   const [openForm, setOpenForm] = React.useState(false);
@@ -43,6 +44,7 @@ function AdminResources() {
   } = useInfiniteQuery(
     createInfiniteResourcesQueryOptions({
       opts: {
+        keyword: filters.keyword.trim() || undefined,
         paging: {
           limit: pagination.pageSize,
           page: pagination.pageIndex + 1
@@ -144,6 +146,14 @@ function AdminResources() {
         deleteLabel="Xóa đã chọn"
         title="Quản lý tài nguyên"
         description="Khai báo tài nguyên và hành động hỗ trợ để gán quyền cho các chức vụ"
+        filter={{
+          fields: [{ key: "keyword", label: "Từ khóa", placeholder: "Tìm tài nguyên..." }],
+          values: filters,
+          onChange: (values) => {
+            setFilters(values);
+            setPagination((current) => ({ ...current, pageIndex: 0 }));
+          }
+        }}
       />
       <ResourceFormDialog
         open={openForm}
