@@ -15,12 +15,13 @@ import type { ModuleDTO } from "@/lib/types/module";
 export const createModuleColumns = ({
   onEdit,
   onShowDeleteConfirm,
-  onToggleActive
+  onToggleActive,
+  onAssign
 }: {
   onEdit: (module: ModuleDTO) => void;
   onShowDeleteConfirm: (id: number, name?: string) => void;
   onToggleActive: (module: ModuleDTO, active: boolean) => void;
-  onAssign?: (module: ModuleDTO) => void;
+  onAssign: (module: ModuleDTO) => void;
 }): ColumnDef<ModuleDTO>[] => [
   {
     accessorKey: "name",
@@ -65,6 +66,7 @@ export const createModuleColumns = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
           <DropdownMenuItem onClick={() => onEdit(row.original)}>Sửa</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onAssign(row.original)}>Gán tài nguyên</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-destructive"

@@ -6,6 +6,7 @@ import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 
 import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
 import { createModuleColumns } from "@/components/crm/module/columns";
+import { AssignResourcesDialog } from "@/components/crm/module/assign-resources-dialog";
 import { ModuleFormDialog } from "@/components/crm/module/module-dialog";
 import {
   AlertDialog,
@@ -21,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import {
   createInfiniteModulesQueryOptions,
   deleteModuleMutationOptions,
+  assignResourcesMutationOptions,
   updateModuleStatusMutationOptions,
   upsertModuleMutationOptions
 } from "@/lib/tanstack/options/module";
@@ -34,6 +36,7 @@ function AdminModules() {
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
   const [keyword, setKeyword] = React.useState("");
   const [selectedModule, setSelectedModule] = React.useState<ModuleDTO | null>(null);
+  const [assignModule, setAssignModule] = React.useState<ModuleDTO | null>(null);
   const [openForm, setOpenForm] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [deleteModuleId, setDeleteModuleId] = React.useState<number | null>(null);
@@ -76,6 +79,7 @@ function AdminModules() {
     }
   });
   const statusMutation = useMutation(statusOptions);
+  const assignMutation = useMutation(assignResourcesMutationOptions());
 
   const handleEdit = (module: ModuleDTO) => {
     setSelectedModule(module);
@@ -106,10 +110,18 @@ function AdminModules() {
     );
   };
 
+  const handleAssign = (module: ModuleDTO, resourceIds: number[]) => {
+    assignMutation.mutate(
+      { moduleId: module.id, resourceIds },
+      { onSuccess: () => setAssignModule(null) }
+    );
+  };
+
   const columns = createModuleColumns({
     onEdit: handleEdit,
     onShowDeleteConfirm: handleShowDeleteConfirm,
-    onToggleActive: handleToggleActive
+    onToggleActive: handleToggleActive,
+    onAssign: setAssignModule
   });
 
   return (
@@ -155,6 +167,18 @@ function AdminModules() {
             }
           })
         }
+      />
+      <AssignResourcesDialog
+        open={assignModule !== null}
+        module={assignModule}
+        isPending={assignMutation.isPending}
+        onOpenChange={(open) => {
+          if (!open) setAssignModule(null);
+        }}
+        onAssign={(moduleId, resourceIds) => {
+          const module = assignModule;
+          if (module?.id === moduleId) handleAssign(module, resourceIds);
+        }}
       />
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
