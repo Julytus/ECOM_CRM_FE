@@ -33,9 +33,10 @@ export function PermissionMatrix({
   }
 
   const resourcesByModule = new Map<number, ResourceInfoDTO[]>();
+  const moduleIds = new Set(modules.map((module) => module.id));
   const unassignedResources: ResourceInfoDTO[] = [];
   for (const resource of resources) {
-    if (resource.moduleId == null) {
+    if (resource.moduleId == null || !moduleIds.has(resource.moduleId)) {
       unassignedResources.push(resource);
       continue;
     }
