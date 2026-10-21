@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import type { AxiosError } from "axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ShoppingBag } from "lucide-react";
@@ -44,7 +45,10 @@ function CheckoutPage() {
         setCheckoutResult(result);
         toast.success("Đặt hàng thành công!");
       },
-      onError: () => toast.error("Không thể đặt hàng. Vui lòng kiểm tra thông tin và thử lại.")
+      onError: (error) => {
+        const message = (error as AxiosError<{ message?: string }>).response?.data?.message;
+        toast.error(message || "Không thể đặt hàng. Vui lòng kiểm tra thông tin và thử lại.");
+      }
     });
   };
 

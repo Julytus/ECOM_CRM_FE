@@ -1,5 +1,6 @@
 import { CheckCircle2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatVnd } from "@/lib/format";
 import type { components } from "@/lib/api/schema.gen";
 
 type CheckoutResponse = components["schemas"]["CheckoutResponse"];
@@ -36,7 +37,7 @@ export function CheckoutSuccess({ result, paymentConfirmed }: CheckoutSuccessPro
         <dd className="text-right font-semibold">{result.invoiceCode || "—"}</dd>
         <dt className="text-muted-foreground">Tổng thanh toán</dt>
         <dd className="text-primary text-right font-bold">
-          {result.finalAmount === undefined ? "—" : `${result.finalAmount.toLocaleString("vi-VN")}₫`}
+          {result.finalAmount === undefined ? "—" : formatVnd(result.finalAmount)}
         </dd>
         {!isPayos && <dt className="col-span-2 text-center font-semibold">Thanh toán khi nhận hàng</dt>}
       </dl>

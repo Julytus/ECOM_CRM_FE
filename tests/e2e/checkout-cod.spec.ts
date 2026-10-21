@@ -51,13 +51,13 @@ test.describe("Storefront checkout", () => {
     await page.getByLabel("Địa chỉ*").fill("1 Lê Lợi, Quận 1, TP Hồ Chí Minh");
     await page.getByLabel("Họ và tên người mua*").fill("Trần Văn A");
     await page.getByLabel("Số điện thoại người mua*").fill("0901234567");
-    await expect(page.getByText("205.000₫")).toBeVisible();
+    await expect(page.getByText(/205\.000/)).toBeVisible();
     await page.getByRole("button", { name: "Xác nhận đặt hàng" }).click();
 
     await expect(page.getByRole("heading", { name: "Đặt hàng thành công" })).toBeVisible();
     await expect(page.getByText("ORD-2026-001")).toBeVisible();
     await expect(page.getByText("INV-2026-001")).toBeVisible();
-    await expect(page.getByText("205.000₫")).toBeVisible();
+    await expect(page.getByText(/205\.000/)).toBeVisible();
     await expect(page.getByText("Thanh toán khi nhận hàng", { exact: true })).toBeVisible();
     expect(submittedPayload).toMatchObject({
       paymentMethod: "COD",

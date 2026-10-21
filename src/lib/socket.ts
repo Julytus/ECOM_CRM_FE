@@ -8,8 +8,7 @@ export interface PaymentDonePayload {
 }
 
 function getSocketUrl() {
-  const apiUrl = new URL(env.VITE_API_URL);
-  return `${apiUrl.protocol}//${apiUrl.host}`;
+  return env.VITE_SOCKET_URL;
 }
 
 export function connectPaymentSocket(userId: number): Socket {
