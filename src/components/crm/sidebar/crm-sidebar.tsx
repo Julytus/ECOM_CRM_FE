@@ -9,23 +9,19 @@ import {
   KeySquare,
   LifeBuoy,
   Receipt,
-  ChartNoAxesCombined,
-  Send,
+    Send,
   ShieldCheck,
   ShoppingCart,
   Users
 } from "lucide-react";
-import { Link, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
-import { CrmMain } from "@/components/crm/crm-main";
-import { CrmSecondary } from "@/components/crm/crm-secondary";
+import { CrmMain, type CrmNavItem } from "@/components/crm/sidebar/crm-main";
+import { CrmSecondary } from "@/components/crm/sidebar/crm-secondary";
 import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -33,52 +29,24 @@ import {
 } from "@/components/ui/sidebar";
 import { permissionResourceQueryOptions } from "@/lib/tanstack/options/permission";
 
-const data = {
-  navMain: [
-    {
-      title: "Quản lý quy trình",
-      url: "/bussiness-process",
-      icon: Cog
-    },
-    {
-      title: "Bán hàng",
-      url: "",
-      icon: ShoppingCart,
-      isActive: true,
-      items: [
-        {
-          title: "Sản phẩm",
-          url: "/crm/product"
-        },
-        {
-          title: "Đơn hàng",
-          url: "/crm/order"
-        },
-        {
-          title: "Danh mục",
-          url: "/crm/category"
-        },
-        {
-          title: "Doanh thu",
-          url: "/crm/revenue",
-          icon: ChartNoAxesCombined
-        }
-      ]
-    }
-  ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send
-    }
-  ]
-};
+const NAV_MAIN: CrmNavItem[] = [
+  { title: "Quản lý quy trình", url: "/bussiness-process", icon: Cog },
+  {
+    title: "Bán hàng",
+    icon: ShoppingCart,
+    items: [
+      { title: "Sản phẩm", url: "/crm/product" },
+      { title: "Đơn hàng", url: "/crm/order" },
+      { title: "Danh mục", url: "/crm/category" },
+      { title: "Doanh thu", url: "/crm/revenue" }
+    ]
+  }
+];
+
+const NAV_SECONDARY = [
+  { title: "Support", url: "#", icon: LifeBuoy },
+  { title: "Feedback", url: "#", icon: Send }
+];
 
 /**
  * 4 mục quản trị hệ thống — ẩn/hiện theo quyền VIEW thật của role đăng nhập
@@ -97,7 +65,6 @@ const ADMIN_NAV_ITEMS = [
 export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: me } = useQuery(meQueryOptions);
 
-  const location = useLocation();
   const { data: permissionResources, isError: isPermissionError } = useQuery({
     ...permissionResourceQueryOptions(),
     retry: 1
@@ -107,15 +74,16 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Người dùng thường lọc theo quyền VIEW; chỉ fail-open khi query lỗi.
   // Khi đang tải, `permissionResources` là `undefined` nên mục tạm ẩn hết.
   // Backend vẫn chặn ở API nên đây chỉ là ẩn/hiện UI, không phải lớp bảo vệ.
-  const visibleAdminItems = me?.isOperator === 1
-    ? ADMIN_NAV_ITEMS
-    : isPermissionError
-    ? ADMIN_NAV_ITEMS
-    : ADMIN_NAV_ITEMS.filter((item) =>
-        permissionResources?.some(
-          (resource) => resource.code === item.code && resource.actions.includes("VIEW")
-        )
-      );
+  const visibleAdminItems =
+    me?.isOperator === 1
+      ? ADMIN_NAV_ITEMS
+      : isPermissionError
+        ? ADMIN_NAV_ITEMS
+        : ADMIN_NAV_ITEMS.filter((item) =>
+            permissionResources?.some(
+              (resource) => resource.code === item.code && resource.actions.includes("VIEW")
+            )
+          );
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -127,9 +95,8 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
-                <div className="grid flex-1 text-left text-xl leading-tight">
-                  <span className="font-bold">CRM System</span>
-                  {/* <span className="truncate text-xs">System</span> */}
+                <div className="grid flex-1 text-left text-lg leading-tight">
+                  <span className="font-semibold">CRM System</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -137,31 +104,16 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <CrmMain items={data.navMain} />
+        <CrmMain label="Chức năng chính" items={NAV_MAIN} />
 
         {visibleAdminItems.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Quản trị hệ thống</SidebarGroupLabel>
-            <SidebarMenu>
-              {visibleAdminItems.map((item) => (
-                <SidebarMenuItem key={item.code}>
-                  <SidebarMenuButton
-                    isActive={location.pathname === item.url}
-                    asChild
-                    tooltip={item.title}
-                  >
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span className="font-bold">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
+          <CrmMain
+            label="Quản trị hệ thống"
+            items={visibleAdminItems.map(({ title, url, icon }) => ({ title, url, icon }))}
+          />
         )}
 
-        <CrmSecondary items={data.navSecondary} className="mt-auto" />
+        <CrmSecondary items={NAV_SECONDARY} className="mt-auto" />
       </SidebarContent>
       {/* <SidebarFooter>
         <CrmUser

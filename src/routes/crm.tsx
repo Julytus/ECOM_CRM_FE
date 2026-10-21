@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { CrmSidebar } from "@/components/crm/crm-sidebar";
-import { CrmUser } from "@/components/crm/crm-user";
+import { CrmSidebar } from "@/components/crm/sidebar/crm-sidebar";
+import { CrmUser } from "@/components/crm/sidebar/crm-user";
 import { useQuery } from "@tanstack/react-query";
 import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
