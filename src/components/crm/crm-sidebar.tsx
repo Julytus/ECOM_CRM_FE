@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  Blocks,
   Cog,
   Command,
   Database,
@@ -79,6 +80,7 @@ const data = {
 const ADMIN_NAV_ITEMS = [
   { code: "USER", title: "Người dùng", url: "/crm/user", icon: Users },
   { code: "RESOURCE", title: "Tài nguyên", url: "/crm/resource", icon: Database },
+  { code: "MODULE", title: "Module", url: "/crm/module", icon: Blocks },
   { code: "ROLE", title: "Chức vụ", url: "/crm/role", icon: ShieldCheck },
   { code: "PERMISSION", title: "Phân quyền", url: "/crm/permission", icon: KeySquare }
 ] as const;
