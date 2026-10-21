@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
@@ -12,6 +12,7 @@ import {
 import { PermissionMatrix } from "@/components/crm/permission/permission-matrix";
 
 import { getRoles } from "@/lib/axios/role";
+import { getModules } from "@/lib/axios/module";
 import {
   addPermissionMutationOptions,
   permissionInfoQueryOptions,
@@ -19,11 +20,15 @@ import {
 } from "@/lib/tanstack/options/permission";
 
 export const Route = createFileRoute("/crm/permission")({
+  validateSearch: (search: Record<string, unknown>): { roleId?: number } => ({
+    roleId: typeof search.roleId === "number" ? search.roleId : undefined
+  }),
   component: PermissionPage
 });
 
 function PermissionPage() {
-  const [roleId, setRoleId] = React.useState<number | undefined>(undefined);
+  const { roleId } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
 
   const { data: rolesPage } = useQuery({
     queryKey: ["roles-for-permission"],
@@ -31,11 +36,20 @@ function PermissionPage() {
   });
   const roles = React.useMemo(() => rolesPage?.items ?? [], [rolesPage]);
 
+  const { data: modulesPage } = useQuery({
+    queryKey: ["modules-for-permission"],
+    queryFn: () => getModules({ paging: { page: 1, limit: 100 } })
+  });
+  const modules = React.useMemo(() => modulesPage?.items ?? [], [modulesPage]);
+
   React.useEffect(() => {
     if (roleId === undefined && roles.length > 0) {
-      setRoleId(roles[0].id);
+      void navigate({
+        search: (prev) => ({ ...prev, roleId: roles[0].id }),
+        replace: true
+      });
     }
-  }, [roleId, roles]);
+  }, [navigate, roleId, roles]);
 
   const { data: resources = [], isFetching } = useQuery(permissionInfoQueryOptions(roleId));
 
@@ -63,8 +77,13 @@ function PermissionPage() {
 
       <div className="w-64">
         <Select
-          value={roleId ? String(roleId) : undefined}
-          onValueChange={(value) => setRoleId(Number(value))}
+          value={roleId !== undefined ? String(roleId) : undefined}
+          onValueChange={(value) => {
+            void navigate({
+              search: (prev) => ({ ...prev, roleId: Number(value) }),
+              replace: true
+            });
+          }}
         >
           <SelectTrigger>
             <SelectValue placeholder="Chọn chức vụ" />
@@ -81,6 +100,7 @@ function PermissionPage() {
 
       <PermissionMatrix
         resources={resources}
+        modules={modules}
         isMutating={addMutation.isPending || removeMutation.isPending}
         onToggle={handleToggle}
       />
