@@ -6,8 +6,8 @@ import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { useBulkDelete } from "@/hooks/use-bulk-delete";
-import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
-import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
+import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
+import { DeleteConfirmDialog } from "@/components/crm/delete-confirm-dialog";
 import { createModuleColumns } from "@/components/crm/module/columns";
 import { AssignResourcesDialog } from "@/components/crm/module/assign-resources-dialog";
 import { ModuleFormDialog } from "@/components/crm/module/module-dialog";

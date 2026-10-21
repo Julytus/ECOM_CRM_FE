@@ -6,9 +6,9 @@ import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { useBulkDelete } from "@/hooks/use-bulk-delete";
-import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
+import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
 import { createRoleColumns } from "@/components/crm/role/columns";
-import { RoleFormDialog } from "@/components/admin/role/role-dialog";
+import { RoleFormDialog } from "@/components/crm/role/role-dialog";
 import {
   AlertDialog,
   AlertDialogAction,

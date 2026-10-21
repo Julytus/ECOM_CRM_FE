@@ -15,7 +15,7 @@ import { CrmUser } from "@/components/crm/crm-user";
 import { useQuery } from "@tanstack/react-query";
 import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AdminLoading } from "@/components/admin/admin-loading";
+import { AdminLoading } from "@/components/crm/crm-loading";
 import { ThemeToggle } from "@/components/layout/theme/theme-toggle";
 
 export const Route = createFileRoute("/crm")({

@@ -5,11 +5,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
+import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
 import { createOrderColumns } from "@/components/crm/order/columns";
-import { OrderFormDialog } from "@/components/admin/order/order-form-dialog";
-import { DeleteOrderDialog } from "@/components/admin/order/delete-order-dialog";
-import { OrderDetailSheet } from "@/components/admin/order/order-sheet";
+import { OrderFormDialog } from "@/components/crm/order/order-form-dialog";
+import { DeleteOrderDialog } from "@/components/crm/order/delete-order-dialog";
+import { OrderDetailSheet } from "@/components/crm/order/order-sheet";
 
 import {
   createInfiniteOrdersQueryOptions,

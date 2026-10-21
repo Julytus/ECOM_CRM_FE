@@ -1,6 +1,6 @@
 import { flexRender, type Table as TanStackTable } from "@tanstack/react-table";
-import { DataTableViewOptions } from "@/components/admin/table/column-toggle";
-import { DataTablePagination } from "@/components/admin/table/pagination";
+import { DataTableViewOptions } from "@/components/crm/table/column-toggle";
+import { DataTablePagination } from "@/components/crm/table/pagination";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react"; // Added for the pill search look
 

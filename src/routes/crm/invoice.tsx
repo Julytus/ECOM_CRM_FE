@@ -4,18 +4,25 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { toast } from "sonner";
 
-import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
-import {
-  createInvoiceColumns,
-  type InvoiceAction
-} from "@/components/crm/invoice/columns";
+import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
+import { createInvoiceColumns, type InvoiceAction } from "@/components/crm/invoice/columns";
 import { InvoiceActionDialogs } from "@/components/crm/invoice/invoice-action-dialogs";
-import { InvoiceStatusFilter } from "@/components/crm/invoice/status-filter";
 import { InvoiceDetailSheet } from "@/components/crm/invoice/invoice-detail-sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cancelInvoice, confirmInvoicePayment, refundInvoice, type InvoiceListParams } from "@/lib/api/invoice";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import {
+  cancelInvoice,
+  confirmInvoicePayment,
+  refundInvoice,
+  type InvoiceListParams
+} from "@/lib/api/invoice";
 import type { components } from "@/lib/api/schema.gen";
 import { useResourceAction } from "@/lib/hooks/use-resource-action";
 import { invoicesQueryOptions } from "@/lib/tanstack/options/invoice";
@@ -70,12 +77,14 @@ function InvoicePage() {
   });
 
   React.useEffect(() => {
-    if (listQuery.error) toast.error(getErrorMessage(listQuery.error, "Không thể tải danh sách hóa đơn."));
+    if (listQuery.error)
+      toast.error(getErrorMessage(listQuery.error, "Không thể tải danh sách hóa đơn."));
   }, [listQuery.error]);
 
   const page = listQuery.data;
   const invoices = React.useMemo(
-    () => (page?.items ?? []).map((invoice, index) => ({ ...invoice, id: invoice.id ?? -(index + 1) })),
+    () =>
+      (page?.items ?? []).map((invoice, index) => ({ ...invoice, id: invoice.id ?? -(index + 1) })),
     [page?.items]
   );
   const columns = React.useMemo(
@@ -112,20 +121,51 @@ function InvoicePage() {
       <section className="grid gap-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-2">
           <Label htmlFor="invoice-keyword">Từ khóa</Label>
-          <Input id="invoice-keyword" value={filters.keyword ?? ""} onChange={(event) => updateFilter({ keyword: event.target.value || undefined })} placeholder="Mã, tên, số điện thoại" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="invoice-status">Trạng thái</Label>
-          <InvoiceStatusFilter
-            id="invoice-status"
-            value={filters.status ?? []}
-            onChange={(status) => updateFilter({ status: status.length ? status : undefined })}
+          <Input
+            id="invoice-keyword"
+            value={filters.keyword ?? ""}
+            onChange={(event) => updateFilter({ keyword: event.target.value || undefined })}
+            placeholder="Mã, tên, số điện thoại"
           />
         </div>
         <div className="space-y-2">
+          <Label htmlFor="invoice-status">Trạng thái</Label>
+          <select
+            id="invoice-status"
+            multiple
+            value={(filters.status ?? []).map(String)}
+            onChange={(event) =>
+              updateFilter({
+                status: Array.from(event.currentTarget.selectedOptions, (option) =>
+                  Number(option.value)
+                )
+              })
+            }
+            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            aria-label="Trạng thái hóa đơn"
+          >
+            <option value="0">Nháp</option>
+            <option value="1">Hoàn tất</option>
+            <option value="2">Đã hủy</option>
+            <option value="3">Chưa thanh toán</option>
+            <option value="4">Hoàn tiền</option>
+          </select>
+          <p className="text-muted-foreground text-xs">Giữ Ctrl/Cmd để chọn nhiều trạng thái.</p>
+        </div>
+        <div className="space-y-2">
           <Label>Phương thức thanh toán</Label>
-          <Select value={filters.paymentMethod ?? "all"} onValueChange={(value) => updateFilter({ paymentMethod: value === "all" ? undefined : value as InvoiceListParams["paymentMethod"] })}>
-            <SelectTrigger><SelectValue placeholder="Tất cả" /></SelectTrigger>
+          <Select
+            value={filters.paymentMethod ?? "all"}
+            onValueChange={(value) =>
+              updateFilter({
+                paymentMethod:
+                  value === "all" ? undefined : (value as InvoiceListParams["paymentMethod"])
+              })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Tất cả" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
               <SelectItem value="COD">COD</SelectItem>
@@ -137,20 +177,41 @@ function InvoicePage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="invoice-order-code">Mã đơn hàng</Label>
-          <Input id="invoice-order-code" value={filters.orderCode ?? ""} onChange={(event) => updateFilter({ orderCode: event.target.value || undefined })} />
+          <Input
+            id="invoice-order-code"
+            value={filters.orderCode ?? ""}
+            onChange={(event) => updateFilter({ orderCode: event.target.value || undefined })}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="invoice-from-date">Từ ngày</Label>
-          <Input id="invoice-from-date" type="date" value={filters.fromDate ?? ""} onChange={(event) => updateFilter({ fromDate: event.target.value || undefined })} />
+          <Input
+            id="invoice-from-date"
+            type="date"
+            value={filters.fromDate ?? ""}
+            onChange={(event) => updateFilter({ fromDate: event.target.value || undefined })}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="invoice-to-date">Đến ngày</Label>
-          <Input id="invoice-to-date" type="date" value={filters.toDate ?? ""} onChange={(event) => updateFilter({ toDate: event.target.value || undefined })} />
+          <Input
+            id="invoice-to-date"
+            type="date"
+            value={filters.toDate ?? ""}
+            onChange={(event) => updateFilter({ toDate: event.target.value || undefined })}
+          />
         </div>
         <div className="space-y-2">
           <Label>Sắp xếp theo</Label>
-          <Select value={filters.sortBy ?? "createdTime"} onValueChange={(value) => updateFilter({ sortBy: value as InvoiceListParams["sortBy"] })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+          <Select
+            value={filters.sortBy ?? "createdTime"}
+            onValueChange={(value) =>
+              updateFilter({ sortBy: value as InvoiceListParams["sortBy"] })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="createdTime">Ngày tạo</SelectItem>
               <SelectItem value="id">Mã hóa đơn</SelectItem>
@@ -160,8 +221,13 @@ function InvoicePage() {
         </div>
         <div className="space-y-2">
           <Label>Thứ tự</Label>
-          <Select value={filters.sortDir ?? "desc"} onValueChange={(value) => updateFilter({ sortDir: value as "asc" | "desc" })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+          <Select
+            value={filters.sortDir ?? "desc"}
+            onValueChange={(value) => updateFilter({ sortDir: value as "asc" | "desc" })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="desc">Mới nhất</SelectItem>
               <SelectItem value="asc">Cũ nhất</SelectItem>
@@ -194,7 +260,9 @@ function InvoicePage() {
             setSelectedInvoice(null);
           }
         }}
-        onConfirm={(invoice, selectedAction, reason) => actionMutation.mutate({ invoice, action: selectedAction, reason })}
+        onConfirm={(invoice, selectedAction, reason) =>
+          actionMutation.mutate({ invoice, action: selectedAction, reason })
+        }
       />
       <InvoiceDetailSheet
         invoiceId={detailInvoiceId}

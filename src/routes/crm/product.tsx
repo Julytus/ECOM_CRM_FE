@@ -7,16 +7,16 @@ import { useAtom } from "jotai";
 import { toast } from "sonner";
 import { useMemo, useState } from "react";
 
-import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
+import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
 import { createProductColumns } from "@/components/crm/product/columns";
-import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
+import { DeleteConfirmDialog } from "@/components/crm/delete-confirm-dialog";
 
 import {
   createInfiniteProductDetailsQueryOptions,
   deleteProductsMutationOptions
 } from "@/lib/tanstack/options/product";
-import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/admin/product/atoms";
-import { ProductDialog } from "@/components/admin/product/product-dialog";
+import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/crm/product/atoms";
+import { ProductDialog } from "@/components/crm/product/product-dialog";
 
 export const Route = createFileRoute("/crm/product")({
   component: AdminProducts

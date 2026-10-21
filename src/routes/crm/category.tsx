@@ -6,10 +6,10 @@ import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { useBulkDelete } from "@/hooks/use-bulk-delete";
-import { DataTableAdvanced } from "@/components/admin/table/data-table-advanced";
+import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
 import { createCategoryColumns } from "@/components/crm/category/columns";
-import { CategoryFormDialog } from "@/components/admin/category/category-dialog";
-import { DeleteConfirmDialog } from "@/components/admin/delete-confirm-dialog";
+import { CategoryFormDialog } from "@/components/crm/category/category-dialog";
+import { DeleteConfirmDialog } from "@/components/crm/delete-confirm-dialog";
 
 import {
   createInfiniteCategoriesQueryOptions,

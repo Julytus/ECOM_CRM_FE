@@ -1,0 +1,1 @@
+- [Shop design tokens](project_shop_design_tokens.md) — sale/success/warning tokens, dark-mode contrast pitfalls, baseline tsc errors

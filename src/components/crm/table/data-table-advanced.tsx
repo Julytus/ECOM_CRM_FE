@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import {
   TableSearchFilter,
   type TableSearchFilterProps
-} from "@/components/admin/table/table-search-filter";
+} from "@/components/crm/table/table-search-filter";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
