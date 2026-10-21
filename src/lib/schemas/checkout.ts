@@ -4,8 +4,8 @@ export const checkoutSchema = z.object({
   items: z
     .array(
       z.object({
-        productVariantId: z.number().optional(),
-        quantity: z.number().optional()
+        productVariantId: z.number().int().positive(),
+        quantity: z.number().int().min(1)
       })
     )
     .min(1),

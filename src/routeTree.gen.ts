@@ -31,6 +31,8 @@ import { Route as AdminCategoryRouteImport } from './routes/admin/category'
 import { Route as ShopWishlistRouteImport } from './routes/_shop/wishlist'
 import { Route as ShopSearchRouteImport } from './routes/_shop/search'
 import { Route as ShopCheckoutIndexRouteImport } from './routes/_shop/checkout/index'
+import { Route as PaymentOrderCodeReturnRouteImport } from './routes/payment.$orderCode.return'
+import { Route as PaymentOrderCodeCancelRouteImport } from './routes/payment.$orderCode.cancel'
 import { Route as ShopProductIdRouteImport } from './routes/_shop/product.$id'
 import { Route as ShopProfileProfileRouteImport } from './routes/_shop/_profile/profile'
 import { Route as ShopProfileOrdersRouteImport } from './routes/_shop/_profile/orders'
@@ -147,6 +149,16 @@ const ShopCheckoutIndexRoute = ShopCheckoutIndexRouteImport.update({
   path: '/checkout/',
   getParentRoute: () => ShopRoute,
 } as any)
+const PaymentOrderCodeReturnRoute = PaymentOrderCodeReturnRouteImport.update({
+  id: '/payment/$orderCode/return',
+  path: '/payment/$orderCode/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentOrderCodeCancelRoute = PaymentOrderCodeCancelRouteImport.update({
+  id: '/payment/$orderCode/cancel',
+  path: '/payment/$orderCode/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopProductIdRoute = ShopProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
@@ -205,6 +217,8 @@ export interface FileRoutesByFullPath {
   '/orders': typeof ShopProfileOrdersRoute
   '/profile': typeof ShopProfileProfileRoute
   '/product/$id': typeof ShopProductIdRoute
+  '/payment/$orderCode/cancel': typeof PaymentOrderCodeCancelRoute
+  '/payment/$orderCode/return': typeof PaymentOrderCodeReturnRoute
   '/checkout': typeof ShopCheckoutIndexRoute
 }
 export interface FileRoutesByTo {
@@ -233,6 +247,8 @@ export interface FileRoutesByTo {
   '/orders': typeof ShopProfileOrdersRoute
   '/profile': typeof ShopProfileProfileRoute
   '/product/$id': typeof ShopProductIdRoute
+  '/payment/$orderCode/cancel': typeof PaymentOrderCodeCancelRoute
+  '/payment/$orderCode/return': typeof PaymentOrderCodeReturnRoute
   '/checkout': typeof ShopCheckoutIndexRoute
 }
 export interface FileRoutesById {
@@ -264,6 +280,8 @@ export interface FileRoutesById {
   '/_shop/_profile/orders': typeof ShopProfileOrdersRoute
   '/_shop/_profile/profile': typeof ShopProfileProfileRoute
   '/_shop/product/$id': typeof ShopProductIdRoute
+  '/payment/$orderCode/cancel': typeof PaymentOrderCodeCancelRoute
+  '/payment/$orderCode/return': typeof PaymentOrderCodeReturnRoute
   '/_shop/checkout/': typeof ShopCheckoutIndexRoute
 }
 export interface FileRouteTypes {
@@ -295,6 +313,8 @@ export interface FileRouteTypes {
     | '/orders'
     | '/profile'
     | '/product/$id'
+    | '/payment/$orderCode/cancel'
+    | '/payment/$orderCode/return'
     | '/checkout'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -323,6 +343,8 @@ export interface FileRouteTypes {
     | '/orders'
     | '/profile'
     | '/product/$id'
+    | '/payment/$orderCode/cancel'
+    | '/payment/$orderCode/return'
     | '/checkout'
   id:
     | '__root__'
@@ -353,6 +375,8 @@ export interface FileRouteTypes {
     | '/_shop/_profile/orders'
     | '/_shop/_profile/profile'
     | '/_shop/product/$id'
+    | '/payment/$orderCode/cancel'
+    | '/payment/$orderCode/return'
     | '/_shop/checkout/'
   fileRoutesById: FileRoutesById
 }
@@ -361,6 +385,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   CrmRoute: typeof CrmRouteWithChildren
+  PaymentOrderCodeCancelRoute: typeof PaymentOrderCodeCancelRoute
+  PaymentOrderCodeReturnRoute: typeof PaymentOrderCodeReturnRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -519,6 +545,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopCheckoutIndexRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/payment/$orderCode/return': {
+      id: '/payment/$orderCode/return'
+      path: '/payment/$orderCode/return'
+      fullPath: '/payment/$orderCode/return'
+      preLoaderRoute: typeof PaymentOrderCodeReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/$orderCode/cancel': {
+      id: '/payment/$orderCode/cancel'
+      path: '/payment/$orderCode/cancel'
+      fullPath: '/payment/$orderCode/cancel'
+      preLoaderRoute: typeof PaymentOrderCodeCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_shop/product/$id': {
       id: '/_shop/product/$id'
       path: '/product/$id'
@@ -641,6 +681,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   CrmRoute: CrmRouteWithChildren,
+  PaymentOrderCodeCancelRoute: PaymentOrderCodeCancelRoute,
+  PaymentOrderCodeReturnRoute: PaymentOrderCodeReturnRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
