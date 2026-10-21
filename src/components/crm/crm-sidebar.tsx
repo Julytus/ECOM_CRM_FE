@@ -8,6 +8,7 @@ import {
   Database,
   KeySquare,
   LifeBuoy,
+  Receipt,
   Send,
   ShieldCheck,
   ShoppingCart,
@@ -83,7 +84,8 @@ const ADMIN_NAV_ITEMS = [
   { code: "RESOURCE", title: "Tài nguyên", url: "/crm/resource", icon: Database },
   { code: "MODULE", title: "Module", url: "/crm/module", icon: Blocks },
   { code: "ROLE", title: "Chức vụ", url: "/crm/role", icon: ShieldCheck },
-  { code: "PERMISSION", title: "Phân quyền", url: "/crm/permission", icon: KeySquare }
+  { code: "PERMISSION", title: "Phân quyền", url: "/crm/permission", icon: KeySquare },
+  { code: "INVOICE", title: "Hóa đơn", url: "/crm/invoice", icon: Receipt }
 ] as const;
 
 export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

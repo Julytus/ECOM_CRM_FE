@@ -22,6 +22,7 @@ import { Route as CrmProductRouteImport } from './routes/crm/product'
 import { Route as CrmPermissionRouteImport } from './routes/crm/permission'
 import { Route as CrmOrderRouteImport } from './routes/crm/order'
 import { Route as CrmModuleRouteImport } from './routes/crm/module'
+import { Route as CrmInvoiceRouteImport } from './routes/crm/invoice'
 import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
 import { Route as CrmCategoryRouteImport } from './routes/crm/category'
 import { Route as AdminUserRouteImport } from './routes/admin/user'
@@ -102,6 +103,11 @@ const CrmOrderRoute = CrmOrderRouteImport.update({
 const CrmModuleRoute = CrmModuleRouteImport.update({
   id: '/module',
   path: '/module',
+  getParentRoute: () => CrmRoute,
+} as any)
+const CrmInvoiceRoute = CrmInvoiceRouteImport.update({
+  id: '/invoice',
+  path: '/invoice',
   getParentRoute: () => CrmRoute,
 } as any)
 const CrmDashboardRoute = CrmDashboardRouteImport.update({
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
+  '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
+  '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
@@ -265,6 +273,7 @@ export interface FileRoutesById {
   '/admin/user': typeof AdminUserRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
+  '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
@@ -298,6 +307,7 @@ export interface FileRouteTypes {
     | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
+    | '/crm/invoice'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
+    | '/crm/invoice'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
@@ -360,6 +371,7 @@ export interface FileRouteTypes {
     | '/admin/user'
     | '/crm/category'
     | '/crm/dashboard'
+    | '/crm/invoice'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
@@ -480,6 +492,13 @@ declare module '@tanstack/react-router' {
       path: '/module'
       fullPath: '/crm/module'
       preLoaderRoute: typeof CrmModuleRouteImport
+      parentRoute: typeof CrmRoute
+    }
+    '/crm/invoice': {
+      id: '/crm/invoice'
+      path: '/invoice'
+      fullPath: '/crm/invoice'
+      preLoaderRoute: typeof CrmInvoiceRouteImport
       parentRoute: typeof CrmRoute
     }
     '/crm/dashboard': {
@@ -653,6 +672,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface CrmRouteChildren {
   CrmCategoryRoute: typeof CrmCategoryRoute
   CrmDashboardRoute: typeof CrmDashboardRoute
+  CrmInvoiceRoute: typeof CrmInvoiceRoute
   CrmModuleRoute: typeof CrmModuleRoute
   CrmOrderRoute: typeof CrmOrderRoute
   CrmPermissionRoute: typeof CrmPermissionRoute
@@ -665,6 +685,7 @@ interface CrmRouteChildren {
 const CrmRouteChildren: CrmRouteChildren = {
   CrmCategoryRoute: CrmCategoryRoute,
   CrmDashboardRoute: CrmDashboardRoute,
+  CrmInvoiceRoute: CrmInvoiceRoute,
   CrmModuleRoute: CrmModuleRoute,
   CrmOrderRoute: CrmOrderRoute,
   CrmPermissionRoute: CrmPermissionRoute,
