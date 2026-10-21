@@ -174,7 +174,17 @@ export function DataTableAdvanced<TData extends { id: number }>({
               variant="outline"
               size="sm"
               aria-pressed={filterOpen}
-              onClick={() => setFilterOpen((open) => !open)}
+              onClick={() => {
+                const shouldClose = filterOpen;
+                setFilterOpen(!shouldClose);
+                if (shouldClose) {
+                  const clearedValues = Object.fromEntries(
+                    Object.keys(filter.values).map((key) => [key, ""])
+                  );
+                  setPagination((current) => ({ ...current, pageIndex: 0 }));
+                  filter.onChange(clearedValues);
+                }
+              }}
             >
               <Search className="size-4" />
               <span>Bộ lọc</span>
