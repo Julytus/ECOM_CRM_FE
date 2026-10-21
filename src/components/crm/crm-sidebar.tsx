@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { CrmMain } from "@/components/crm/crm-main";
 import { CrmSecondary } from "@/components/crm/crm-secondary";
+import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import {
   Sidebar,
   SidebarContent,
@@ -86,7 +87,7 @@ const ADMIN_NAV_ITEMS = [
 ] as const;
 
 export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  //   const { data: me } = useQuery(meQueryOptions);
+  const { data: me } = useQuery(meQueryOptions);
 
   const location = useLocation();
   const { data: permissionResources, isError: isPermissionError } = useQuery({
@@ -94,12 +95,13 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     retry: 1
   });
 
-  // Fail-open CHỈ khi query thật sự lỗi (không phải lúc đang tải lần đầu —
-  // nếu không, mọi user bị giới hạn quyền đều thấy đủ 4 mục trong thời gian
-  // chờ response, dù chỉ vài trăm ms). Lúc đang tải, `permissionResources`
-  // là `undefined` → `.some()` không chạy → mục tạm ẩn hết thay vì hiện sai.
+  // Operator luôn thấy đủ mục quản trị, không phụ thuộc dữ liệu permission.
+  // Người dùng thường lọc theo quyền VIEW; chỉ fail-open khi query lỗi.
+  // Khi đang tải, `permissionResources` là `undefined` nên mục tạm ẩn hết.
   // Backend vẫn chặn ở API nên đây chỉ là ẩn/hiện UI, không phải lớp bảo vệ.
-  const visibleAdminItems = isPermissionError
+  const visibleAdminItems = me?.isOperator === 1
+    ? ADMIN_NAV_ITEMS
+    : isPermissionError
     ? ADMIN_NAV_ITEMS
     : ADMIN_NAV_ITEMS.filter((item) =>
         permissionResources?.some(
