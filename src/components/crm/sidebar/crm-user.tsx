@@ -69,9 +69,9 @@ export function CrmUser({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate({ to: "/" })}>
             <Sparkles />
-            Upgrade to Pro
+            Shop
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

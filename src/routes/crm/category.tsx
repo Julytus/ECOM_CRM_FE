@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -19,7 +20,11 @@ import {
 import type { CategoryDTO } from "@/lib/types/category";
 
 export const Route = createFileRoute("/crm/category")({
-  component: AdminCategories
+  component: () => (
+    <CrmPermissionGuard code="CATEGORY_ITEM">
+      <AdminCategories />
+    </CrmPermissionGuard>
+  )
 });
 
 function AdminCategories() {

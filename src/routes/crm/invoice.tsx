@@ -1,7 +1,10 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 import type { AxiosError } from "axios";
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 
 import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
@@ -24,13 +27,29 @@ import {
   type InvoiceListParams
 } from "@/lib/api/invoice";
 import type { components } from "@/lib/api/schema.gen";
+import { cn } from "@/lib/utils";
 import { useResourceAction } from "@/lib/hooks/use-resource-action";
 import { invoicesQueryOptions } from "@/lib/tanstack/options/invoice";
 
 type Invoice = components["schemas"]["Invoice"];
+type TableInvoice = Invoice & { id: number };
 type ActionError = AxiosError<{ message?: string }>;
 
-export const Route = createFileRoute("/crm/invoice")({ component: InvoicePage });
+export const Route = createFileRoute("/crm/invoice")({
+  component: () => (
+    <CrmPermissionGuard code="INVOICE">
+      <InvoicePage />
+    </CrmPermissionGuard>
+  )
+});
+
+const INVOICE_STATUS_OPTIONS = [
+  { value: 0, label: "Nháp" },
+  { value: 1, label: "Hoàn tất" },
+  { value: 2, label: "Đã hủy" },
+  { value: 3, label: "Chưa thanh toán" },
+  { value: 4, label: "Hoàn tiền" }
+] as const;
 
 const DEFAULT_FILTERS: InvoiceListParams = {
   page: 1,
@@ -53,7 +72,10 @@ function InvoicePage() {
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
   const [selectedInvoice, setSelectedInvoice] = React.useState<Invoice | null>(null);
   const [action, setAction] = React.useState<InvoiceAction | null>(null);
-  const [detailInvoiceId, setDetailInvoiceId] = React.useState<number | null>(null);
+  const [detailInvoiceId, setDetailInvoiceId] = React.useState<number | null>(() => {
+    const invoiceId = Number(new URLSearchParams(window.location.search).get("invoiceId"));
+    return Number.isInteger(invoiceId) && invoiceId > 0 ? invoiceId : null;
+  });
 
   const listQuery = useQuery(invoicesQueryOptions(filters));
   const actionMutation = useMutation({
@@ -89,7 +111,7 @@ function InvoicePage() {
   );
   const columns = React.useMemo(
     () =>
-      createInvoiceColumns({
+      [...createInvoiceColumns({
         canUpdate,
         canDelete,
         onView: (invoice) => setDetailInvoiceId(invoice.id ?? null),
@@ -98,12 +120,39 @@ function InvoicePage() {
           setAction(nextAction);
         }
       }),
+      ...([
+        {
+          accessorKey: "updatedTime",
+          header: "Cập nhật lúc",
+          cell: ({ row }) =>
+            row.original.updatedTime
+              ? new Date(row.original.updatedTime).toLocaleString("vi-VN")
+              : "—"
+        },
+        {
+          accessorKey: "receiptDate",
+          header: "Ngày thu tiền",
+          cell: ({ row }) =>
+            row.original.receiptDate
+              ? new Date(row.original.receiptDate).toLocaleString("vi-VN")
+              : "—"
+        }
+      ] satisfies ColumnDef<TableInvoice>[])
+      ],
     [canDelete, canUpdate]
   );
 
   const updateFilter = (patch: Partial<InvoiceListParams>) => {
     setPagination((current) => ({ ...current, pageIndex: 0 }));
     setFilters((current) => ({ ...current, ...patch, page: 1 }));
+  };
+
+  const selectedStatuses = filters.status ?? [];
+  const toggleStatus = (value: number) => {
+    const next = selectedStatuses.includes(value)
+      ? selectedStatuses.filter((v) => v !== value)
+      : [...selectedStatuses, value];
+    updateFilter({ status: next.length > 0 ? next : undefined });
   };
 
   const setPage = (pageIndex: number, pageSize: number) => {
@@ -128,29 +177,41 @@ function InvoicePage() {
             placeholder="Mã, tên, số điện thoại"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="invoice-status">Trạng thái</Label>
-          <select
-            id="invoice-status"
-            multiple
-            value={(filters.status ?? []).map(String)}
-            onChange={(event) =>
-              updateFilter({
-                status: Array.from(event.currentTarget.selectedOptions, (option) =>
-                  Number(option.value)
-                )
-              })
-            }
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
-            aria-label="Trạng thái hóa đơn"
-          >
-            <option value="0">Nháp</option>
-            <option value="1">Hoàn tất</option>
-            <option value="2">Đã hủy</option>
-            <option value="3">Chưa thanh toán</option>
-            <option value="4">Hoàn tiền</option>
-          </select>
-          <p className="text-muted-foreground text-xs">Giữ Ctrl/Cmd để chọn nhiều trạng thái.</p>
+        <div className="space-y-2 sm:col-span-2">
+          <div className="flex items-center justify-between">
+            <Label>Trạng thái</Label>
+            {selectedStatuses.length > 0 && (
+              <button
+                type="button"
+                onClick={() => updateFilter({ status: undefined })}
+                className="text-muted-foreground hover:text-foreground text-xs underline-offset-2 hover:underline"
+              >
+                Bỏ chọn ({selectedStatuses.length})
+              </button>
+            )}
+          </div>
+          <div role="group" aria-label="Trạng thái hóa đơn" className="flex flex-wrap gap-2">
+            {INVOICE_STATUS_OPTIONS.map(({ value, label }) => {
+              const active = selectedStatuses.includes(value);
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => toggleStatus(value)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-background text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  {active && <Check className="size-3.5" />}
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div className="space-y-2">
           <Label>Phương thức thanh toán</Label>

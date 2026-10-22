@@ -27,16 +27,13 @@ import {
 } from "@/components/ui/sidebar";
 import { permissionResourceQueryOptions } from "@/lib/tanstack/options/permission";
 
-const NAV_SALES: CrmNavItem = {
-  title: "Bán hàng",
-  icon: ShoppingCart,
-  items: [
-    { title: "Sản phẩm", url: "/crm/product" },
-    { title: "Đơn hàng", url: "/crm/order" },
-    { title: "Danh mục", url: "/crm/category" },
-    { title: "Doanh thu", url: "/crm/revenue" }
-  ]
-};
+/** Mục con "Bán hàng"; `code` khớp resource BE (URI controller: /product/, /order/, /categoryItem/, /report/). */
+const SALES_ITEMS = [
+  { code: "PRODUCT", title: "Sản phẩm", url: "/crm/product" },
+  { code: "ORDER", title: "Đơn hàng", url: "/crm/order" },
+  { code: "CATEGORY_ITEM", title: "Danh mục", url: "/crm/category" },
+  { code: "REPORT", title: "Doanh thu", url: "/crm/revenue" }
+] as const;
 
 const NAV_SECONDARY = [
   { title: "Support", url: "#", icon: LifeBuoy },
@@ -85,9 +82,16 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ({ title, url }) => ({ title, url })
   );
 
+  const salesChildren = SALES_ITEMS.filter((i) => canView(i.code)).map(({ title, url }) => ({
+    title,
+    url
+  }));
+
   const navMain: CrmNavItem[] = [
     { title: "Quản lý quy trình", url: "/bussiness-process", icon: Cog },
-    NAV_SALES,
+    ...(salesChildren.length > 0
+      ? [{ title: "Bán hàng", icon: ShoppingCart, items: salesChildren }]
+      : []),
     ...(canView(INVOICE_ITEM.code)
       ? [{ title: INVOICE_ITEM.title, url: INVOICE_ITEM.url, icon: INVOICE_ITEM.icon }]
       : []),

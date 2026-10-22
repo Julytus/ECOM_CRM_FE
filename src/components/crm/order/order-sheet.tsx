@@ -1,13 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Package,
   MapPin,
-  ShieldCheck,
   Truck,
-  Ban,
   CheckCircle2,
   Printer,
   User,
@@ -24,18 +22,19 @@ import {
 import { orderByIdQueryOptions } from "@/lib/tanstack/options/order";
 import { QueryBoundary } from "@/components/boundary";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatVnd } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types/order";
 import { ImageWithFallback } from "@/components/image/image-with-fallback";
-import { toast } from "sonner";
+import type { OrderRow } from "@/components/crm/order/columns";
 
 interface OrderDetailSheetProps {
   orderId: number | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onAdvance: (order: OrderRow) => void;
+  isAdvancing: boolean;
 }
 
 const getStatusStyles = (status?: OrderStatus) => {
@@ -53,21 +52,10 @@ const getStatusStyles = (status?: OrderStatus) => {
   }
 };
 
-export function OrderDetailSheet({ orderId, open, onOpenChange }: OrderDetailSheetProps) {
-  const queryClient = useQueryClient();
+export function OrderDetailSheet({ orderId, open, onOpenChange, onAdvance, isAdvancing }: OrderDetailSheetProps) {
   const { data, status, error, refetch } = useQuery({
     ...orderByIdQueryOptions(orderId ?? 0),
     enabled: open && !!orderId
-  });
-
-  const updateStatusMutation = useMutation({
-    mutationFn: async (newStatus: OrderStatus) => {
-      console.log(`Admin updating order ${orderId} to ${newStatus}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-      toast.success("Trạng thái đơn hàng đã được cập nhật");
-    }
   });
 
   return (
@@ -111,6 +99,7 @@ export function OrderDetailSheet({ orderId, open, onOpenChange }: OrderDetailShe
         <div className="flex-1 overflow-y-auto px-8 py-10">
           <QueryBoundary data={data} status={status} error={error} onRetry={() => refetch()}>
             {(order) => {
+              const orderRow = order as OrderRow;
               // Parsing Name and Phone from address string
               const [customerName, customerPhone, ...addressParts] = (order.address || "").split(
                 " | "
@@ -249,6 +238,15 @@ export function OrderDetailSheet({ orderId, open, onOpenChange }: OrderDetailShe
                       </div>
                     </div>
                   </div>
+
+                  {orderRow.invoiceId && (
+                    <a
+                      href={`/crm/invoice?invoiceId=${orderRow.invoiceId}`}
+                      className="inline-flex text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      Hóa đơn {orderRow.invoiceCode || `#${orderRow.invoiceId}`}
+                    </a>
+                  )}
                 </div>
               );
             }}
@@ -260,20 +258,38 @@ export function OrderDetailSheet({ orderId, open, onOpenChange }: OrderDetailShe
           <div className="grid grid-cols-2 gap-3">
             {data?.status === "NEW" && (
               <Button
-                onClick={() => updateStatusMutation.mutate("SHIPPING" as OrderStatus)}
+                onClick={() => data && onAdvance(data as OrderRow)}
+                disabled={isAdvancing}
                 className="col-span-2 rounded-full bg-stone-900 py-7 font-bold tracking-widest text-white uppercase shadow-lg transition-transform hover:scale-[1.01] active:scale-95"
               >
-                <Truck className="mr-2 h-4 w-4" /> Xác nhận & Vận chuyển
+                <CheckCircle2 className="mr-2 h-4 w-4" /> Xác nhận đơn
+              </Button>
+            )}
+
+            {data?.status === "CONFIRMED" && (
+              <Button
+                onClick={() => data && onAdvance(data as OrderRow)}
+                disabled={isAdvancing}
+                className="col-span-2 rounded-full bg-stone-900 py-7 font-bold tracking-widest text-white uppercase shadow-lg transition-transform hover:scale-[1.01] active:scale-95"
+              >
+                <Truck className="mr-2 h-4 w-4" /> Giao hàng
               </Button>
             )}
 
             {data?.status === "SHIPPING" && (
               <Button
-                onClick={() => updateStatusMutation.mutate("COMPLETED" as OrderStatus)}
+                onClick={() => data && onAdvance(data as OrderRow)}
+                disabled={isAdvancing}
                 className="col-span-2 rounded-full bg-emerald-600 py-7 font-bold tracking-widest text-white uppercase shadow-lg transition-transform hover:scale-[1.01]"
               >
                 <CheckCircle2 className="mr-2 h-4 w-4" /> Hoàn tất đơn hàng
               </Button>
+            )}
+
+            {data?.status === "COMPLETED" && data.paymentMethod === "COD" && (
+              <p className="col-span-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+                Hoàn tất sẽ ghi nhận đã thu tiền.
+              </p>
             )}
 
             <Button
@@ -284,14 +300,6 @@ export function OrderDetailSheet({ orderId, open, onOpenChange }: OrderDetailShe
               Đóng
             </Button>
 
-            <Button
-              variant="outline"
-              disabled={data?.status === "CANCELLED" || data?.status === "COMPLETED"}
-              onClick={() => updateStatusMutation.mutate("CANCELLED" as OrderStatus)}
-              className="rounded-full border-red-100 py-6 text-red-500 hover:bg-red-50 hover:text-red-600"
-            >
-              <Ban className="mr-2 h-4 w-4" /> Hủy bỏ đơn
-            </Button>
           </div>
         </div>
       </SheetContent>

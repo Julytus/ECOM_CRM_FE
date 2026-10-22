@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -28,7 +29,11 @@ import {
 import type { RoleDTO } from "@/lib/types/role";
 
 export const Route = createFileRoute("/crm/role")({
-  component: AdminRoles
+  component: () => (
+    <CrmPermissionGuard code="ROLE">
+      <AdminRoles />
+    </CrmPermissionGuard>
+  )
 });
 
 function AdminRoles() {

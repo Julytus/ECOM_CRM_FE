@@ -66,6 +66,8 @@ export function InvoiceDetailSheet({
                 <Field label="Số điện thoại" value={invoice.buyerPhone} />
                 <Field label="Phương thức" value={invoice.paymentMethod} />
                 <Field label="Ngày tạo" value={invoice.createdTime ? new Date(invoice.createdTime).toLocaleString("vi-VN") : undefined} />
+                <Field label="Cập nhật lúc" value={invoice.updatedTime ? new Date(invoice.updatedTime).toLocaleString("vi-VN") : undefined} />
+                <Field label="Ngày thu tiền" value={invoice.receiptDate ? new Date(invoice.receiptDate).toLocaleString("vi-VN") : undefined} />
                 <Field label="Tổng tiền" value={formatVnd(invoice.amount ?? 0)} />
                 <Field label="Đã thu" value={formatVnd(invoice.paid ?? 0)} />
                 <Field label="Còn nợ" value={formatVnd(invoice.debt ?? 0)} />

@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
+import { useInfiniteQuery, useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { DataTableAdvanced } from "@/components/crm/table/data-table-advanced";
@@ -10,9 +11,12 @@ import { createOrderColumns } from "@/components/crm/order/columns";
 import { OrderFormDialog } from "@/components/crm/order/order-form-dialog";
 import { DeleteOrderDialog } from "@/components/crm/order/delete-order-dialog";
 import { OrderDetailSheet } from "@/components/crm/order/order-sheet";
+import type { OrderRow } from "@/components/crm/order/columns";
 
 import {
   createInfiniteOrdersQueryOptions,
+  advanceOrderMutationOptions,
+  orderByIdQueryOptions,
   updateOrderMutationOptions,
   deleteOrderMutationOptions,
   batchDeleteOrdersMutationOptions
@@ -20,10 +24,15 @@ import {
 import type { OrderDTO } from "@/lib/types/order";
 
 export const Route = createFileRoute("/crm/order")({
-  component: AdminOrders
+  component: () => (
+    <CrmPermissionGuard code="ORDER">
+      <AdminOrders />
+    </CrmPermissionGuard>
+  )
 });
 
 function AdminOrders() {
+  const queryClient = useQueryClient();
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10
@@ -56,12 +65,56 @@ function AdminOrders() {
   );
 
   const orders = React.useMemo(() => queryData?.pages.flatMap((p) => p.items) ?? [], [queryData]);
+  const orderDetailQueries = useQueries({
+    queries: orders.map((order) => ({
+      ...orderByIdQueryOptions(order.id),
+      enabled: order.id > 0
+    }))
+  });
+  const ordersWithDetails = orders.map((order, index) => ({
+    ...order,
+    ...orderDetailQueries[index]?.data
+  })) as OrderRow[];
   const total = React.useMemo(() => queryData?.pages[0]?.total ?? 0, [queryData]);
 
   // Mutations
   const upsertMutation = useMutation(updateOrderMutationOptions());
   const deleteMutation = useMutation(deleteOrderMutationOptions());
   const batchDeleteMutation = useMutation(batchDeleteOrdersMutationOptions());
+  const advanceMutation = useMutation(advanceOrderMutationOptions());
+
+  const handleAdvance = (order: OrderRow) => {
+    const nextStatus =
+      order.status === "NEW"
+        ? "CONFIRMED"
+        : order.status === "CONFIRMED"
+          ? "SHIPPING"
+          : order.status === "SHIPPING"
+            ? "COMPLETED"
+            : undefined;
+    if (!nextStatus) return;
+
+    advanceMutation.mutate(
+      { id: order.id, to: nextStatus },
+      {
+        onSuccess: async () => {
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["orders"] }),
+            queryClient.invalidateQueries({ queryKey: ["order", order.id] }),
+            queryClient.invalidateQueries({ queryKey: ["invoices"] }),
+            queryClient.invalidateQueries({ queryKey: ["invoice"] }),
+            queryClient.invalidateQueries({ queryKey: ["revenue-report"] }),
+            queryClient.invalidateQueries({ queryKey: ["revenue-summary"] }),
+            queryClient.invalidateQueries({ queryKey: ["revenue-series"] }),
+            queryClient.invalidateQueries({ queryKey: ["revenue-payment-method"] }),
+            queryClient.invalidateQueries({ queryKey: ["revenue-top-products"] }),
+            queryClient.invalidateQueries({ queryKey: ["dashboard", "revenue"] })
+          ]);
+          toast.success("Đã cập nhật trạng thái đơn hàng.");
+        },
+      }
+    );
+  };
 
   const handleUpdate = (values: Partial<OrderDTO>) => {
     upsertMutation.mutate(values as any, {
@@ -124,7 +177,6 @@ function AdminOrders() {
     () =>
       createOrderColumns({
         onDelete: handleDelete,
-        onUpdate: handleUpdate,
         onShowDeleteConfirm: handleShowDeleteConfirm,
         onViewDetails: handleViewDetails
       }),
@@ -134,7 +186,7 @@ function AdminOrders() {
   return (
     <>
       <DataTableAdvanced
-        data={orders}
+        data={ordersWithDetails}
         columns={columns}
         total={total}
         pageSize={pagination.pageSize}
@@ -165,6 +217,8 @@ function AdminOrders() {
         orderId={detailOrderId}
         open={detailSheetOpen}
         onOpenChange={setDetailSheetOpen}
+        onAdvance={handleAdvance}
+        isAdvancing={advanceMutation.isPending}
       />
     </>
   );

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -21,7 +22,11 @@ import {
 import type { ModuleDTO } from "@/lib/types/module";
 
 export const Route = createFileRoute("/crm/module")({
-  component: AdminModules
+  component: () => (
+    <CrmPermissionGuard code="MODULE">
+      <AdminModules />
+    </CrmPermissionGuard>
+  )
 });
 
 function AdminModules() {

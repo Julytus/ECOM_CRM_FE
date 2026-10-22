@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { MoreVertical, Trash2, Eye, CheckCircle2, Truck, RotateCcw, XCircle, Clock } from "lucide-react";
+import { MoreVertical, Eye } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
@@ -23,6 +22,9 @@ import {
 } from "@/components/ui/tooltip";
 import type { OrderDTO, OrderStatus } from "@/lib/types/order";
 import { formatVnd } from "@/lib/format";
+import type { components } from "@/lib/api/schema.gen";
+
+export type OrderRow = OrderDTO & Pick<components["schemas"]["OrderResponse"], "invoiceId" | "invoiceCode" | "updatedAt">;
 
 const getStatusStyles = (status?: OrderStatus) => {
   switch (status) {
@@ -56,12 +58,10 @@ export const createOrderColumns = ({
   onDelete,
   onShowDeleteConfirm,
   onViewDetails,
-  onUpdate
 }: {
   onDelete: (id: number) => void;
   onShowDeleteConfirm: (id: number, code?: string) => void;
-  onViewDetails: (order: OrderDTO) => void;
-  onUpdate: (order: OrderDTO) => void;
+  onViewDetails: (order: OrderRow) => void;
 }): ColumnDef<OrderDTO>[] => [
   {
     id: "select",
@@ -164,16 +164,34 @@ export const createOrderColumns = ({
     )
   },
   {
+    id: "invoiceCode",
+    header: "Mã hóa đơn",
+    cell: ({ row }) => {
+      const order = row.original as OrderRow;
+      return order.invoiceId ? (
+        <a
+          className="font-medium text-primary underline-offset-4 hover:underline"
+          href={`/crm/invoice?invoiceId=${order.invoiceId}`}
+        >
+          {order.invoiceCode || `#${order.invoiceId}`}
+        </a>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      );
+    }
+  },
+  {
     accessorKey: "paymentMethod",
     header: "Phương thức thanh toán",
     cell: ({ row }) => {
       const method = row.original.paymentMethod;
-      const methodLabel = {
+      const methodLabels: Record<string, string> = {
         COD: "Thanh toán khi nhận hàng",
         BANK_TRANSFER: "Chuyển khoản ngân hàng",
         CREDIT_CARD: "Thẻ tín dụng",
         E_WALLET: "Ví điện tử"
-      }[method] || method;
+      };
+      const methodLabel = method ? methodLabels[method] || method : "—";
 
       return (
         <div className="text-sm text-foreground">
@@ -187,19 +205,25 @@ export const createOrderColumns = ({
     header: "Trạng thái thanh toán",
     cell: ({ row }) => {
       const paymentStatus = row.original.paymentStatus;
-      const statusStyles = {
+      const paymentStatusStyles: Record<string, string> = {
         PAID: "bg-emerald-50 text-emerald-700 border-emerald-200",
         UNPAID: "bg-amber-50 text-amber-700 border-amber-200",
         PARTIAL: "bg-blue-50 text-blue-700 border-blue-200",
         REFUNDED: "bg-red-50 text-red-700 border-red-200"
-      }[paymentStatus] || "bg-stone-50 text-stone-600 border-stone-200";
+      };
+      const statusStyles = paymentStatus
+        ? paymentStatusStyles[paymentStatus] || "bg-stone-50 text-stone-600 border-stone-200"
+        : "bg-stone-50 text-stone-600 border-stone-200";
 
-      const statusLabel = {
+      const paymentStatusLabels: Record<string, string> = {
         PAID: "Đã thanh toán",
         UNPAID: "Chưa thanh toán",
         PARTIAL: "Thanh toán một phần",
         REFUNDED: "Đã hoàn tiền"
-      }[paymentStatus] || paymentStatus;
+      };
+      const statusLabel = paymentStatus
+        ? paymentStatusLabels[paymentStatus] || paymentStatus
+        : "—";
 
       return (
         <Badge
@@ -223,11 +247,21 @@ export const createOrderColumns = ({
     )
   },
   {
+    accessorKey: "updatedAt",
+    header: "Cập nhật lúc",
+    cell: ({ row }) => {
+      const updatedAt = (row.original as OrderRow).updatedAt;
+      return (
+        <div className="text-muted-foreground text-sm">
+          {updatedAt ? new Date(updatedAt).toLocaleString("vi-VN") : "—"}
+        </div>
+      );
+    }
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const order = row.original;
-      const currentStatus = order.status;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -242,83 +276,9 @@ export const createOrderColumns = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[180px]">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onViewDetails?.(order)}>
+            <DropdownMenuItem onClick={() => onViewDetails?.(order as OrderRow)}>
               <Eye className="mr-2 h-4 w-4" /> Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-
-            {/* NEW -> CONFIRMED */}
-            {currentStatus === "NEW" && (
-              <DropdownMenuItem onClick={() => onUpdate({ ...order, status: "CONFIRMED" })}>
-                <CheckCircle2 className="mr-2 h-4 w-4 text-blue-600" /> Xác nhận đơn
-              </DropdownMenuItem>
-            )}
-
-            {/* CONFIRMED -> SHIPPING */}
-            {currentStatus === "CONFIRMED" && (
-              <DropdownMenuItem onClick={() => onUpdate({ ...order, status: "SHIPPING" })}>
-                <Truck className="mr-2 h-4 w-4 text-orange-600" /> Giao hàng
-              </DropdownMenuItem>
-            )}
-
-            {/* SHIPPING -> COMPLETED */}
-            {currentStatus === "SHIPPING" && (
-              <DropdownMenuItem
-                onClick={() =>
-                  onUpdate({
-                    ...order,
-                    status: "COMPLETED",
-                    paymentStatus: "PAID"
-                  })
-                }
-              >
-                <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" /> Hoàn thành
-              </DropdownMenuItem>
-            )}
-
-            {/* Any active status -> COMPLETED */}
-            {(currentStatus === "NEW" || currentStatus === "CONFIRMED") && (
-              <DropdownMenuItem
-                onClick={() =>
-                  onUpdate({
-                    ...order,
-                    status: "COMPLETED",
-                    paymentStatus: "PAID"
-                  })
-                }
-              >
-                <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" /> Hoàn thành ngay
-              </DropdownMenuItem>
-            )}
-
-            {/* COMPLETED -> REFUNDED */}
-            {currentStatus === "COMPLETED" && (
-              <DropdownMenuItem onClick={() => onUpdate({ ...order, status: "REFUNDED" })}>
-                <RotateCcw className="mr-2 h-4 w-4 text-purple-600" /> Hoàn tiền
-              </DropdownMenuItem>
-            )}
-
-            {/* Any non-final status -> CANCELLED */}
-            {currentStatus !== "COMPLETED" &&
-              currentStatus !== "CANCELLED" &&
-              currentStatus !== "REFUNDED" && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onClick={() => onUpdate({ ...order, status: "CANCELLED" })}
-                  >
-                    <XCircle className="mr-2 h-4 w-4" /> Hủy đơn
-                  </DropdownMenuItem>
-                </>
-              )}
-
-            {/* CANCELLED -> NEW (reopen) */}
-            {currentStatus === "CANCELLED" && (
-              <DropdownMenuItem onClick={() => onUpdate({ ...order, status: "NEW" })}>
-                <Clock className="mr-2 h-4 w-4 text-gray-600" /> Mở lại đơn
-              </DropdownMenuItem>
-            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );

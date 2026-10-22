@@ -5,7 +5,7 @@ import { AlertCircle, Home } from "lucide-react";
 
 export function AdminAccessDenied() {
   return (
-    <div className="bg-muted/30 flex min-h-screen items-center justify-center p-6">
+    <div className="bg-muted/30 flex min-h-[60vh] items-center justify-center rounded-xl p-6">
       <Card className="bg-background shadow-foreground/5 w-full max-w-lg rounded-3xl border-0 shadow-xl">
         <CardContent className="flex flex-col items-center gap-8 py-12 text-center">
           <div className="bg-destructive/10 text-destructive flex h-20 w-20 items-center justify-center rounded-full">
@@ -16,7 +16,7 @@ export function AdminAccessDenied() {
               Truy cập bị từ chối
             </h1>
             <p className="text-muted-foreground text-lg">
-              Bạn cần quyền quản trị viên để xem trang này. <br />
+              Bạn không có quyền xem trang này. <br />
               Vui lòng liên hệ bộ phận hỗ trợ nếu đây là một sai sót.
             </p>
           </div>

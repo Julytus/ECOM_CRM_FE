@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -29,7 +30,11 @@ export const Route = createFileRoute("/crm/permission")({
   validateSearch: (search: Record<string, unknown>): { roleId?: number } => ({
     roleId: typeof search.roleId === "number" ? search.roleId : undefined
   }),
-  component: PermissionPage
+  component: () => (
+    <CrmPermissionGuard code="PERMISSION">
+      <PermissionPage />
+    </CrmPermissionGuard>
+  )
 });
 
 function PermissionPage() {

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { toast } from "sonner";
@@ -19,7 +20,11 @@ import { productSheetOpenAtom, selectedProductIdAtom } from "@/components/crm/pr
 import { ProductDialog } from "@/components/crm/product/product-dialog";
 
 export const Route = createFileRoute("/crm/product")({
-  component: AdminProducts
+  component: () => (
+    <CrmPermissionGuard code="PRODUCT">
+      <AdminProducts />
+    </CrmPermissionGuard>
+  )
 });
 
 function AdminProducts() {

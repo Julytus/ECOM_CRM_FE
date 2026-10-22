@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { CrmPermissionGuard } from "@/components/crm/crm-permission-guard";
 import { useQuery } from "@tanstack/react-query";
 import { defaultRevenueRange, RevenueFilters } from "@/components/crm/revenue/revenue-filters";
 import { KpiCards } from "@/components/crm/revenue/kpi-cards";
@@ -14,7 +15,13 @@ import {
   type GroupBy
 } from "@/lib/api/report";
 
-export const Route = createFileRoute("/crm/revenue")({ component: RevenuePage });
+export const Route = createFileRoute("/crm/revenue")({
+  component: () => (
+    <CrmPermissionGuard code="REPORT">
+      <RevenuePage />
+    </CrmPermissionGuard>
+  )
+});
 
 function RevenuePage() {
   const initial = React.useMemo(defaultRevenueRange, []);
