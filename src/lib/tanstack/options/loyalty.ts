@@ -11,9 +11,14 @@ import {
   getTiers,
   getMyVouchers,
   getRedeemable,
-  redeemVoucher
+  redeemVoucher,
+  saveTier,
+  deleteTier,
+  getLoyaltyConfig,
+  updateLoyaltyConfig
 } from "@/lib/api/loyalty";
 import type { components } from "@/lib/api/schema.gen";
+import type { UseMutationOptions } from "@tanstack/react-query";
 
 type LoyaltyTransactionsPage = components["schemas"]["PageLoyaltyTransaction"];
 type MyVouchersPage = components["schemas"]["PageMyVoucherResponse"];
@@ -47,6 +52,40 @@ export const tiersQueryOptions = queryOptions({
   queryFn: async () => (await getTiers()) ?? [],
   retry: false,
   refetchOnWindowFocus: false
+});
+
+export const loyaltyConfigQueryOptions = queryOptions({
+  queryKey: ["loyalty-config"],
+  queryFn: async () => {
+    const result = await getLoyaltyConfig();
+    if (!result) throw new Error("Không nhận được cấu hình tích điểm.");
+    return result;
+  },
+  retry: false,
+  refetchOnWindowFocus: false
+});
+
+export const saveTierMutationOptions = (): UseMutationOptions<
+  components["schemas"]["LoyaltyTier"] | undefined,
+  Error,
+  components["schemas"]["LoyaltyTierRequest"]
+> => ({
+  mutationFn: saveTier,
+  meta: { invalidatesQuery: [["loyalty-tiers"]] }
+});
+
+export const deleteTierMutationOptions = (): UseMutationOptions<number | undefined, Error, number> => ({
+  mutationFn: deleteTier,
+  meta: { invalidatesQuery: [["loyalty-tiers"]] }
+});
+
+export const updateLoyaltyConfigMutationOptions = (): UseMutationOptions<
+  components["schemas"]["LoyaltyConfig"] | undefined,
+  Error,
+  components["schemas"]["LoyaltyConfigRequest"]
+> => ({
+  mutationFn: updateLoyaltyConfig,
+  meta: { invalidatesQuery: [["loyalty-config"]] }
 });
 
 export const redeemMutationOptions = () =>

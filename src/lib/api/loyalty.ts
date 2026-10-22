@@ -7,6 +7,9 @@ type RedeemableVouchersResponse = components["schemas"]["ApiResponseListRedeemab
 type LoyaltyTiersResponse = components["schemas"]["ApiResponseListLoyaltyTier"];
 type RedeemVoucherResponse = components["schemas"]["ApiResponseInteger"];
 type MyVouchersResponse = components["schemas"]["ApiResponsePageMyVoucherResponse"];
+type LoyaltyTierRequest = components["schemas"]["LoyaltyTierRequest"];
+type LoyaltyConfigResponse = components["schemas"]["ApiResponseLoyaltyConfig"];
+type LoyaltyConfigRequest = components["schemas"]["LoyaltyConfigRequest"];
 
 export type MyLoyaltyTransactionsParams = {
   page?: number;
@@ -38,6 +41,31 @@ export const getRedeemable = async () => {
 
 export const getTiers = async () => {
   const res = await axiosInstance.get<LoyaltyTiersResponse>("/loyalty/tier/list");
+  return res.data.result;
+};
+
+export const saveTier = async (tier: LoyaltyTierRequest) => {
+  const res = await axiosInstance.post<components["schemas"]["ApiResponseLoyaltyTier"]>(
+    "/loyalty/tier/save",
+    tier
+  );
+  return res.data.result;
+};
+
+export const deleteTier = async (id: number) => {
+  const res = await axiosInstance.delete<components["schemas"]["ApiResponseInteger"]>(
+    `/loyalty/tier/delete/${id}`
+  );
+  return res.data.result;
+};
+
+export const getLoyaltyConfig = async () => {
+  const res = await axiosInstance.get<LoyaltyConfigResponse>("/loyalty/config");
+  return res.data.result;
+};
+
+export const updateLoyaltyConfig = async (config: LoyaltyConfigRequest) => {
+  const res = await axiosInstance.post<LoyaltyConfigResponse>("/loyalty/config/update", config);
   return res.data.result;
 };
 

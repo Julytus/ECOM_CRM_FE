@@ -7,6 +7,7 @@ import {
   Database,
   KeySquare,
   LifeBuoy,
+  Award,
   Receipt,
   Send,
   ShoppingCart,
@@ -53,6 +54,7 @@ const PERMISSION_ITEM = {
   icon: KeySquare
 } as const;
 const INVOICE_ITEM = { code: "INVOICE", title: "Hóa đơn", url: "/crm/invoice", icon: Receipt } as const;
+const LOYALTY_ITEM = { code: "LOYALTY", title: "Loyalty", url: "/crm/loyalty", icon: Award } as const;
 
 /** Nhóm gộp: tài nguyên / chức vụ / module. Hiện khi có VIEW ít nhất một mục con. */
 const SYSTEM_GROUP_ITEMS = [
@@ -94,6 +96,9 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       : []),
     ...(canView(INVOICE_ITEM.code)
       ? [{ title: INVOICE_ITEM.title, url: INVOICE_ITEM.url, icon: INVOICE_ITEM.icon }]
+      : []),
+    ...(canView(LOYALTY_ITEM.code)
+      ? [{ title: LOYALTY_ITEM.title, url: LOYALTY_ITEM.url, icon: LOYALTY_ITEM.icon }]
       : []),
     ...(systemChildren.length > 0
       ? [{ title: "Cấu hình hệ thống", icon: Database, items: systemChildren }]
