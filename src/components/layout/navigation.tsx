@@ -18,7 +18,7 @@ import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAtom } from "jotai";
-import { Heart, Search, User, LogOut, Settings, LayoutDashboard } from "lucide-react";
+import { Gift, Heart, Search, User, LogOut, LayoutDashboard } from "lucide-react";
 
 export function Navigation() {
   const [, setSearchOpen] = useAtom(searchOpenAtom);
@@ -55,6 +55,13 @@ export function Navigation() {
           <Button size="icon" variant="ghost" onClick={handleOpenSearch}>
             <Search className="h-5 w-5" />
           </Button>
+
+          <Link to="/vouchers">
+            <Button variant="ghost" className="gap-2 px-2 sm:px-3">
+              <Gift className="h-5 w-5" />
+              <span>Ưu đãi</span>
+            </Button>
+          </Link>
 
           {me ? (
             <DropdownMenu>

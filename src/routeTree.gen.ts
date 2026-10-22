@@ -25,6 +25,7 @@ import { Route as CrmInvoiceRouteImport } from './routes/crm/invoice'
 import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
 import { Route as CrmCategoryRouteImport } from './routes/crm/category'
 import { Route as ShopWishlistRouteImport } from './routes/_shop/wishlist'
+import { Route as ShopVouchersRouteImport } from './routes/_shop/vouchers'
 import { Route as ShopSearchRouteImport } from './routes/_shop/search'
 import { Route as ShopCheckoutIndexRouteImport } from './routes/_shop/checkout/index'
 import { Route as PaymentOrderCodeReturnRouteImport } from './routes/payment.$orderCode.return'
@@ -117,6 +118,11 @@ const ShopWishlistRoute = ShopWishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => ShopRoute,
 } as any)
+const ShopVouchersRoute = ShopVouchersRouteImport.update({
+  id: '/vouchers',
+  path: '/vouchers',
+  getParentRoute: () => ShopRoute,
+} as any)
 const ShopSearchRoute = ShopSearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/crm': typeof CrmRouteWithChildren
   '/search': typeof ShopSearchRoute
+  '/vouchers': typeof ShopVouchersRoute
   '/wishlist': typeof ShopWishlistRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/crm': typeof CrmRouteWithChildren
   '/search': typeof ShopSearchRoute
+  '/vouchers': typeof ShopVouchersRoute
   '/wishlist': typeof ShopWishlistRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/crm': typeof CrmRouteWithChildren
   '/_shop/search': typeof ShopSearchRoute
+  '/_shop/vouchers': typeof ShopVouchersRoute
   '/_shop/wishlist': typeof ShopWishlistRoute
   '/crm/category': typeof CrmCategoryRoute
   '/crm/dashboard': typeof CrmDashboardRoute
@@ -274,6 +283,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/crm'
     | '/search'
+    | '/vouchers'
     | '/wishlist'
     | '/crm/category'
     | '/crm/dashboard'
@@ -303,6 +313,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/crm'
     | '/search'
+    | '/vouchers'
     | '/wishlist'
     | '/crm/category'
     | '/crm/dashboard'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/crm'
     | '/_shop/search'
+    | '/_shop/vouchers'
     | '/_shop/wishlist'
     | '/crm/category'
     | '/crm/dashboard'
@@ -481,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopWishlistRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/_shop/vouchers': {
+      id: '/_shop/vouchers'
+      path: '/vouchers'
+      fullPath: '/vouchers'
+      preLoaderRoute: typeof ShopVouchersRouteImport
+      parentRoute: typeof ShopRoute
+    }
     '/_shop/search': {
       id: '/_shop/search'
       path: '/search'
@@ -570,6 +589,7 @@ declare module '@tanstack/react-router' {
 
 interface ShopRouteChildren {
   ShopSearchRoute: typeof ShopSearchRoute
+  ShopVouchersRoute: typeof ShopVouchersRoute
   ShopWishlistRoute: typeof ShopWishlistRoute
   ShopIndexRoute: typeof ShopIndexRoute
   ShopAuthLoginRoute: typeof ShopAuthLoginRoute
@@ -585,6 +605,7 @@ interface ShopRouteChildren {
 
 const ShopRouteChildren: ShopRouteChildren = {
   ShopSearchRoute: ShopSearchRoute,
+  ShopVouchersRoute: ShopVouchersRoute,
   ShopWishlistRoute: ShopWishlistRoute,
   ShopIndexRoute: ShopIndexRoute,
   ShopAuthLoginRoute: ShopAuthLoginRoute,
