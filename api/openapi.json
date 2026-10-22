@@ -67,6 +67,24 @@
         },
         "type": "object"
       },
+      "ApiResponseBoolean": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseBoughtProduct": {
         "properties": {
           "code": {
@@ -768,6 +786,27 @@
         },
         "type": "object"
       },
+      "ApiResponseListLoyaltyTier": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "items": {
+              "$ref": "#/components/schemas/LoyaltyTier"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseListOrderStatusStatistic": {
         "properties": {
           "code": {
@@ -825,6 +864,27 @@
           "result": {
             "items": {
               "$ref": "#/components/schemas/ProductVariantResponse"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseListRedeemableVoucherResponse": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "items": {
+              "$ref": "#/components/schemas/RedeemableVoucherResponse"
             },
             "type": "array"
           }
@@ -1035,6 +1095,78 @@
           "result": {
             "format": "int64",
             "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseLoyaltyAccount": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/LoyaltyAccount"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseLoyaltyAccountResponse": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/LoyaltyAccountResponse"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseLoyaltyConfig": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/LoyaltyConfig"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponseLoyaltyTier": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/LoyaltyTier"
           }
         },
         "type": "object"
@@ -1510,6 +1642,24 @@
         },
         "type": "object"
       },
+      "ApiResponsePageLoyaltyTransaction": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/PageLoyaltyTransaction"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponsePageMessage": {
         "properties": {
           "code": {
@@ -1542,6 +1692,24 @@
           },
           "result": {
             "$ref": "#/components/schemas/PageModule"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponsePageMyVoucherResponse": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/PageMyVoucherResponse"
           }
         },
         "type": "object"
@@ -2933,11 +3101,19 @@
       },
       "CheckoutPreviewResponse": {
         "properties": {
+          "customerVoucherId": {
+            "format": "int64",
+            "type": "integer"
+          },
           "discount": {
             "format": "double",
             "type": "number"
           },
           "finalAmount": {
+            "format": "double",
+            "type": "number"
+          },
+          "loyaltyDiscount": {
             "format": "double",
             "type": "number"
           },
@@ -2975,6 +3151,10 @@
           },
           "customerId": {
             "format": "int32",
+            "type": "integer"
+          },
+          "customerVoucherId": {
+            "format": "int64",
             "type": "integer"
           },
           "items": {
@@ -3113,6 +3293,10 @@
       },
       "Customer": {
         "properties": {
+          "accountUserId": {
+            "format": "int32",
+            "type": "integer"
+          },
           "address": {
             "type": "string"
           },
@@ -3213,6 +3397,19 @@
           "weight": {
             "format": "double",
             "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "CustomerAccountLinkRequest": {
+        "properties": {
+          "accountUserId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
           }
         },
         "type": "object"
@@ -3732,6 +3929,227 @@
         },
         "type": "object"
       },
+      "LoyaltyAccount": {
+        "properties": {
+          "balance": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "id": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "rankPoints": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "tierId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "version": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LoyaltyAccountResponse": {
+        "properties": {
+          "balance": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "nextTierId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "nextTierMinRankPoints": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "nextTierName": {
+            "type": "string"
+          },
+          "pointsToNextTier": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "rankPoints": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "tierId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "tierName": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LoyaltyAdjustRequest": {
+        "properties": {
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "points": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "rankDelta": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LoyaltyConfig": {
+        "properties": {
+          "earnRate": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "id": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LoyaltyConfigRequest": {
+        "properties": {
+          "earnRate": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LoyaltyTier": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "earnMultiplier": {
+            "type": "number"
+          },
+          "id": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "minRankPoints": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LoyaltyTierRequest": {
+        "properties": {
+          "earnMultiplier": {
+            "type": "number"
+          },
+          "id": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "minRankPoints": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "LoyaltyTransaction": {
+        "properties": {
+          "balanceAfter": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "customerId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "id": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "note": {
+            "type": "string"
+          },
+          "points": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "rankPointsAfter": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "rankPointsDelta": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "refId": {
+            "type": "string"
+          },
+          "refType": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Message": {
         "properties": {
           "branchId": {
@@ -3871,6 +4289,40 @@
             "type": "integer"
           },
           "userId": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "MyVoucherResponse": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pointsSpent": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "voucherId": {
             "format": "int32",
             "type": "integer"
           }
@@ -4115,6 +4567,10 @@
             "format": "int32",
             "type": "integer"
           },
+          "customerVoucherId": {
+            "format": "int32",
+            "type": "integer"
+          },
           "discountAmount": {
             "format": "double",
             "type": "number"
@@ -4126,6 +4582,10 @@
           "id": {
             "format": "int32",
             "type": "integer"
+          },
+          "loyaltyVoucherDiscount": {
+            "format": "double",
+            "type": "number"
           },
           "note": {
             "type": "string"
@@ -4255,6 +4715,10 @@
             "format": "int32",
             "type": "integer"
           },
+          "customerVoucherId": {
+            "format": "int32",
+            "type": "integer"
+          },
           "discountAmount": {
             "format": "double",
             "type": "number"
@@ -4272,6 +4736,10 @@
               "$ref": "#/components/schemas/OrderItemRequest"
             },
             "type": "array"
+          },
+          "loyaltyVoucherDiscount": {
+            "format": "double",
+            "type": "number"
           },
           "note": {
             "type": "string"
@@ -4349,6 +4817,10 @@
             "format": "int32",
             "type": "integer"
           },
+          "customerVoucherId": {
+            "format": "int32",
+            "type": "integer"
+          },
           "discountAmount": {
             "format": "double",
             "type": "number"
@@ -4380,6 +4852,10 @@
               "$ref": "#/components/schemas/OrderItem"
             },
             "type": "array"
+          },
+          "loyaltyVoucherDiscount": {
+            "format": "double",
+            "type": "number"
           },
           "note": {
             "type": "string"
@@ -4751,6 +5227,25 @@
         },
         "type": "object"
       },
+      "PageLoyaltyTransaction": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LoyaltyTransaction"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "PageMessage": {
         "properties": {
           "items": {
@@ -4775,6 +5270,25 @@
           "items": {
             "items": {
               "$ref": "#/components/schemas/Module"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "PageMyVoucherResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MyVoucherResponse"
             },
             "type": "array"
           },
@@ -5784,6 +6298,56 @@
         },
         "type": "object"
       },
+      "RedeemRequest": {
+        "properties": {
+          "voucherId": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "RedeemableVoucherResponse": {
+        "properties": {
+          "affordable": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "minTierId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pointsCost": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "redeemStock": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "redeemedCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "tierOk": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "Resource": {
         "properties": {
           "actions": {
@@ -6622,10 +7186,26 @@
             "format": "double",
             "type": "number"
           },
+          "minTierId": {
+            "format": "int32",
+            "type": "integer"
+          },
           "name": {
             "type": "string"
           },
           "perUserLimit": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "pointsCost": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "redeemStock": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "redeemedCount": {
             "format": "int32",
             "type": "integer"
           },
@@ -8547,6 +9127,36 @@
         ]
       }
     },
+    "/customer/linkAccount": {
+      "post": {
+        "operationId": "linkAccount",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerAccountLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseInteger"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
     "/customer/list": {
       "get": {
         "operationId": "listCustomers",
@@ -9969,6 +10579,459 @@
         },
         "tags": [
           "invoice-controller"
+        ]
+      }
+    },
+    "/loyalty/account": {
+      "get": {
+        "operationId": "account",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "customerId",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoyaltyAccount"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
+    "/loyalty/adjust": {
+      "post": {
+        "operationId": "adjust",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoyaltyAdjustRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBoolean"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
+    "/loyalty/config": {
+      "get": {
+        "operationId": "config",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoyaltyConfig"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
+    "/loyalty/config/update": {
+      "post": {
+        "operationId": "updateConfig",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoyaltyConfigRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoyaltyConfig"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
+    "/loyalty/my": {
+      "get": {
+        "operationId": "my",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoyaltyAccountResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-controller"
+        ]
+      }
+    },
+    "/loyalty/my/transactions": {
+      "get": {
+        "operationId": "transactions_1",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "total",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageLoyaltyTransaction"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-controller"
+        ]
+      }
+    },
+    "/loyalty/my/vouchers": {
+      "get": {
+        "operationId": "myVouchers",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "total",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageMyVoucherResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-controller"
+        ]
+      }
+    },
+    "/loyalty/redeem": {
+      "post": {
+        "operationId": "redeem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseInteger"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-controller"
+        ]
+      }
+    },
+    "/loyalty/redeemable": {
+      "get": {
+        "operationId": "redeemable",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListRedeemableVoucherResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-controller"
+        ]
+      }
+    },
+    "/loyalty/tier/delete/{id}": {
+      "delete": {
+        "operationId": "deleteTier",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseInteger"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
+    "/loyalty/tier/list": {
+      "get": {
+        "operationId": "tiers",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListLoyaltyTier"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
+    "/loyalty/tier/save": {
+      "post": {
+        "operationId": "saveTier",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoyaltyTierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseLoyaltyTier"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
+        ]
+      }
+    },
+    "/loyalty/transactions": {
+      "get": {
+        "operationId": "transactions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "customerId",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "total",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageLoyaltyTransaction"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "loyalty-admin-controller"
         ]
       }
     },
@@ -11738,38 +12801,10 @@
           },
           {
             "in": "query",
-            "name": "page",
-            "required": false,
+            "name": "pageable",
+            "required": true,
             "schema": {
-              "format": "int32",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "required": false,
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "required": false,
-            "schema": {
-              "format": "int32",
-              "type": "integer"
-            }
-          },
-          {
-            "in": "query",
-            "name": "total",
-            "required": false,
-            "schema": {
-              "format": "int64",
-              "type": "integer"
+              "$ref": "#/components/schemas/Pageable"
             }
           }
         ],

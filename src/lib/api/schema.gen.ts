@@ -849,6 +849,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/customer/linkAccount": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["linkAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/customer/list": {
         parameters: {
             query?: never;
@@ -1387,6 +1403,214 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["upsert_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["account"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["adjust"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["config"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["updateConfig"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["my"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/my/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["transactions_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/my/vouchers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["myVouchers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["redeem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/redeemable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["redeemable"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/tier/delete/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteTier"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/tier/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["tiers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/tier/save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["saveTier"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/loyalty/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["transactions"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3822,6 +4046,13 @@ export interface components {
             message?: string;
             result?: components["schemas"]["AuthResponse"];
         };
+        ApiResponseBoolean: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: boolean;
+        };
         ApiResponseBoughtProduct: {
             /** Format: int32 */
             code?: number;
@@ -4083,6 +4314,13 @@ export interface components {
             message?: string;
             result?: components["schemas"]["EmailTemplate"][];
         };
+        ApiResponseListLoyaltyTier: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["LoyaltyTier"][];
+        };
         ApiResponseListOrderStatusStatistic: {
             /** Format: int32 */
             code?: number;
@@ -4103,6 +4341,13 @@ export interface components {
             errors?: Record<string, never>;
             message?: string;
             result?: components["schemas"]["ProductVariantResponse"][];
+        };
+        ApiResponseListRedeemableVoucherResponse: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["RedeemableVoucherResponse"][];
         };
         ApiResponseListResource: {
             /** Format: int32 */
@@ -4174,6 +4419,34 @@ export interface components {
             message?: string;
             /** Format: int64 */
             result?: number;
+        };
+        ApiResponseLoyaltyAccount: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["LoyaltyAccount"];
+        };
+        ApiResponseLoyaltyAccountResponse: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["LoyaltyAccountResponse"];
+        };
+        ApiResponseLoyaltyConfig: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["LoyaltyConfig"];
+        };
+        ApiResponseLoyaltyTier: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["LoyaltyTier"];
         };
         ApiResponseMapStringString: {
             /** Format: int32 */
@@ -4359,6 +4632,13 @@ export interface components {
             message?: string;
             result?: components["schemas"]["PageInvoiceFrequencyReport"];
         };
+        ApiResponsePageLoyaltyTransaction: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["PageLoyaltyTransaction"];
+        };
         ApiResponsePageMessage: {
             /** Format: int32 */
             code?: number;
@@ -4372,6 +4652,13 @@ export interface components {
             errors?: Record<string, never>;
             message?: string;
             result?: components["schemas"]["PageModule"];
+        };
+        ApiResponsePageMyVoucherResponse: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["PageMyVoucherResponse"];
         };
         ApiResponsePageNotification: {
             /** Format: int32 */
@@ -4937,10 +5224,14 @@ export interface components {
             updatedAt?: string;
         };
         CheckoutPreviewResponse: {
+            /** Format: int64 */
+            customerVoucherId?: number;
             /** Format: double */
             discount?: number;
             /** Format: double */
             finalAmount?: number;
+            /** Format: double */
+            loyaltyDiscount?: number;
             /** Format: double */
             shippingFee?: number;
             /** Format: double */
@@ -4956,6 +5247,8 @@ export interface components {
             buyerPhone?: string;
             /** Format: int32 */
             customerId?: number;
+            /** Format: int64 */
+            customerVoucherId?: number;
             items?: components["schemas"]["OrderItemRequest"][];
             note?: string;
             paymentMethod?: string;
@@ -5002,6 +5295,8 @@ export interface components {
             nextCursor?: number;
         };
         Customer: {
+            /** Format: int32 */
+            accountUserId?: number;
             address?: string;
             /** Format: int32 */
             age?: number;
@@ -5044,6 +5339,12 @@ export interface components {
             userName?: string;
             /** Format: double */
             weight?: number;
+        };
+        CustomerAccountLinkRequest: {
+            /** Format: int32 */
+            accountUserId?: number;
+            /** Format: int32 */
+            customerId?: number;
         };
         CustomerAttribute: {
             attributes?: string;
@@ -5267,6 +5568,107 @@ export interface components {
             services?: components["schemas"]["BoughtService"][];
             voucher?: components["schemas"]["VoucherSummary"];
         };
+        LoyaltyAccount: {
+            /** Format: int64 */
+            balance?: number;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: int32 */
+            customerId?: number;
+            /** Format: int32 */
+            id?: number;
+            /** Format: int64 */
+            rankPoints?: number;
+            /** Format: int32 */
+            tierId?: number;
+            /** Format: date-time */
+            updatedAt?: string;
+            /** Format: int32 */
+            version?: number;
+        };
+        LoyaltyAccountResponse: {
+            /** Format: int64 */
+            balance?: number;
+            /** Format: int32 */
+            nextTierId?: number;
+            /** Format: int64 */
+            nextTierMinRankPoints?: number;
+            nextTierName?: string;
+            /** Format: int64 */
+            pointsToNextTier?: number;
+            /** Format: int64 */
+            rankPoints?: number;
+            /** Format: int32 */
+            tierId?: number;
+            tierName?: string;
+        };
+        LoyaltyAdjustRequest: {
+            /** Format: int32 */
+            customerId?: number;
+            /** Format: int64 */
+            points?: number;
+            /** Format: int64 */
+            rankDelta?: number;
+            reason?: string;
+        };
+        LoyaltyConfig: {
+            /** Format: int32 */
+            earnRate?: number;
+            /** Format: int32 */
+            id?: number;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        LoyaltyConfigRequest: {
+            /** Format: int32 */
+            earnRate?: number;
+        };
+        LoyaltyTier: {
+            /** Format: date-time */
+            createdAt?: string;
+            earnMultiplier?: number;
+            /** Format: int32 */
+            id?: number;
+            /** Format: int64 */
+            minRankPoints?: number;
+            name?: string;
+            /** Format: int32 */
+            status?: number;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        LoyaltyTierRequest: {
+            earnMultiplier?: number;
+            /** Format: int32 */
+            id?: number;
+            /** Format: int64 */
+            minRankPoints?: number;
+            name?: string;
+            /** Format: int32 */
+            status?: number;
+        };
+        LoyaltyTransaction: {
+            /** Format: int64 */
+            balanceAfter?: number;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: int32 */
+            createdBy?: number;
+            /** Format: int32 */
+            customerId?: number;
+            /** Format: int32 */
+            id?: number;
+            note?: string;
+            /** Format: int64 */
+            points?: number;
+            /** Format: int64 */
+            rankPointsAfter?: number;
+            /** Format: int64 */
+            rankPointsDelta?: number;
+            refId?: string;
+            refType?: string;
+            type?: string;
+        };
         Message: {
             /** Format: int32 */
             branchId?: number;
@@ -5330,6 +5732,21 @@ export interface components {
             toStage?: number;
             /** Format: int32 */
             userId?: number;
+        };
+        MyVoucherResponse: {
+            code?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            /** Format: int32 */
+            id?: number;
+            name?: string;
+            /** Format: int64 */
+            pointsSpent?: number;
+            status?: string;
+            /** Format: int32 */
+            voucherId?: number;
         };
         Notification: {
             /** Format: int32 */
@@ -5432,12 +5849,16 @@ export interface components {
             createdAt?: string;
             /** Format: int32 */
             customerId?: number;
+            /** Format: int32 */
+            customerVoucherId?: number;
             /** Format: double */
             discountAmount?: number;
             /** Format: double */
             finalAmount?: number;
             /** Format: int32 */
             id?: number;
+            /** Format: double */
+            loyaltyVoucherDiscount?: number;
             note?: string;
             paymentMethod?: string;
             paymentStatus?: string;
@@ -5493,6 +5914,8 @@ export interface components {
             createdAt?: string;
             /** Format: int32 */
             customerId?: number;
+            /** Format: int32 */
+            customerVoucherId?: number;
             /** Format: double */
             discountAmount?: number;
             /** Format: double */
@@ -5500,6 +5923,8 @@ export interface components {
             /** Format: int32 */
             id?: number;
             items?: components["schemas"]["OrderItemRequest"][];
+            /** Format: double */
+            loyaltyVoucherDiscount?: number;
             note?: string;
             paymentMethod?: string;
             paymentReturnUrl?: string;
@@ -5531,6 +5956,8 @@ export interface components {
             createdAt?: string;
             /** Format: int32 */
             customerId?: number;
+            /** Format: int32 */
+            customerVoucherId?: number;
             /** Format: double */
             discountAmount?: number;
             /** Format: double */
@@ -5544,6 +5971,8 @@ export interface components {
             /** Format: int32 */
             invoiceStatus?: number;
             items?: components["schemas"]["OrderItem"][];
+            /** Format: double */
+            loyaltyVoucherDiscount?: number;
             note?: string;
             paymentMethod?: string;
             paymentStatus?: string;
@@ -5682,6 +6111,13 @@ export interface components {
             /** Format: int64 */
             total?: number;
         };
+        PageLoyaltyTransaction: {
+            items?: components["schemas"]["LoyaltyTransaction"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int64 */
+            total?: number;
+        };
         PageMessage: {
             items?: components["schemas"]["Message"][];
             /** Format: int32 */
@@ -5691,6 +6127,13 @@ export interface components {
         };
         PageModule: {
             items?: components["schemas"]["Module"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int64 */
+            total?: number;
+        };
+        PageMyVoucherResponse: {
+            items?: components["schemas"]["MyVoucherResponse"][];
             /** Format: int32 */
             page?: number;
             /** Format: int64 */
@@ -6093,6 +6536,28 @@ export interface components {
             /** Format: int32 */
             stock?: number;
         };
+        RedeemRequest: {
+            /** Format: int32 */
+            voucherId?: number;
+        };
+        RedeemableVoucherResponse: {
+            affordable?: boolean;
+            code?: string;
+            /** Format: date-time */
+            endDate?: string;
+            /** Format: int32 */
+            id?: number;
+            /** Format: int32 */
+            minTierId?: number;
+            name?: string;
+            /** Format: int64 */
+            pointsCost?: number;
+            /** Format: int32 */
+            redeemStock?: number;
+            /** Format: int32 */
+            redeemedCount?: number;
+            tierOk?: boolean;
+        };
         Resource: {
             actions?: string;
             /** Format: int32 */
@@ -6452,9 +6917,17 @@ export interface components {
             maxDiscount?: number;
             /** Format: double */
             minInvoiceAmount?: number;
+            /** Format: int32 */
+            minTierId?: number;
             name?: string;
             /** Format: int32 */
             perUserLimit?: number;
+            /** Format: int64 */
+            pointsCost?: number;
+            /** Format: int32 */
+            redeemStock?: number;
+            /** Format: int32 */
+            redeemedCount?: number;
             /** Format: date-time */
             startDate?: string;
             /** Format: int32 */
@@ -7704,6 +8177,30 @@ export interface operations {
             };
         };
     };
+    linkAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerAccountLinkRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseInteger"];
+                };
+            };
+        };
+    };
     listCustomers: {
         parameters: {
             query: {
@@ -8565,6 +9062,303 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseInteger"];
+                };
+            };
+        };
+    };
+    account: {
+        parameters: {
+            query: {
+                customerId: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseLoyaltyAccount"];
+                };
+            };
+        };
+    };
+    adjust: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoyaltyAdjustRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseBoolean"];
+                };
+            };
+        };
+    };
+    config: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseLoyaltyConfig"];
+                };
+            };
+        };
+    };
+    updateConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoyaltyConfigRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseLoyaltyConfig"];
+                };
+            };
+        };
+    };
+    my: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseLoyaltyAccountResponse"];
+                };
+            };
+        };
+    };
+    transactions_1: {
+        parameters: {
+            query?: {
+                page?: number;
+                offset?: number;
+                limit?: number;
+                total?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponsePageLoyaltyTransaction"];
+                };
+            };
+        };
+    };
+    myVouchers: {
+        parameters: {
+            query?: {
+                status?: string;
+                page?: number;
+                offset?: number;
+                limit?: number;
+                total?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponsePageMyVoucherResponse"];
+                };
+            };
+        };
+    };
+    redeem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedeemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseInteger"];
+                };
+            };
+        };
+    };
+    redeemable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseListRedeemableVoucherResponse"];
+                };
+            };
+        };
+    };
+    deleteTier: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseInteger"];
+                };
+            };
+        };
+    };
+    tiers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseListLoyaltyTier"];
+                };
+            };
+        };
+    };
+    saveTier: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoyaltyTierRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseLoyaltyTier"];
+                };
+            };
+        };
+    };
+    transactions: {
+        parameters: {
+            query: {
+                customerId: number;
+                page?: number;
+                offset?: number;
+                limit?: number;
+                total?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponsePageLoyaltyTransaction"];
                 };
             };
         };
@@ -9645,12 +10439,9 @@ export interface operations {
     };
     myOrders: {
         parameters: {
-            query?: {
+            query: {
                 orderStatus?: string;
-                page?: number;
-                offset?: number;
-                limit?: number;
-                total?: number;
+                pageable: components["schemas"]["Pageable"];
             };
             header?: never;
             path?: never;
