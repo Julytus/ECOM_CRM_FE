@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import type { AxiosError } from "axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ShoppingBag } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -19,7 +19,8 @@ import {
 import { PageWrapper } from "@/components/layout/page-warper";
 import { QueryBoundary } from "@/components/boundary";
 import { CheckoutForm } from "@/components/form/block/checkout-form";
-import { CheckoutSuccess } from "@/components/shop/checkout-success";
+import { PaymentWaiting } from "@/components/shop/checkout/payment-waiting";
+import { PaymentResult } from "@/components/shop/checkout/payment-result";
 import { createProductVariantDetailByIdsQueryOptions } from "@/lib/tanstack/options/product";
 import { submitCheckoutMutationOptions } from "@/lib/tanstack/options/checkout";
 import { usePaymentDone } from "@/lib/socket";
@@ -32,13 +33,17 @@ export const Route = createFileRoute("/_shop/checkout/")({ component: CheckoutPa
 
 function CheckoutPage() {
   const { getSelectedItems, clearSelected } = useCartStore();
+  const queryClient = useQueryClient();
   const selectedItems = getSelectedItems();
   const variantIds = React.useMemo(
     () => selectedItems.map((item) => item.variantId),
     [selectedItems]
   );
   const [checkoutResult, setCheckoutResult] = React.useState<CheckoutResponse | null>(null);
-  const [paymentConfirmed, setPaymentConfirmed] = React.useState(false);
+  const [paymentStatus, setPaymentStatus] = React.useState<number | undefined>();
+  const [paymentStartedAt, setPaymentStartedAt] = React.useState<number | null>(null);
+  const [paymentExpired, setPaymentExpired] = React.useState(false);
+  const [paymentRefreshSignal, setPaymentRefreshSignal] = React.useState(0);
 
   const query = useQuery({
     ...createProductVariantDetailByIdsQueryOptions({ ids: variantIds }),
@@ -55,6 +60,9 @@ function CheckoutPage() {
         }
         clearSelected();
         setCheckoutResult(result);
+        setPaymentStatus(undefined);
+        setPaymentExpired(false);
+        setPaymentStartedAt(Date.now());
         toast.success("Đặt hàng thành công!");
       },
       onError: (error) => {
@@ -64,7 +72,10 @@ function CheckoutPage() {
     });
   };
 
-  const handlePaymentDone = React.useCallback(() => setPaymentConfirmed(true), []);
+  const handlePaymentDone = React.useCallback(
+    () => setPaymentRefreshSignal((value) => value + 1),
+    []
+  );
   usePaymentDone(
     checkoutResult?.paymentMethod === "PAYOS" ? checkoutResult.invoiceId : undefined,
     handlePaymentDone
@@ -82,7 +93,43 @@ function CheckoutPage() {
     >
       <div className="relative container mx-auto px-4 py-8 sm:px-6 md:py-12 lg:px-8 lg:py-16">
         {checkoutResult ? (
-          <CheckoutSuccess result={checkoutResult} paymentConfirmed={paymentConfirmed} />
+          checkoutResult.paymentMethod === "PAYOS" ? (
+            (paymentStatus !== undefined && paymentStatus !== 3) || paymentExpired ? (
+              <PaymentResult
+                result={checkoutResult}
+                orderCode={checkoutResult.orderCode ?? ""}
+                invoiceStatus={
+                  paymentStatus !== undefined && paymentStatus !== 3 ? paymentStatus : 2
+                }
+                onRetry={(result) => {
+                  setCheckoutResult(result);
+                  setPaymentStartedAt(Date.now());
+                  setPaymentStatus(3);
+                  setPaymentExpired(false);
+                  queryClient.setQueryData(["payment-status", result.orderCode], {
+                    invoiceId: result.invoiceId,
+                    orderCode: result.orderCode,
+                    invoiceStatus: 3
+                  });
+                }}
+              />
+            ) : paymentStartedAt !== null ? (
+              <PaymentWaiting
+                result={checkoutResult}
+                startedAt={paymentStartedAt}
+                refreshSignal={paymentRefreshSignal}
+                onStatusChange={setPaymentStatus}
+                onExpired={() => setPaymentExpired(true)}
+              />
+            ) : null
+          ) : (
+            <PaymentResult
+              result={checkoutResult}
+              orderCode={checkoutResult.orderCode ?? ""}
+              invoiceStatus={3}
+              isCod
+            />
+          )
         ) : (
           <QueryBoundary
             status={variantIds.length > 0 ? query.status : "success"}
