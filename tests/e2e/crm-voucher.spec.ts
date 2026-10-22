@@ -8,7 +8,7 @@ async function mockVoucherApis(page: Page) {
     code: "WELCOME10",
     name: "Ưu đãi chào mừng",
     description: "Giảm giá đơn đầu tiên",
-    discountType: 0,
+    discountType: 1,
     discountValue: 10,
     maxDiscount: 50000,
     minInvoiceAmount: 100000,
@@ -84,7 +84,7 @@ async function openCreateForm(page: Page) {
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByLabel("Mã voucher").fill("SPRING20");
   await page.getByLabel("Tên voucher").fill("Ưu đãi mùa xuân");
-  await page.getByLabel("Giá trị giảm").fill("20");
+  await page.getByLabel("Giá trị giảm (đ)").fill("20000");
   await page.getByLabel("Bắt đầu").fill("2026-10-01T00:00");
   await page.getByLabel("Kết thúc").fill("2026-12-31T23:59");
 }
@@ -96,10 +96,23 @@ test.describe("CRM voucher management", () => {
     await page.getByRole("button", { name: "Tạo voucher" }).click();
     await expect(page.getByRole("dialog")).toBeHidden();
     expect(submitted).toHaveLength(1);
-    expect(submitted[0]).toMatchObject({ code: "SPRING20", name: "Ưu đãi mùa xuân", discountValue: 20, status: 1 });
+    expect(submitted[0]).toMatchObject({ code: "SPRING20", name: "Ưu đãi mùa xuân", discountType: 1, discountValue: 20000, status: 1 });
+    expect(submitted[0]).not.toHaveProperty("maxDiscount");
     expect(submitted[0]).not.toHaveProperty("pointsCost");
     expect(submitted[0]).not.toHaveProperty("redeemStock");
     expect(submitted[0]).not.toHaveProperty("minTierId");
+  });
+
+  test("offers a percentage discount with a maximum discount", async ({ page }) => {
+    const { submitted } = await mockVoucherApis(page);
+    await openCreateForm(page);
+    await page.getByRole("combobox", { name: "Loại giảm giá" }).click();
+    await page.getByRole("option", { name: "Giảm theo %" }).click();
+    await page.getByLabel("Giá trị giảm (%)").fill("20");
+    await page.getByLabel("Giảm tối đa (đ)").fill("50000");
+    await page.getByRole("button", { name: "Tạo voucher" }).click();
+    await expect(page.getByRole("dialog")).toBeHidden();
+    expect(submitted[0]).toMatchObject({ discountType: 2, discountValue: 20, maxDiscount: 50000 });
   });
 
   test("creates a points redemption voucher and selects a tier", async ({ page }) => {

@@ -31,7 +31,7 @@ type FormValues = {
 };
 
 const EMPTY_VALUES: FormValues = {
-  code: "", name: "", description: "", discountType: "0", discountValue: "", maxDiscount: "",
+  code: "", name: "", description: "", discountType: "1", discountValue: "", maxDiscount: "",
   minInvoiceAmount: "", startDate: "", endDate: "", totalQuantity: "", perUserLimit: "",
   status: "1", branchId: "", pointsCost: "", redeemStock: "", minTierId: ""
 };
@@ -75,7 +75,7 @@ export function VoucherDialog({
   React.useEffect(() => {
     setValues(voucher ? {
       code: voucher.code ?? "", name: voucher.name ?? "", description: voucher.description ?? "",
-      discountType: String(voucher.discountType ?? 0), discountValue: voucher.discountValue == null ? "" : String(voucher.discountValue),
+      discountType: String(voucher.discountType ?? 1), discountValue: voucher.discountValue == null ? "" : String(voucher.discountValue),
       maxDiscount: voucher.maxDiscount == null ? "" : String(voucher.maxDiscount),
       minInvoiceAmount: voucher.minInvoiceAmount == null ? "" : String(voucher.minInvoiceAmount),
       startDate: dateToInput(voucher.startDate), endDate: dateToInput(voucher.endDate),
@@ -90,7 +90,11 @@ export function VoucherDialog({
   }, [voucher, open]);
 
   const setField = (field: keyof FormValues, value: string) => {
-    setValues((current) => ({ ...current, [field]: value }));
+    setValues((current) => ({
+      ...current,
+      [field]: value,
+      ...(field === "discountType" && value !== "2" ? { maxDiscount: "" } : {})
+    }));
     setError("");
   };
 
@@ -169,9 +173,18 @@ export function VoucherDialog({
               <Label htmlFor="voucher-description">Mô tả</Label>
               <Textarea id="voucher-description" value={values.description} onChange={(event) => setField("description", event.target.value)} disabled={isLoading || !canUpdate} />
             </div>
-            {field("discountType", "Loại giảm giá", { type: "number", min: "0", step: "1", required: true })}
-            {field("discountValue", "Giá trị giảm", { type: "number", min: "0", step: "any", required: true })}
-            {field("maxDiscount", "Giảm tối đa", { type: "number", min: "0", step: "any" })}
+            <div className="space-y-2">
+              <Label htmlFor="voucher-discountType">Loại giảm giá</Label>
+              <Select value={values.discountType} onValueChange={(value) => setField("discountType", value)} disabled={isLoading || !canUpdate}>
+                <SelectTrigger id="voucher-discountType" aria-label="Loại giảm giá"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Giảm số tiền</SelectItem>
+                  <SelectItem value="2">Giảm theo %</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {field("discountValue", values.discountType === "2" ? "Giá trị giảm (%)" : "Giá trị giảm (đ)", { type: "number", min: "0", step: "any", required: true })}
+            {values.discountType === "2" && field("maxDiscount", "Giảm tối đa (đ)", { type: "number", min: "0", step: "any" })}
             {field("minInvoiceAmount", "Giá trị hóa đơn tối thiểu", { type: "number", min: "0", step: "any" })}
             {field("startDate", "Bắt đầu", { type: "datetime-local", required: true })}
             {field("endDate", "Kết thúc", { type: "datetime-local", required: true })}

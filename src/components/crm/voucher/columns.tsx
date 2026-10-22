@@ -68,7 +68,13 @@ export function createVoucherColumns({
     {
       id: "discount",
       header: "Ưu đãi",
-      cell: ({ row }) => `${row.original.discountType ?? "—"} · ${numberFormatter.format(row.original.discountValue ?? 0)}`
+      cell: ({ row }) => {
+        const { discountType, discountValue } = row.original;
+        const value = numberFormatter.format(discountValue ?? 0);
+        if (discountType === 1) return `Giảm số tiền · ${value} ₫`;
+        if (discountType === 2) return `Giảm theo % · ${value}%`;
+        return `— · ${value}`;
+      }
     },
     {
       id: "validity",
