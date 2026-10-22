@@ -2129,6 +2129,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/order/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["myOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/order/my/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["myOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/order/my/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelMyOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/order/update": {
         parameters: {
             query?: never;
@@ -2161,6 +2209,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/order/{id}/advance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["advance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payment/create": {
         parameters: {
             query?: never;
@@ -2171,6 +2235,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["createPayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payment/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payment/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["status"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4079,6 +4175,15 @@ export interface components {
             /** Format: int64 */
             result?: number;
         };
+        ApiResponseMapStringString: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: {
+                [key: string]: string;
+            };
+        };
         ApiResponseMessage: {
             /** Format: int32 */
             code?: number;
@@ -4296,6 +4401,13 @@ export interface components {
             message?: string;
             result?: components["schemas"]["PageOrderItem"];
         };
+        ApiResponsePageOrderResponse: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["PageOrderResponse"];
+        };
         ApiResponsePageProduct: {
             /** Format: int32 */
             code?: number;
@@ -4400,6 +4512,13 @@ export interface components {
             errors?: Record<string, never>;
             message?: string;
             result?: components["schemas"]["Payment"];
+        };
+        ApiResponsePaymentStatusResponse: {
+            /** Format: int32 */
+            code?: number;
+            errors?: Record<string, never>;
+            message?: string;
+            result?: components["schemas"]["PaymentStatusResponse"];
         };
         ApiResponsePermission: {
             /** Format: int32 */
@@ -5418,10 +5537,17 @@ export interface components {
             finalAmount?: number;
             /** Format: int32 */
             id?: number;
+            invoice?: components["schemas"]["Invoice"];
+            invoiceCode?: string;
+            /** Format: int32 */
+            invoiceId?: number;
+            /** Format: int32 */
+            invoiceStatus?: number;
             items?: components["schemas"]["OrderItem"][];
             note?: string;
             paymentMethod?: string;
             paymentStatus?: string;
+            payments?: components["schemas"]["Payment"][];
             receiverName?: string;
             receiverPhone?: string;
             /** Format: double */
@@ -5598,6 +5724,13 @@ export interface components {
             /** Format: int64 */
             total?: number;
         };
+        PageOrderResponse: {
+            items?: components["schemas"]["OrderResponse"][];
+            /** Format: int32 */
+            page?: number;
+            /** Format: int64 */
+            total?: number;
+        };
         PageProduct: {
             items?: components["schemas"]["Product"][];
             /** Format: int32 */
@@ -5728,6 +5861,19 @@ export interface components {
             status?: string;
             /** Format: date-time */
             updatedTime?: string;
+        };
+        PaymentStatusResponse: {
+            /** Format: int32 */
+            invoiceId?: number;
+            /** Format: int32 */
+            invoiceStatus?: number;
+            orderCode?: string;
+            /** Format: int32 */
+            orderId?: number;
+            orderStatus?: string;
+            /** Format: date-time */
+            paidAt?: string;
+            paymentStatus?: string;
         };
         Permission: {
             actions?: string;
@@ -9497,6 +9643,76 @@ export interface operations {
             };
         };
     };
+    myOrders: {
+        parameters: {
+            query?: {
+                orderStatus?: string;
+                page?: number;
+                offset?: number;
+                limit?: number;
+                total?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponsePageOrderResponse"];
+                };
+            };
+        };
+    };
+    myOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOrderResponse"];
+                };
+            };
+        };
+    };
+    cancelMyOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseString"];
+                };
+            };
+        };
+    };
     update_9: {
         parameters: {
             query?: never;
@@ -9545,6 +9761,30 @@ export interface operations {
             };
         };
     };
+    advance: {
+        parameters: {
+            query: {
+                to: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseString"];
+                };
+            };
+        };
+    };
     createPayment: {
         parameters: {
             query: {
@@ -9563,6 +9803,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponsePayment"];
+                };
+            };
+        };
+    };
+    retry: {
+        parameters: {
+            query: {
+                invoiceId: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseMapStringString"];
+                };
+            };
+        };
+    };
+    status: {
+        parameters: {
+            query: {
+                orderCode: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponsePaymentStatusResponse"];
                 };
             };
         };

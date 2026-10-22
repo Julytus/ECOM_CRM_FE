@@ -1,4 +1,5 @@
 import {
+  mutationOptions,
   queryOptions,
   type InfiniteData,
   type UseInfiniteQueryOptions,
@@ -8,13 +9,21 @@ import {
   createOrder,
   createStripePayment,
   createCashPayment,
-  type GetInfiniteOrdersProps,
   updateOrder,
   getOrders,
   getOrderById,
   deleteOrder,
   batchDeleteOrders
 } from "@/lib/axios/order";
+import {
+  advanceOrder,
+  cancelMyOrder,
+  getMyOrderDetail,
+  getMyOrders,
+  type AdvanceOrderParams,
+  type MyOrdersParams
+} from "@/lib/api/order";
+import type { components } from "@/lib/api/schema.gen";
 import type {
   CreateOrderRequest,
   CreateOrderResponse,
@@ -28,14 +37,76 @@ import type {
 } from "@/lib/types/order";
 
 export type OrdersPage = OrderListResponseDTO;
+type MyOrdersPage = components["schemas"]["PageOrderResponse"];
 
 const DEFAULT_LIMIT = 10;
+const ORDER_LIFECYCLE_INVALIDATIONS = [
+  ["orders"],
+  ["order"],
+  ["my-orders"],
+  ["my-order"],
+  ["invoices"],
+  ["invoice"],
+  ["revenue-report"],
+  ["revenue-summary"],
+  ["revenue-series"],
+  ["revenue-payment-method"],
+  ["revenue-top-products"],
+  ["dashboard", "revenue"]
+];
 
 export const orderByIdQueryOptions = (id: number) =>
   queryOptions({
     queryKey: ["order", id],
     queryFn: () => getOrderById(id),
     enabled: typeof id === "number" && id > 0
+  });
+
+export const myOrdersInfiniteQueryOptions = (
+  params: MyOrdersParams = {}
+): UseInfiniteQueryOptions<
+  MyOrdersPage,
+  Error,
+  InfiniteData<MyOrdersPage>,
+  unknown[],
+  number
+> => {
+  const limit = params.limit ?? DEFAULT_LIMIT;
+
+  return {
+    queryKey: ["my-orders", { ...params, limit }],
+    queryFn: async ({ pageParam }) => {
+      const result = await getMyOrders({ ...params, page: pageParam, limit });
+      if (!result) throw new Error("Không nhận được danh sách đơn hàng");
+      return result;
+    },
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      if (lastPage.total === undefined) return undefined;
+      const nextPage = (lastPage.page ?? lastPageParam) + 1;
+      return nextPage <= Math.ceil(lastPage.total / limit) ? nextPage : undefined;
+    },
+    initialPageParam: params.page ?? 1,
+    refetchOnWindowFocus: false
+  };
+};
+
+export const myOrderDetailQueryOptions = (id: number) =>
+  queryOptions({
+    queryKey: ["my-order", id],
+    queryFn: () => getMyOrderDetail(id),
+    enabled: id > 0
+  });
+
+export const cancelMyOrderMutationOptions = () =>
+  mutationOptions({
+    mutationFn: (id: number) => cancelMyOrder(id),
+    meta: { invalidatesQuery: ORDER_LIFECYCLE_INVALIDATIONS }
+  });
+
+export const advanceOrderMutationOptions = () =>
+  mutationOptions({
+    mutationFn: (params: AdvanceOrderParams) => advanceOrder(params),
+    meta: { invalidatesQuery: ORDER_LIFECYCLE_INVALIDATIONS }
   });
 
 export const createOrderMutationOptions = (): UseMutationOptions<

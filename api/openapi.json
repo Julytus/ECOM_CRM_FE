@@ -1039,6 +1039,27 @@
         },
         "type": "object"
       },
+      "ApiResponseMapStringString": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponseMessage": {
         "properties": {
           "code": {
@@ -1597,6 +1618,24 @@
         },
         "type": "object"
       },
+      "ApiResponsePageOrderResponse": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/PageOrderResponse"
+          }
+        },
+        "type": "object"
+      },
       "ApiResponsePageProduct": {
         "properties": {
           "code": {
@@ -1863,6 +1902,24 @@
           },
           "result": {
             "$ref": "#/components/schemas/Payment"
+          }
+        },
+        "type": "object"
+      },
+      "ApiResponsePaymentStatusResponse": {
+        "properties": {
+          "code": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "errors": {
+            "type": "object"
+          },
+          "message": {
+            "type": "string"
+          },
+          "result": {
+            "$ref": "#/components/schemas/PaymentStatusResponse"
           }
         },
         "type": "object"
@@ -4304,6 +4361,20 @@
             "format": "int32",
             "type": "integer"
           },
+          "invoice": {
+            "$ref": "#/components/schemas/Invoice"
+          },
+          "invoiceCode": {
+            "type": "string"
+          },
+          "invoiceId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "invoiceStatus": {
+            "format": "int32",
+            "type": "integer"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/OrderItem"
@@ -4318,6 +4389,12 @@
           },
           "paymentStatus": {
             "type": "string"
+          },
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/Payment"
+            },
+            "type": "array"
           },
           "receiverName": {
             "type": "string"
@@ -4788,6 +4865,25 @@
         },
         "type": "object"
       },
+      "PageOrderResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderResponse"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "total": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
       "PageProduct": {
         "properties": {
           "items": {
@@ -5124,6 +5220,36 @@
           },
           "updatedTime": {
             "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PaymentStatusResponse": {
+        "properties": {
+          "invoiceId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "invoiceStatus": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "orderCode": {
+            "type": "string"
+          },
+          "orderId": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "orderStatus": {
+            "type": "string"
+          },
+          "paidAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "paymentStatus": {
             "type": "string"
           }
         },
@@ -11598,6 +11724,134 @@
         ]
       }
     },
+    "/order/my": {
+      "get": {
+        "operationId": "myOrders",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderStatus",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "total",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageOrderResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "order-controller"
+        ]
+      }
+    },
+    "/order/my/{id}": {
+      "get": {
+        "operationId": "myOrder",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOrderResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "order-controller"
+        ]
+      }
+    },
+    "/order/my/{id}/cancel": {
+      "post": {
+        "operationId": "cancelMyOrder",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "order-controller"
+        ]
+      }
+    },
     "/order/update": {
       "post": {
         "operationId": "update_9",
@@ -11658,6 +11912,45 @@
         ]
       }
     },
+    "/order/{id}/advance": {
+      "post": {
+        "operationId": "advance",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "order-controller"
+        ]
+      }
+    },
     "/payment/create": {
       "post": {
         "operationId": "createPayment",
@@ -11678,6 +11971,67 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponsePayment"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "payment-controller"
+        ]
+      }
+    },
+    "/payment/retry": {
+      "post": {
+        "operationId": "retry",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "invoiceId",
+            "required": true,
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseMapStringString"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "payment-controller"
+        ]
+      }
+    },
+    "/payment/status": {
+      "get": {
+        "operationId": "status",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderCode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePaymentStatusResponse"
                 }
               }
             },
