@@ -12,6 +12,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
     "api:sync": "node scripts/api-sync.mjs",
+    "seed:loyalty": "node scripts/seed-loyalty.mjs",
     "api:slice": "node scripts/api-slice.mjs"
   },
   "dependencies": {
