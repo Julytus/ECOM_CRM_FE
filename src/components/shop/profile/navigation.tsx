@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { User, ShoppingBag, LogOut } from "lucide-react";
+import { User, ShoppingBag, LogOut, Award } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -44,6 +44,12 @@ export function ProfileNavigation({ user }: ProfileNavigationProps) {
               icon={<ShoppingBag size={18} />}
               label="Đơn hàng"
               isActive={location.pathname === "/orders"}
+            />
+            <ProfileNavItem
+              to="/loyalty"
+              icon={<Award size={18} />}
+              label="Điểm thưởng"
+              isActive={location.pathname === "/loyalty"}
             />
 
             <Separator className="my-2" />
