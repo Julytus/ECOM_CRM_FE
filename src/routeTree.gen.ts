@@ -32,6 +32,7 @@ import { Route as PaymentOrderCodeCancelRouteImport } from './routes/payment.$or
 import { Route as ShopProductIdRouteImport } from './routes/_shop/product.$id'
 import { Route as ShopProfileProfileRouteImport } from './routes/_shop/_profile/profile'
 import { Route as ShopProfileOrdersRouteImport } from './routes/_shop/_profile/orders'
+import { Route as ShopProfileLoyaltyVouchersRouteImport } from './routes/_shop/_profile/loyalty-vouchers'
 import { Route as ShopProfileLoyaltyRouteImport } from './routes/_shop/_profile/loyalty'
 import { Route as ShopAuthRegisterRouteImport } from './routes/_shop/_auth/register'
 import { Route as ShopAuthLogoutRouteImport } from './routes/_shop/_auth/logout'
@@ -151,6 +152,12 @@ const ShopProfileOrdersRoute = ShopProfileOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => ShopRoute,
 } as any)
+const ShopProfileLoyaltyVouchersRoute =
+  ShopProfileLoyaltyVouchersRouteImport.update({
+    id: '/_profile/loyalty-vouchers',
+    path: '/loyalty-vouchers',
+    getParentRoute: () => ShopRoute,
+  } as any)
 const ShopProfileLoyaltyRoute = ShopProfileLoyaltyRouteImport.update({
   id: '/_profile/loyalty',
   path: '/loyalty',
@@ -193,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/logout': typeof ShopAuthLogoutRoute
   '/register': typeof ShopAuthRegisterRoute
   '/loyalty': typeof ShopProfileLoyaltyRoute
+  '/loyalty-vouchers': typeof ShopProfileLoyaltyVouchersRoute
   '/orders': typeof ShopProfileOrdersRoute
   '/profile': typeof ShopProfileProfileRoute
   '/product/$id': typeof ShopProductIdRoute
@@ -221,6 +229,7 @@ export interface FileRoutesByTo {
   '/logout': typeof ShopAuthLogoutRoute
   '/register': typeof ShopAuthRegisterRoute
   '/loyalty': typeof ShopProfileLoyaltyRoute
+  '/loyalty-vouchers': typeof ShopProfileLoyaltyVouchersRoute
   '/orders': typeof ShopProfileOrdersRoute
   '/profile': typeof ShopProfileProfileRoute
   '/product/$id': typeof ShopProductIdRoute
@@ -251,6 +260,7 @@ export interface FileRoutesById {
   '/_shop/_auth/logout': typeof ShopAuthLogoutRoute
   '/_shop/_auth/register': typeof ShopAuthRegisterRoute
   '/_shop/_profile/loyalty': typeof ShopProfileLoyaltyRoute
+  '/_shop/_profile/loyalty-vouchers': typeof ShopProfileLoyaltyVouchersRoute
   '/_shop/_profile/orders': typeof ShopProfileOrdersRoute
   '/_shop/_profile/profile': typeof ShopProfileProfileRoute
   '/_shop/product/$id': typeof ShopProductIdRoute
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/loyalty'
+    | '/loyalty-vouchers'
     | '/orders'
     | '/profile'
     | '/product/$id'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/register'
     | '/loyalty'
+    | '/loyalty-vouchers'
     | '/orders'
     | '/profile'
     | '/product/$id'
@@ -338,6 +350,7 @@ export interface FileRouteTypes {
     | '/_shop/_auth/logout'
     | '/_shop/_auth/register'
     | '/_shop/_profile/loyalty'
+    | '/_shop/_profile/loyalty-vouchers'
     | '/_shop/_profile/orders'
     | '/_shop/_profile/profile'
     | '/_shop/product/$id'
@@ -517,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopProfileOrdersRouteImport
       parentRoute: typeof ShopRoute
     }
+    '/_shop/_profile/loyalty-vouchers': {
+      id: '/_shop/_profile/loyalty-vouchers'
+      path: '/loyalty-vouchers'
+      fullPath: '/loyalty-vouchers'
+      preLoaderRoute: typeof ShopProfileLoyaltyVouchersRouteImport
+      parentRoute: typeof ShopRoute
+    }
     '/_shop/_profile/loyalty': {
       id: '/_shop/_profile/loyalty'
       path: '/loyalty'
@@ -556,6 +576,7 @@ interface ShopRouteChildren {
   ShopAuthLogoutRoute: typeof ShopAuthLogoutRoute
   ShopAuthRegisterRoute: typeof ShopAuthRegisterRoute
   ShopProfileLoyaltyRoute: typeof ShopProfileLoyaltyRoute
+  ShopProfileLoyaltyVouchersRoute: typeof ShopProfileLoyaltyVouchersRoute
   ShopProfileOrdersRoute: typeof ShopProfileOrdersRoute
   ShopProfileProfileRoute: typeof ShopProfileProfileRoute
   ShopProductIdRoute: typeof ShopProductIdRoute
@@ -570,6 +591,7 @@ const ShopRouteChildren: ShopRouteChildren = {
   ShopAuthLogoutRoute: ShopAuthLogoutRoute,
   ShopAuthRegisterRoute: ShopAuthRegisterRoute,
   ShopProfileLoyaltyRoute: ShopProfileLoyaltyRoute,
+  ShopProfileLoyaltyVouchersRoute: ShopProfileLoyaltyVouchersRoute,
   ShopProfileOrdersRoute: ShopProfileOrdersRoute,
   ShopProfileProfileRoute: ShopProfileProfileRoute,
   ShopProductIdRoute: ShopProductIdRoute,

@@ -3,8 +3,17 @@ import type { components } from "@/lib/api/schema.gen";
 
 type LoyaltyAccountResponse = components["schemas"]["ApiResponseLoyaltyAccountResponse"];
 type LoyaltyTransactionsResponse = components["schemas"]["ApiResponsePageLoyaltyTransaction"];
+type RedeemableVouchersResponse = components["schemas"]["ApiResponseListRedeemableVoucherResponse"];
+type RedeemVoucherResponse = components["schemas"]["ApiResponseInteger"];
+type MyVouchersResponse = components["schemas"]["ApiResponsePageMyVoucherResponse"];
 
 export type MyLoyaltyTransactionsParams = {
+  page?: number;
+  limit?: number;
+};
+
+export type MyVouchersParams = {
+  status?: string;
   page?: number;
   limit?: number;
 };
@@ -18,6 +27,21 @@ export const getMyLoyaltyTransactions = async (params: MyLoyaltyTransactionsPara
   const res = await axiosInstance.get<LoyaltyTransactionsResponse>("/loyalty/my/transactions", {
     params
   });
+  return res.data.result;
+};
+
+export const getRedeemable = async () => {
+  const res = await axiosInstance.get<RedeemableVouchersResponse>("/loyalty/redeemable");
+  return res.data.result;
+};
+
+export const redeemVoucher = async (voucherId: number) => {
+  const res = await axiosInstance.post<RedeemVoucherResponse>("/loyalty/redeem", { voucherId });
+  return res.data.result;
+};
+
+export const getMyVouchers = async (params: MyVouchersParams = {}) => {
+  const res = await axiosInstance.get<MyVouchersResponse>("/loyalty/my/vouchers", { params });
   return res.data.result;
 };
 
