@@ -10,6 +10,41 @@ type MyVouchersResponse = components["schemas"]["ApiResponsePageMyVoucherRespons
 type LoyaltyTierRequest = components["schemas"]["LoyaltyTierRequest"];
 type LoyaltyConfigResponse = components["schemas"]["ApiResponseLoyaltyConfig"];
 type LoyaltyConfigRequest = components["schemas"]["LoyaltyConfigRequest"];
+type LoyaltyAccountAdminResponse = components["schemas"]["ApiResponseLoyaltyAccount"];
+type LoyaltyAdjustRequest = components["schemas"]["LoyaltyAdjustRequest"];
+type CustomerAccountLinkRequest = components["schemas"]["CustomerAccountLinkRequest"];
+
+export type LoyaltyTransactionsParams = { customerId: number; page?: number; limit?: number };
+
+export const getLoyaltyAccount = async (customerId: number) => {
+  const res = await axiosInstance.get<LoyaltyAccountAdminResponse>("/loyalty/account", {
+    params: { customerId }
+  });
+  return res.data.result;
+};
+
+export const getLoyaltyTransactions = async (params: LoyaltyTransactionsParams) => {
+  const res = await axiosInstance.get<LoyaltyTransactionsResponse>("/loyalty/transactions", {
+    params
+  });
+  return res.data.result;
+};
+
+export const adjustLoyalty = async (body: LoyaltyAdjustRequest) => {
+  const res = await axiosInstance.post<components["schemas"]["ApiResponseBoolean"]>(
+    "/loyalty/adjust",
+    body
+  );
+  return res.data.result;
+};
+
+export const linkCustomerAccount = async (body: CustomerAccountLinkRequest) => {
+  const res = await axiosInstance.post<components["schemas"]["ApiResponseInteger"]>(
+    "/customer/linkAccount",
+    body
+  );
+  return res.data.result;
+};
 
 export type MyLoyaltyTransactionsParams = {
   page?: number;

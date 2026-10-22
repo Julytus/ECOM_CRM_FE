@@ -21,6 +21,7 @@ import { Route as CrmProductRouteImport } from './routes/crm/product'
 import { Route as CrmPermissionRouteImport } from './routes/crm/permission'
 import { Route as CrmOrderRouteImport } from './routes/crm/order'
 import { Route as CrmModuleRouteImport } from './routes/crm/module'
+import { Route as CrmLoyaltyCustomerRouteImport } from './routes/crm/loyalty-customer'
 import { Route as CrmLoyaltyRouteImport } from './routes/crm/loyalty'
 import { Route as CrmInvoiceRouteImport } from './routes/crm/invoice'
 import { Route as CrmDashboardRouteImport } from './routes/crm/dashboard'
@@ -97,6 +98,11 @@ const CrmOrderRoute = CrmOrderRouteImport.update({
 const CrmModuleRoute = CrmModuleRouteImport.update({
   id: '/module',
   path: '/module',
+  getParentRoute: () => CrmRoute,
+} as any)
+const CrmLoyaltyCustomerRoute = CrmLoyaltyCustomerRouteImport.update({
+  id: '/loyalty-customer',
+  path: '/loyalty-customer',
   getParentRoute: () => CrmRoute,
 } as any)
 const CrmLoyaltyRoute = CrmLoyaltyRouteImport.update({
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/loyalty': typeof CrmLoyaltyRoute
+  '/crm/loyalty-customer': typeof CrmLoyaltyCustomerRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/loyalty': typeof CrmLoyaltyRoute
+  '/crm/loyalty-customer': typeof CrmLoyaltyCustomerRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
@@ -265,6 +273,7 @@ export interface FileRoutesById {
   '/crm/dashboard': typeof CrmDashboardRoute
   '/crm/invoice': typeof CrmInvoiceRoute
   '/crm/loyalty': typeof CrmLoyaltyRoute
+  '/crm/loyalty-customer': typeof CrmLoyaltyCustomerRoute
   '/crm/module': typeof CrmModuleRoute
   '/crm/order': typeof CrmOrderRoute
   '/crm/permission': typeof CrmPermissionRoute
@@ -298,6 +307,7 @@ export interface FileRouteTypes {
     | '/crm/dashboard'
     | '/crm/invoice'
     | '/crm/loyalty'
+    | '/crm/loyalty-customer'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/crm/dashboard'
     | '/crm/invoice'
     | '/crm/loyalty'
+    | '/crm/loyalty-customer'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
@@ -361,6 +372,7 @@ export interface FileRouteTypes {
     | '/crm/dashboard'
     | '/crm/invoice'
     | '/crm/loyalty'
+    | '/crm/loyalty-customer'
     | '/crm/module'
     | '/crm/order'
     | '/crm/permission'
@@ -475,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/module'
       fullPath: '/crm/module'
       preLoaderRoute: typeof CrmModuleRouteImport
+      parentRoute: typeof CrmRoute
+    }
+    '/crm/loyalty-customer': {
+      id: '/crm/loyalty-customer'
+      path: '/loyalty-customer'
+      fullPath: '/crm/loyalty-customer'
+      preLoaderRoute: typeof CrmLoyaltyCustomerRouteImport
       parentRoute: typeof CrmRoute
     }
     '/crm/loyalty': {
@@ -645,6 +664,7 @@ interface CrmRouteChildren {
   CrmDashboardRoute: typeof CrmDashboardRoute
   CrmInvoiceRoute: typeof CrmInvoiceRoute
   CrmLoyaltyRoute: typeof CrmLoyaltyRoute
+  CrmLoyaltyCustomerRoute: typeof CrmLoyaltyCustomerRoute
   CrmModuleRoute: typeof CrmModuleRoute
   CrmOrderRoute: typeof CrmOrderRoute
   CrmPermissionRoute: typeof CrmPermissionRoute
@@ -660,6 +680,7 @@ const CrmRouteChildren: CrmRouteChildren = {
   CrmDashboardRoute: CrmDashboardRoute,
   CrmInvoiceRoute: CrmInvoiceRoute,
   CrmLoyaltyRoute: CrmLoyaltyRoute,
+  CrmLoyaltyCustomerRoute: CrmLoyaltyCustomerRoute,
   CrmModuleRoute: CrmModuleRoute,
   CrmOrderRoute: CrmOrderRoute,
   CrmPermissionRoute: CrmPermissionRoute,

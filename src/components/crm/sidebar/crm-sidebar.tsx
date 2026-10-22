@@ -11,6 +11,7 @@ import {
   Receipt,
   Send,
   ShoppingCart,
+  Search,
   Users
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -55,6 +56,7 @@ const PERMISSION_ITEM = {
 } as const;
 const INVOICE_ITEM = { code: "INVOICE", title: "Hóa đơn", url: "/crm/invoice", icon: Receipt } as const;
 const LOYALTY_ITEM = { code: "LOYALTY", title: "Loyalty", url: "/crm/loyalty", icon: Award } as const;
+const LOYALTY_CUSTOMER_ITEM = { code: "LOYALTY", title: "Tra cứu điểm", url: "/crm/loyalty-customer", icon: Search } as const;
 
 /** Nhóm gộp: tài nguyên / chức vụ / module. Hiện khi có VIEW ít nhất một mục con. */
 const SYSTEM_GROUP_ITEMS = [
@@ -98,7 +100,10 @@ export function CrmSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ? [{ title: INVOICE_ITEM.title, url: INVOICE_ITEM.url, icon: INVOICE_ITEM.icon }]
       : []),
     ...(canView(LOYALTY_ITEM.code)
-      ? [{ title: LOYALTY_ITEM.title, url: LOYALTY_ITEM.url, icon: LOYALTY_ITEM.icon }]
+      ? [
+          { title: LOYALTY_ITEM.title, url: LOYALTY_ITEM.url, icon: LOYALTY_ITEM.icon },
+          { title: LOYALTY_CUSTOMER_ITEM.title, url: LOYALTY_CUSTOMER_ITEM.url, icon: LOYALTY_CUSTOMER_ITEM.icon }
+        ]
       : []),
     ...(systemChildren.length > 0
       ? [{ title: "Cấu hình hệ thống", icon: Database, items: systemChildren }]

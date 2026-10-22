@@ -15,8 +15,13 @@ import {
   saveTier,
   deleteTier,
   getLoyaltyConfig,
-  updateLoyaltyConfig
+  updateLoyaltyConfig,
+  getLoyaltyAccount,
+  getLoyaltyTransactions,
+  adjustLoyalty,
+  linkCustomerAccount
 } from "@/lib/api/loyalty";
+import { getCustomers } from "@/lib/api/customer";
 import type { components } from "@/lib/api/schema.gen";
 import type { UseMutationOptions } from "@tanstack/react-query";
 
@@ -24,6 +29,50 @@ type LoyaltyTransactionsPage = components["schemas"]["PageLoyaltyTransaction"];
 type MyVouchersPage = components["schemas"]["PageMyVoucherResponse"];
 
 const DEFAULT_LIMIT = 10;
+
+export const customersQueryOptions = (keyword: string, page = 1, limit = 10) =>
+  queryOptions({
+    queryKey: ["loyalty-customer-search", { keyword, page, limit }],
+    queryFn: async () => (await getCustomers({ keyword, page, limit })) ?? { items: [], page, total: 0 },
+    enabled: keyword.trim().length > 0,
+    retry: false
+  });
+
+export const loyaltyAccountQueryOptions = (customerId?: number) =>
+  queryOptions({
+    queryKey: ["loyalty-admin-account", customerId],
+    queryFn: async () => {
+      const account = await getLoyaltyAccount(customerId!);
+      if (!account) throw new Error("Không nhận được tài khoản điểm.");
+      return account;
+    },
+    enabled: typeof customerId === "number",
+    retry: false
+  });
+
+export const loyaltyTransactionsQueryOptions = (customerId?: number, page = 1, limit = 10) =>
+  queryOptions({
+    queryKey: ["loyalty-admin-transactions", { customerId, page, limit }],
+    queryFn: async () => {
+      const result = await getLoyaltyTransactions({ customerId: customerId!, page, limit });
+      if (!result) throw new Error("Không nhận được lịch sử điểm.");
+      return result;
+    },
+    enabled: typeof customerId === "number",
+    retry: false
+  });
+
+export const adjustLoyaltyMutationOptions = (): UseMutationOptions<
+  boolean | undefined,
+  Error,
+  components["schemas"]["LoyaltyAdjustRequest"]
+> => ({ mutationFn: adjustLoyalty });
+
+export const linkCustomerAccountMutationOptions = (): UseMutationOptions<
+  number | undefined,
+  Error,
+  components["schemas"]["CustomerAccountLinkRequest"]
+> => ({ mutationFn: linkCustomerAccount });
 
 export const myLoyaltyQueryOptions = queryOptions({
   queryKey: ["my-loyalty"],
