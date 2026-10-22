@@ -18,6 +18,7 @@ export const checkoutSchema = z.object({
   branchId: z.number().optional(),
   buyerEmail: z.string().optional(),
   customerId: z.number().optional(),
+  customerVoucherId: z.number().optional(),
   note: z.string().optional(),
   voucherCode: z.string().optional()
 });

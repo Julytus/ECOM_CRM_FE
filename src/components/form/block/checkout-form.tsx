@@ -15,6 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { ImageWithFallback } from "@/components/image/image-with-fallback";
 import { useAppForm } from "@/components/form/hooks";
 import { previewCheckoutMutationOptions } from "@/lib/tanstack/options/checkout";
+import { formatVnd } from "@/lib/format";
+import { LoyaltyVoucherSelect } from "@/components/shop/checkout/loyalty-voucher-select";
 import type { components } from "@/lib/api/schema.gen";
 import type { ProductVariantDetailDTO } from "@/lib/types/product";
 import type { CartItem } from "@/lib/types/cart";
@@ -52,10 +54,16 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
   const [preview, setPreview] = React.useState<CheckoutPreview>(emptyPreview);
   const [previewError, setPreviewError] = React.useState<string | null>(null);
   const [voucherInput, setVoucherInput] = React.useState("");
+  const [customerVoucherId, setCustomerVoucherId] = React.useState<number | undefined>();
+  const [previewForKey, setPreviewForKey] = React.useState<string | null>(null);
   const previewMutation = useMutation(previewCheckoutMutationOptions());
   const itemSignature = items
     .map(({ variantId, quantity }) => `${variantId}:${quantity}`)
     .join(",");
+  const previewRequestKey = JSON.stringify([itemSignature, voucherInput.trim(), customerVoucherId]);
+  const latestPreviewKey = React.useRef(previewRequestKey);
+  latestPreviewKey.current = previewRequestKey;
+  const voucherPayload = buildVoucherPayload(voucherInput, customerVoucherId);
 
   const form = useAppForm({
     defaultValues: {
@@ -71,7 +79,7 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
     } as CheckoutFormData,
     validators: { onSubmit: checkoutSchema },
     onSubmit: async ({ value }) => {
-      if (!items.length) return;
+      if (!items.length || previewForKey !== previewRequestKey || previewError) return;
 
       const payload: CheckoutRequest = {
         items: items.map((item) => ({
@@ -86,7 +94,7 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
         addressLine: value.addressLine.trim(),
         ...(value.note.trim() ? { note: value.note.trim() } : {}),
         paymentMethod: value.paymentMethod,
-        ...(voucherInput.trim() ? { voucherCode: voucherInput.trim() } : {})
+        ...voucherPayload
       };
 
       onSubmit(payload);
@@ -96,25 +104,33 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
   React.useEffect(() => {
     if (items.length === 0) {
       setPreview(emptyPreview);
+      setPreviewForKey(null);
       return;
     }
 
+    setPreviewForKey(null);
+    setPreviewError(null);
     const timeoutId = window.setTimeout(() => {
-      setPreviewError(null);
       previewMutation.mutate(
         {
           items: items.map((item) => ({
             productVariantId: item.variantId,
             quantity: item.quantity
           })),
-          ...(voucherInput.trim() ? { voucherCode: voucherInput.trim() } : {})
+          ...voucherPayload
         },
         {
-          onSuccess: (result) => setPreview(result ?? emptyPreview),
+          onSuccess: (result) => {
+            if (latestPreviewKey.current !== previewRequestKey) return;
+            setPreview(result ?? emptyPreview);
+            setPreviewForKey(previewRequestKey);
+          },
           onError: (error) => {
+            if (latestPreviewKey.current !== previewRequestKey) return;
             const responseMessage = (error as AxiosError<{ message?: string }>).response?.data
               ?.message;
             setPreview(emptyPreview);
+            setPreviewForKey(null);
             setPreviewError(responseMessage || "Không thể áp dụng voucher hoặc tính phí đơn hàng.");
           }
         }
@@ -124,7 +140,7 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
     return () => window.clearTimeout(timeoutId);
     // The item signature tracks cart changes without depending on array identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemSignature, voucherInput]);
+  }, [previewRequestKey]);
 
   const setSameAsBuyer = (checked: boolean) => {
     setReceiverIsBuyer(checked);
@@ -256,6 +272,7 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
               onChange={(event) => setVoucherInput(event.target.value)}
             />
           </label>
+          <LoyaltyVoucherSelect value={customerVoucherId} onChange={setCustomerVoucherId} />
           {previewError && (
             <p role="alert" className="text-destructive text-sm">
               {previewError}
@@ -340,7 +357,8 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
           <Separator className="my-6" />
           <div className="space-y-3" aria-live="polite">
             <MoneyRow label="Tạm tính" value={preview.subtotal} />
-            <MoneyRow label="Giảm giá" value={preview.discount} tone="success" />
+            <MoneyRow label="Giảm giá (voucher)" value={preview.discount} tone="success" />
+            <MoneyRow label="Giảm giá (đổi điểm)" value={preview.loyaltyDiscount} tone="success" />
             <MoneyRow label="Phí vận chuyển" value={preview.shippingFee} />
             {preview.voucherCode && (
               <p className="text-success text-xs font-medium">
@@ -348,7 +366,7 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
               </p>
             )}
             <Separator className="my-2" />
-            <MoneyRow label="Tổng cộng" value={preview.finalAmount} emphasis />
+            <MoneyRow label="Tổng" value={preview.finalAmount} emphasis />
             {previewMutation.isPending && (
               <p className="text-muted-foreground text-xs">Đang cập nhật tổng tiền…</p>
             )}
@@ -357,7 +375,7 @@ export function CheckoutForm({ items, details, onSubmit, isPending }: CheckoutFo
             type="submit"
             size="lg"
             className="mt-6 h-12 w-full rounded-xl text-sm font-semibold tracking-[0.12em] uppercase md:h-14"
-            disabled={isPending || items.length === 0}
+            disabled={isPending || items.length === 0 || previewMutation.isPending || previewForKey !== previewRequestKey || Boolean(previewError)}
             aria-busy={isPending}
           >
             {isPending ? (
@@ -399,10 +417,20 @@ function MoneyRow({
           tone === "success" && value ? "text-success" : undefined
         )}
       >
-        {value === undefined ? "—" : `${value.toLocaleString("vi-VN")}₫`}
+        {value === undefined ? "—" : formatVnd(value)}
       </span>
     </div>
   );
+}
+
+function buildVoucherPayload(
+  voucherCode: string,
+  customerVoucherId?: number
+): Pick<CheckoutRequest, "voucherCode" | "customerVoucherId"> {
+  return {
+    ...(voucherCode.trim() ? { voucherCode: voucherCode.trim() } : {}),
+    ...(customerVoucherId !== undefined ? { customerVoucherId } : {})
+  };
 }
 
 function SectionHeader({
