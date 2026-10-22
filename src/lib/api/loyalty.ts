@@ -4,6 +4,7 @@ import type { components } from "@/lib/api/schema.gen";
 type LoyaltyAccountResponse = components["schemas"]["ApiResponseLoyaltyAccountResponse"];
 type LoyaltyTransactionsResponse = components["schemas"]["ApiResponsePageLoyaltyTransaction"];
 type RedeemableVouchersResponse = components["schemas"]["ApiResponseListRedeemableVoucherResponse"];
+type LoyaltyTiersResponse = components["schemas"]["ApiResponseListLoyaltyTier"];
 type RedeemVoucherResponse = components["schemas"]["ApiResponseInteger"];
 type MyVouchersResponse = components["schemas"]["ApiResponsePageMyVoucherResponse"];
 
@@ -32,6 +33,11 @@ export const getMyLoyaltyTransactions = async (params: MyLoyaltyTransactionsPara
 
 export const getRedeemable = async () => {
   const res = await axiosInstance.get<RedeemableVouchersResponse>("/loyalty/redeemable");
+  return res.data.result;
+};
+
+export const getTiers = async () => {
+  const res = await axiosInstance.get<LoyaltyTiersResponse>("/loyalty/tier/list");
   return res.data.result;
 };
 

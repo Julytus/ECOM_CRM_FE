@@ -14,7 +14,8 @@ export function RedeemableCard({
   onRedeemError,
   guest = false,
   linked = true,
-  requiredTierName
+  requiredTierName,
+  showShortfall = false
 }: {
   voucher: RedeemableVoucher;
   balance: number;
@@ -22,6 +23,7 @@ export function RedeemableCard({
   guest?: boolean;
   linked?: boolean;
   requiredTierName?: string;
+  showShortfall?: boolean;
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const reason = balance < 0 ? "Số dư điểm đang âm" : voucher.tierOk === false ? "Chưa đủ hạng" : voucher.affordable === false ? "Không đủ điểm" : undefined;
@@ -75,7 +77,7 @@ export function RedeemableCard({
           <p className="text-sm text-muted-foreground">Tài khoản chưa liên kết, liên hệ cửa hàng</p>
         ) : reason ? (
           <p className="text-sm text-destructive">
-            {reason === "Không đủ điểm" && voucher.affordable === false
+            {showShortfall && reason === "Không đủ điểm" && voucher.affordable === false
               ? `Thiếu ${pointsShortfall.toLocaleString("vi-VN")} điểm`
               : reason === "Chưa đủ hạng"
                 ? reason

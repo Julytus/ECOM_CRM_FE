@@ -8,17 +8,16 @@ import { PageWrapper } from "@/components/layout/page-warper";
 import { RedeemableCard } from "@/components/shop/loyalty/redeemable-card";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
-import axiosInstance from "@/lib/axios/instance";
 import type { components } from "@/lib/api/schema.gen";
 import { isUnlinkedAccountError } from "@/lib/api/loyalty";
 import { meQueryOptions } from "@/lib/tanstack/options/auth";
 import {
   myLoyaltyQueryOptions,
-  redeemableQueryOptions
+  redeemableQueryOptions,
+  tiersQueryOptions
 } from "@/lib/tanstack/options/loyalty";
 
 type LoyaltyTier = components["schemas"]["LoyaltyTier"];
-type LoyaltyTiersResponse = components["schemas"]["ApiResponseListLoyaltyTier"];
 
 export const Route = createFileRoute("/_shop/vouchers")({ component: VouchersPage });
 
@@ -28,15 +27,7 @@ function VouchersPage() {
   // Backend probe (2026-10-22): GET /api/loyalty/redeemable without a token returned HTTP 401.
   // Keep the request independent of /loyalty/my so unlinked customers can still browse the catalog.
   const redeemableQuery = useQuery(redeemableQueryOptions);
-  const tiersQuery = useQuery({
-    queryKey: ["loyalty-tiers"],
-    queryFn: async () => {
-      const response = await axiosInstance.get<LoyaltyTiersResponse>("/loyalty/tier/list");
-      return response.data.result ?? [];
-    },
-    retry: false,
-    refetchOnWindowFocus: false
-  });
+  const tiersQuery = useQuery(tiersQueryOptions);
 
   const unlinked = isUnlinkedAccountError(accountQuery.error);
   const loggedIn = Boolean(userQuery.data);
@@ -124,6 +115,7 @@ function VouchersPage() {
                 guest={!loggedIn}
                 linked={accountReady}
                 requiredTierName={voucher.minTierId === undefined ? undefined : tierNames.get(voucher.minTierId)}
+                showShortfall
               />
             ))}
           </section>

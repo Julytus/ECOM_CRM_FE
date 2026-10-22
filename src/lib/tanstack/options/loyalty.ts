@@ -8,6 +8,7 @@ import {
 import {
   getMyLoyalty,
   getMyLoyaltyTransactions,
+  getTiers,
   getMyVouchers,
   getRedeemable,
   redeemVoucher
@@ -37,6 +38,13 @@ export const redeemableQueryOptions = queryOptions({
     if (!result) throw new Error("Không nhận được danh sách voucher đổi điểm.");
     return result;
   },
+  retry: false,
+  refetchOnWindowFocus: false
+});
+
+export const tiersQueryOptions = queryOptions({
+  queryKey: ["loyalty-tiers"],
+  queryFn: async () => (await getTiers()) ?? [],
   retry: false,
   refetchOnWindowFocus: false
 });
