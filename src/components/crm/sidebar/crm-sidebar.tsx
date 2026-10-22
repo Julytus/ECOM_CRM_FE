@@ -34,6 +34,7 @@ const SALES_ITEMS = [
   { code: "PRODUCT", title: "Sản phẩm", url: "/crm/product" },
   { code: "ORDER", title: "Đơn hàng", url: "/crm/order" },
   { code: "CATEGORY_ITEM", title: "Danh mục", url: "/crm/category" },
+  { code: "VOUCHER", title: "Voucher", url: "/crm/voucher" },
   { code: "REPORT", title: "Doanh thu", url: "/crm/revenue" }
 ] as const;
 

@@ -13,6 +13,7 @@ import { Route as CrmRouteImport } from './routes/crm'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ShopRouteImport } from './routes/_shop'
 import { Route as ShopIndexRouteImport } from './routes/_shop/index'
+import { Route as CrmVoucherRouteImport } from './routes/crm/voucher'
 import { Route as CrmUserRouteImport } from './routes/crm/user'
 import { Route as CrmRoleRouteImport } from './routes/crm/role'
 import { Route as CrmRevenueRouteImport } from './routes/crm/revenue'
@@ -59,6 +60,11 @@ const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ShopRoute,
+} as any)
+const CrmVoucherRoute = CrmVoucherRouteImport.update({
+  id: '/voucher',
+  path: '/voucher',
+  getParentRoute: () => CrmRoute,
 } as any)
 const CrmUserRoute = CrmUserRouteImport.update({
   id: '/user',
@@ -216,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/crm/revenue': typeof CrmRevenueRoute
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
+  '/crm/voucher': typeof CrmVoucherRoute
   '/': typeof ShopIndexRoute
   '/login': typeof ShopAuthLoginRoute
   '/logout': typeof ShopAuthLogoutRoute
@@ -248,6 +255,7 @@ export interface FileRoutesByTo {
   '/crm/revenue': typeof CrmRevenueRoute
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
+  '/crm/voucher': typeof CrmVoucherRoute
   '/': typeof ShopIndexRoute
   '/login': typeof ShopAuthLoginRoute
   '/logout': typeof ShopAuthLogoutRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/crm/revenue': typeof CrmRevenueRoute
   '/crm/role': typeof CrmRoleRoute
   '/crm/user': typeof CrmUserRoute
+  '/crm/voucher': typeof CrmVoucherRoute
   '/_shop/': typeof ShopIndexRoute
   '/_shop/_auth/login': typeof ShopAuthLoginRoute
   '/_shop/_auth/logout': typeof ShopAuthLogoutRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/crm/revenue'
     | '/crm/role'
     | '/crm/user'
+    | '/crm/voucher'
     | '/'
     | '/login'
     | '/logout'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/crm/revenue'
     | '/crm/role'
     | '/crm/user'
+    | '/crm/voucher'
     | '/'
     | '/login'
     | '/logout'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '/crm/revenue'
     | '/crm/role'
     | '/crm/user'
+    | '/crm/voucher'
     | '/_shop/'
     | '/_shop/_auth/login'
     | '/_shop/_auth/logout'
@@ -432,6 +444,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof ShopIndexRouteImport
       parentRoute: typeof ShopRoute
+    }
+    '/crm/voucher': {
+      id: '/crm/voucher'
+      path: '/voucher'
+      fullPath: '/crm/voucher'
+      preLoaderRoute: typeof CrmVoucherRouteImport
+      parentRoute: typeof CrmRoute
     }
     '/crm/user': {
       id: '/crm/user'
@@ -673,6 +692,7 @@ interface CrmRouteChildren {
   CrmRevenueRoute: typeof CrmRevenueRoute
   CrmRoleRoute: typeof CrmRoleRoute
   CrmUserRoute: typeof CrmUserRoute
+  CrmVoucherRoute: typeof CrmVoucherRoute
 }
 
 const CrmRouteChildren: CrmRouteChildren = {
@@ -689,6 +709,7 @@ const CrmRouteChildren: CrmRouteChildren = {
   CrmRevenueRoute: CrmRevenueRoute,
   CrmRoleRoute: CrmRoleRoute,
   CrmUserRoute: CrmUserRoute,
+  CrmVoucherRoute: CrmVoucherRoute,
 }
 
 const CrmRouteWithChildren = CrmRoute._addFileChildren(CrmRouteChildren)
